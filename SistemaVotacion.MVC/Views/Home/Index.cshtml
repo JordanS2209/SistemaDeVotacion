@@ -1,0 +1,113 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Inicio - Sistema de Voto Electrónico</title>
+    <link rel="stylesheet" href="~/css/home.css" />
+</head>
+
+<body>
+    <main class="page">
+
+        <section class="grid-hero">
+            <!-- IZQUIERDA -->
+            <div class="hero">
+                <h1 class="hero-title">Sistema de Voto Electrónico</h1>
+                <p class="hero-subtitle">
+                    Gestión de procesos electorales y participación ciudadana con una interfaz clara y confiable.
+                </p>
+
+                <div class="actions">
+                    <a class="btn btn-primary" href="/Auth/Login">Iniciar sesión</a>
+                    <a class="btn btn-outline" href="/Auth/Register">Registrarse</a>
+                   
+                </div>
+
+                <div class="note">
+                    <strong>Nota:</strong> La votación se habilitará cuando el proceso esté en estado <b>ABIERTO</b>.
+                </div>
+            </div>
+
+            
+            <aside class="panel">
+                <div class="panel-top">
+                    <div>
+                        <h3 class="panel-title">Proceso electoral actual</h3>
+                        <p class="panel-subtitle">Estado y ventana de votación</p>
+                    </div>
+
+                    <span class="status status-closed">CERRADO</span>
+                </div>
+
+                <div class="panel-body">
+                    <p class="panel-empty">
+                        Aún no hay un proceso habilitado para votar. Cuando se active, aquí verás el nombre y las fechas.
+                    </p>
+
+                    <div class="keyline"></div>
+
+                    <div class="kv">
+                        <div class="kv-row">
+                            <span class="kv-label">Proceso</span>
+                            <span class="kv-value">—</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Inicio</span>
+                            <span class="kv-value">—</span>
+                        </div>
+                        <div class="kv-row">
+                            <span class="kv-label">Fin</span>
+                            <span class="kv-value">—</span>
+                        </div>
+                    </div>
+
+                    <div class="stats">
+                        <div class="stat">
+                            <span class="stat-label">Votantes</span>
+                            <span class="stat-value">0</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Votos</span>
+                            <span class="stat-value">0</span>
+                        </div>
+                    </div>
+
+                   
+
+                    <div class="panel-actions">
+                        <a class="btn btn-soft" href="/Elecciones/Procesos">Ver procesos</a>
+                        <a class="btn btn-outline btn-disabled" href="#">Emitir voto</a>
+                    </div>
+                </div>
+            </aside>
+        </section>
+
+        
+        <section class="cards">
+            <article class="card">
+                <h4>Votantes</h4>
+                <p>Iniciopara unicamente para votantes.</p>
+                <a class="btn btn-soft" href="/Auth/Login">Acceder</a>
+            </article>
+
+            <article class="card">
+                <h4>Proceso electoral</h4>
+                <p>Gestión de procesos, fechas, listas y candidatos.</p>
+                <a class="btn btn-soft" href="/Elecciones/Procesos">Ver procesos</a>
+            </article>
+
+            <article class="card">
+                <h4>Resultados</h4>
+                <p>Consulta de resultados una vez finalizado el proceso.</p>
+                <a class="btn btn-soft" href="/Resultados">Ver resultados</a>
+            </article>
+        </section>
+
+    </main>
+</body>
+</html>

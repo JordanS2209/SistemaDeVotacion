@@ -24,11 +24,9 @@ namespace SistemaVotacion.Modelos
 
         public string NumeroIdentificacion { get; set; }
 
-
-        //public TipoIdentificacion? TipoIdentificacion { get; set; }
+        public TipoIdentificacion? TipoIdentificacion { get; set; }
 
         public virtual Rol? Rol { get; set; }
 
-        //public Votante? Votante { get; set; }
     }
 }

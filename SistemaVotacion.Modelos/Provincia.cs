@@ -7,12 +7,15 @@ using System.Threading.Tasks;
 
 namespace SistemaVotacion.Modelos
 {
-    public class Provincias
+    public class Provincia
     {
         [Key] public int Id { get; set; }
 
         public string NombreProv { get; set; }
 
         public int CodigoPostal { get; set; }
+
+        //public List<Ciudad>? Ciudades { get; set; } = new List<Ciudad>();
+
     }
 }

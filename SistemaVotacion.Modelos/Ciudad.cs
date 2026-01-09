@@ -9,7 +9,7 @@ namespace SistemaVotacion.Modelos
 {
     public class Ciudad
     {
-        [Key] public string Id { get; set; }
+        [Key] public int Id { get; set; }
 
         public string NombreCiu { get; set; }
 
@@ -19,7 +19,7 @@ namespace SistemaVotacion.Modelos
 
         public virtual Provincia? Provincia { get; set; }
 
-        //public List <Parroquia>? Parroquias { get; set; } = new List<Parroquia>();
+        public List <Parroquia>? Parroquias { get; set; } = new List<Parroquia>();
 
     }
 }

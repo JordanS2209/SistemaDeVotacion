@@ -13,9 +13,9 @@ namespace SistemaVotacion.Modelos
 
         public string NombreProv { get; set; }
 
-        public int CodigoPostal { get; set; }
+        public int CodigoPostalProv { get; set; }
 
-        //public List<Ciudad>? Ciudades { get; set; } = new List<Ciudad>();
+        public List<Ciudad>? Ciudades { get; set; } = new List<Ciudad>();
 
     }
 }

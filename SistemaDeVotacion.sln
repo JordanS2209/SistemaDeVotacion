@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36616.10 d17.14
+VisualStudioVersion = 17.14.36616.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SistemaVotacion.Modelos", "SistemaVotacion.Modelos\SistemaVotacion.Modelos.csproj", "{D4C26787-6C43-42F0-91D1-448BDCEE2899}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SistemaVotacion.MVC", "SistemaVotacion.MVC\SistemaVotacion.MVC.csproj", "{270D3B1F-30F5-4B44-B360-B2A9AB48D577}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{D4C26787-6C43-42F0-91D1-448BDCEE2899}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4C26787-6C43-42F0-91D1-448BDCEE2899}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4C26787-6C43-42F0-91D1-448BDCEE2899}.Release|Any CPU.Build.0 = Release|Any CPU
+		{270D3B1F-30F5-4B44-B360-B2A9AB48D577}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{270D3B1F-30F5-4B44-B360-B2A9AB48D577}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{270D3B1F-30F5-4B44-B360-B2A9AB48D577}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{270D3B1F-30F5-4B44-B360-B2A9AB48D577}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

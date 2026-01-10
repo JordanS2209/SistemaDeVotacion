@@ -1,0 +1,89 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Boleta de Votación</title>
+    <link rel="stylesheet" href="~/css/Boleta.css">
+</head>
+<body>
+
+    <div class="boleta-container">
+
+        <header class="boleta-header">
+            <h1>Elecciones Presidenciales</h1>
+            <p>Seleccione un (1) binomio presidencial</p>
+        </header>
+
+        <section class="boleta-opciones">
+
+            
+            <label class="opcion-card">
+                <input type="radio" name="voto">
+
+                <div class="opcion-content">
+                    <div class="partido">
+                        <img src="img/partido1.png">
+                        <span class="lista">Lista 4-35</span>
+                        <p>Alianza Democrática Nacional</p>
+                    </div>
+
+                    <div class="binomio">
+                        <div class="persona">
+                            <img src="img/presidente1.jpg">
+                            <span class="cargo">Presidente</span>
+                            <span class="nombre">Daniel Noboa</span>
+                        </div>
+
+                        <div class="persona">
+                            <img src="img/vice1.jpg">
+                            <span class="cargo">Vicepresidenta</span>
+                            <span class="nombre">Verónica Abad</span>
+                        </div>
+                    </div>
+                </div>
+            </label>
+
+            
+            <label class="opcion-card">
+                <input type="radio" name="voto">
+
+                <div class="opcion-content">
+                    <div class="partido">
+                        <img src="img/partido2.png">
+                        <span class="lista">Lista 5</span>
+                        <p>Movimiento Revolución Ciudadana</p>
+                    </div>
+
+                    <div class="binomio">
+                        <div class="persona">
+                            <img src="img/presidente2.jpg">
+                            <span class="cargo">Presidenta</span>
+                            <span class="nombre">Luisa González</span>
+                        </div>
+
+                        <div class="persona">
+                            <img src="img/vice2.jpg">
+                            <span class="cargo">Vicepresidente</span>
+                            <span class="nombre">Andrés Arauz</span>
+                        </div>
+                    </div>
+                </div>
+            </label>
+
+        </section>
+
+        <div class="acciones">
+            <button class="btn-votar">Confirmar Voto</button>
+        </div>
+
+    </div>
+<div class="contador-elecciones">
+    <span class="titulo">Cierre de votación en</span>
+    <span id="tiempo-restante">00:00</span>
+</div>
+
+</body>
+</html>

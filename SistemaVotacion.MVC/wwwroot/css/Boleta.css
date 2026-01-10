@@ -1,0 +1,222 @@
+﻿* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    background: linear-gradient(135deg, #eef2f7, #d9e2ec);
+}
+
+
+.boleta-container {
+    width: 100vw;
+    min-height: 100vh;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+
+.boleta-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+    .boleta-header h1 {
+        margin: 0;
+        font-size: 28px;
+        color: #1f2933;
+    }
+
+    .boleta-header p {
+        color: #52606d;
+    }
+
+
+.boleta-opciones {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+}
+
+
+.opcion-card {
+    cursor: pointer;
+    position: relative;
+}
+
+    .opcion-card input {
+        position: absolute;
+        opacity: 0;
+    }
+
+.opcion-content {
+    border-radius: 16px;
+    background: #f8fafc;
+    padding: 20px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.opcion-card:hover .opcion-content {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+}
+
+.opcion-card input:checked + .opcion-content {
+    border-color: #2563eb;
+    background: #eff6ff;
+}
+
+
+.partido {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+    .partido img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .partido .lista {
+        background: #2563eb;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+
+.binomio {
+    display: flex;
+    gap: 20px;
+}
+
+
+.persona {
+    background: white;
+    border-radius: 14px;
+    padding: 15px;
+    text-align: center;
+    width: 100%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+    .persona img {
+        width: 100%;
+        max-width: 120px;
+        height: auto;
+        aspect-ratio: 3 / 4;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-bottom: 10px;
+    }
+
+.cargo {
+    display: block;
+    font-size: 13px;
+    color: #2563eb;
+    font-weight: 600;
+}
+
+.nombre {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111827;
+}
+
+
+.acciones {
+    margin-top: 40px;
+    text-align: center;
+}
+
+.btn-votar {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 16px 48px;
+    border-radius: 999px;
+    font-size: 17px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+    .btn-votar:hover {
+        background: #1d4ed8;
+    }
+
+
+.contador-elecciones {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(31, 41, 55, 0.95);
+    color: #ffffff;
+    padding: 14px 20px;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 14px;
+    z-index: 999;
+}
+
+    .contador-elecciones .titulo {
+        font-size: 12px;
+        color: #9ca3af;
+    }
+
+#tiempo-restante {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #38bdf8;
+}
+
+
+@media (max-width: 900px) {
+    .boleta-opciones {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .boleta-header h1 {
+        font-size: 22px;
+    }
+
+    .binomio {
+        flex-direction: column;
+    }
+
+    .btn-votar {
+        width: 100%;
+        font-size: 18px;
+        padding: 18px;
+    }
+
+    .contador-elecciones {
+        bottom: 10px;
+        right: 10px;
+        padding: 12px 16px;
+    }
+}

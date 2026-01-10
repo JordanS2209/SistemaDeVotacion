@@ -9,7 +9,7 @@ namespace SistemaVotacion.Modelos
 {
     public class JuntaReceptora
     {
-        [Key] public int IdJunta { get; set; }
+        [Key] public int Id { get; set; }
         public string NumeroJunta { get; set; }
         public string? Genero { get; set; }
         public int IdRecinto { get; set; }

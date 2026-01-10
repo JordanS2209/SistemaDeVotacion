@@ -12,6 +12,6 @@ namespace SistemaVotacion.Modelos
         [Key] public int Id { get; set; }
         public string NombreDignidad { get; set; } 
 
-        //public virtual List<Candidato> Candidatos { get; set; } = new List<Candidato>();
+        public virtual List<Candidato>? Candidatos { get; set; } = new List<Candidato>();
     }
 }

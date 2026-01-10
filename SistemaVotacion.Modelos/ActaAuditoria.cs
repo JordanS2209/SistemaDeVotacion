@@ -15,12 +15,13 @@ namespace SistemaVotacion.Modelos
         public int IdJunta { get; set; }
         public int TotalSufragantesPadron { get; set; }
         public int VotosEnUrna { get; set; }
-        public string HashSeguridad { get; set; } = null!;
+        public string HashSeguridad { get; set; }
         public DateTime FechaCierre { get; set; }
 
         public  ProcesoElectoral? Procesos { get; set; }
+
         public  JuntaReceptora? Juntas { get; set; }
 
-        //public virtual List<ResultadoDetalleAuditoria> DetallesResultados { get; set; } = new List<ResultadoDetalleAuditoria>();
+        public virtual List<ResultadoDetalleAuditoria> DetallesResultados { get; set; } = new List<ResultadoDetalleAuditoria>();
     }
 }

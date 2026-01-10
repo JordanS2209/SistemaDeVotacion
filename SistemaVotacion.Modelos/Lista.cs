@@ -10,15 +10,15 @@ namespace SistemaVotacion.Modelos
 {
     public class Lista
     {
-        [Key] public int IdLista { get; set; }
+        [Key] public int Id { get; set; }
         public string NombreLista { get; set; } 
         public int NumeroLista { get; set; }
         public int IdProceso { get; set; }
 
          public  ProcesoElectoral? Procesos { get; set; }
 
-        //public  List<Candidato> Candidatos { get; set; } = new List<Candidato>();
+        public  List<Candidato>? Candidatos { get; set; } = new List<Candidato>();
 
-        //public  List<Multimedia> RecursosMultimedia { get; set; } = new List<Multimedia>();
+        public  List<Multimedia>? RecursosMultimedia { get; set; } = new List<Multimedia>();
     }
 }

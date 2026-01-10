@@ -18,5 +18,7 @@ namespace SistemaVotacion.Modelos
         public int IdCiudad { get; set; }
 
         public  Ciudad? Ciudad { get; set; }
+
+        public  List<RecintoElectoral> Recintos { get; set; } = new List<RecintoElectoral>();
     }
 }

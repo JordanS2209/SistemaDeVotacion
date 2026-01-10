@@ -17,7 +17,7 @@ namespace SistemaVotacion.Modelos
 
         public int IdProvincia { get; set; }
 
-        public virtual Provincia? Provincia { get; set; }
+        public  Provincia? Provincia { get; set; }
 
         public List <Parroquia>? Parroquias { get; set; } = new List<Parroquia>();
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SistemaVotacion.Modelos
 {
-    public class RecientoElectoral
+    public class RecintoElectoral
     {
         [Key] public int Id { get; set; }
 
@@ -20,5 +20,7 @@ namespace SistemaVotacion.Modelos
         public int IdParroquia { get; set; }
 
         public Parroquia? Parroquia { get; set; }
+
+        //public  List<JuntaReceptora> JuntasReceptoras { get; set; } = new List<JuntaReceptora>();
     }
 }

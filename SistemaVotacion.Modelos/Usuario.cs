@@ -18,15 +18,25 @@ namespace SistemaVotacion.Modelos
 
         public string Email { get; set; }
 
+        public DateTime FechaNacimiento { get; set; }
+
         public int IdRol { get; set; }
 
-        public int IdTipoIdentificacion { get; set; }
+        public int IdTipoIdent { get; set; }
 
         public string NumeroIdentificacion { get; set; }
+
+        public string CodigoIdent { get; set; } 
+
+        public DateTime FechaExpedicion { get; set; }
 
         public TipoIdentificacion? TipoIdentificacion { get; set; }
 
         public virtual Rol? Rol { get; set; }
+
+        //public virtual List<Login> Logins { get; set; } = new List<Login>();
+
+        public virtual Votante? PerfilVotante { get; set; }
 
     }
 }

@@ -14,10 +14,10 @@ namespace SistemaVotacion.Modelos
         public string? Genero { get; set; }
         public int IdRecinto { get; set; }
 
-        public  RecintoElectoral? Recinto { get; set; }
+        public  RecintoElectoral? Recintos { get; set; }
 
-        public virtual List<Votante>? Votantes { get; set; } = new List<Votante>();
+        public  List<Votante>? Votantes { get; set; } = new List<Votante>();
 
-       // public virtual List<VotoDetalle>? Votos { get; set; } = new List<VotoDetalle>();
+        public  List<VotoDetalle>? Votos { get; set; } = new List<VotoDetalle>();
     }
 }

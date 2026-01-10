@@ -14,7 +14,7 @@ namespace SistemaVotacion.Modelos
         public int IdJunta { get; set; }
         public int IdProceso { get; set; }
 
-        //public  TipoVoto? TipoVoto { get; set; }
+        public  TipoVoto? TipoVoto { get; set; }
 
         public  JuntaReceptora? Junta { get; set; }
 

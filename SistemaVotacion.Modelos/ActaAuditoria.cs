@@ -10,7 +10,7 @@ namespace SistemaVotacion.Modelos
 {
     public class ActaAuditoria
     {
-        [Key] public int IdActa { get; set; }
+        [Key] public int Id { get; set; }
         public int IdProceso { get; set; }
         public int IdJunta { get; set; }
         public int TotalSufragantesPadron { get; set; }

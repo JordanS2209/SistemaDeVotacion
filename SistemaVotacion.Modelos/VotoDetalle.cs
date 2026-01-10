@@ -18,6 +18,6 @@ namespace SistemaVotacion.Modelos
 
         public  JuntaReceptora? Junta { get; set; }
 
-        //public  ProcesoElectoral? Proceso { get; set; }
+        public  ProcesoElectoral? Proceso { get; set; }
     }
 }

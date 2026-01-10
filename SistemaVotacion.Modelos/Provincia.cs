@@ -11,7 +11,7 @@ namespace SistemaVotacion.Modelos
     {
         [Key] public int Id { get; set; }
 
-        public string NombreProv { get; set; }
+        public string NombreProvincia { get; set; }
 
         public int CodigoPostalProv { get; set; }
 

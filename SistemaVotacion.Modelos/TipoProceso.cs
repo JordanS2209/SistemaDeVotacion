@@ -11,7 +11,7 @@ namespace SistemaVotacion.Modelos
     {
         [Key] public int Id{ get; set; }
 
-        public string NombreTipoProc { get; set; }
+        public string NombreTipoProceso { get; set; }
 
         public string? Descripcion { get; set; }
 

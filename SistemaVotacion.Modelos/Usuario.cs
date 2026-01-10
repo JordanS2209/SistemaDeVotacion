@@ -22,11 +22,11 @@ namespace SistemaVotacion.Modelos
 
         public int IdRol { get; set; }
 
-        public int IdTipoIdent { get; set; }
+        public int IdTipoIdentificacion { get; set; }
 
         public string NumeroIdentificacion { get; set; }
 
-        public string CodigoIdent { get; set; } 
+        public string CodigoIdentificacion { get; set; } 
 
         public DateTime FechaExpedicion { get; set; }
 

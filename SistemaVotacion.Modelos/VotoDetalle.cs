@@ -9,9 +9,11 @@ namespace SistemaVotacion.Modelos
 {
     public class VotoDetalle
     {
-        [Key] public int IdVoto { get; set; }
+        [Key] public int Id { get; set; }
         public int IdTipoVoto { get; set; }
+
         public int IdJunta { get; set; }
+
         public int IdProceso { get; set; }
 
         public  TipoVoto? TipoVoto { get; set; }

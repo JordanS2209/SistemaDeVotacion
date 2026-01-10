@@ -8,18 +8,19 @@ using System.Threading.Tasks;
 
 namespace SistemaVotacion.Modelos
 {
-    public class Votante
+    public class Padron
     {
         [Key] public int Id { get; set; }
 
-        public int IdJunta { get; set; }
+        public bool HaVotado { get; set; }
 
-        public int IdUsuario { get; set; }
+        public int IdProceso { get; set; }
 
-        public virtual Usuario? Usuario { get; set; }
+        public int IdVotante { get; set; }
 
-        public  JuntaReceptora? Junta { get; set; }
 
-        public List<Padron> ParticipacionesEnPadron { get; set; } = new List<Padron>();
+        public virtual ProcesoElectoral? Proceso { get; set; }
+
+        public virtual Votante? Votante { get; set; }
     }
 }

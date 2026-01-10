@@ -34,7 +34,7 @@ namespace SistemaVotacion.Modelos
 
         public virtual Rol? Rol { get; set; }
 
-        //public virtual List<Login> Logins { get; set; } = new List<Login>();
+        public virtual List<Login> Logins { get; set; } = new List<Login>();
 
         public virtual Votante? PerfilVotante { get; set; }
 

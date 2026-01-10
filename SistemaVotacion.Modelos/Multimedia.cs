@@ -11,9 +11,13 @@ namespace SistemaVotacion.Modelos
     public class Multimedia
     {
         [Key] public int Id { get; set; }
-        public string UrlFoto { get; set; } = null!;
+
+        public string UrlFoto { get; set; }
+
         public string? Descripcion { get; set; }
+
         public int? IdCandidato { get; set; }
+
         public int? IdLista { get; set; }
 
         public  Candidato? Candidato { get; set; }

@@ -11,11 +11,15 @@ namespace SistemaVotacion.Modelos
     public class ResultadoDetalleAuditoria
     {
         [Key] public int Id { get; set; }
+
         public int IdActa { get; set; }
+
         public int? IdLista { get; set; }
+
         public int VotosContabilizados { get; set; }
 
         public  ActaAuditoria? Acta { get; set; }
+
         public  Lista? Lista { get; set; }
     }
 }

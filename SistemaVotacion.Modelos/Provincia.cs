@@ -11,11 +11,10 @@ namespace SistemaVotacion.Modelos
     {
         [Key] public int Id { get; set; }
 
-        public string NombreProvincia { get; set; }
+        [Required, MaxLength(100)]
+        public string NombreProv{ get; set; }
 
-        public int CodigoPostalProv { get; set; }
-
-        public List<Ciudad>? Ciudades { get; set; } = new List<Ciudad>();
+        public List<Ciudad>? Ciudades { get; set; } 
 
     }
 }

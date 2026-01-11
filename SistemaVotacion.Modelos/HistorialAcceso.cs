@@ -8,11 +8,14 @@ using System.Threading.Tasks;
 
 namespace SistemaVotacion.Modelos
 {
-    public class Login
+    public class HistorialAcceso
     {
         [Key] public int Id { get; set; }
 
+        [Required, MaxLength(100)]
         public string Username { get; set; }
+
+        [Required]
 
         public string PasswordHash { get; set; }
 
@@ -20,6 +23,7 @@ namespace SistemaVotacion.Modelos
 
         public bool? CuentaBloqueada { get; set; }
 
+        [Required, ForeignKey("Usuario")]
         public int IdUsuario { get; set; }
 
         public  Usuario? Usuario { get; set; }

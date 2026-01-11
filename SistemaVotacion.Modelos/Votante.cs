@@ -12,14 +12,16 @@ namespace SistemaVotacion.Modelos
     {
         [Key] public int Id { get; set; }
 
+        [Required, ForeignKey("JuntaReceptora")]
         public int IdJunta { get; set; }
 
+         [Required, ForeignKey("Usuario")]
         public int IdUsuario { get; set; }
 
         public virtual Usuario? Usuario { get; set; }
 
         public  JuntaReceptora? Junta { get; set; }
 
-        public List<Padron> ParticipacionesEnPadron { get; set; } = new List<Padron>();
+        public List<Padron> ParticipacionesEnPadron { get; set; }
     }
 }

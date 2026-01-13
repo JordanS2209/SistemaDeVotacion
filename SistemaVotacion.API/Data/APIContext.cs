@@ -26,5 +26,7 @@ using SistemaVotacion.Modelos;
 
         public DbSet<SistemaVotacion.Modelos.Usuario> Usuarios { get; set; } = default!;
 
-public DbSet<SistemaVotacion.Modelos.ActaAuditoria> ActaAuditoria { get; set; } = default!;
+        public DbSet<SistemaVotacion.Modelos.ActaAuditoria> ActasAuditorias { get; set; } = default!;
+
+        public DbSet<SistemaVotacion.Modelos.Ciudad> Ciudades { get; set; } = default!;
     }

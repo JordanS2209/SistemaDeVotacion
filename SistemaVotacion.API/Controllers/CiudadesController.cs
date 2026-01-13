@@ -11,47 +11,47 @@ namespace SistemaVotacion.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ActasAuditoriasController : ControllerBase
+    public class CiudadesController : ControllerBase
     {
         private readonly APIContext _context;
 
-        public ActasAuditoriasController(APIContext context)
+        public CiudadesController(APIContext context)
         {
             _context = context;
         }
 
-        // GET: api/ActasAuditorias
+        // GET: api/Ciudades
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ActaAuditoria>>> GetActaAuditoria()
+        public async Task<ActionResult<IEnumerable<Ciudad>>> GetCiudad()
         {
-            return await _context.ActasAuditorias.ToListAsync();
+            return await _context.Ciudades.ToListAsync();
         }
 
-        // GET: api/ActasAuditorias/5
+        // GET: api/Ciudades/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ActaAuditoria>> GetActaAuditoria(int id)
+        public async Task<ActionResult<Ciudad>> GetCiudad(int id)
         {
-            var actaAuditoria = await _context.ActasAuditorias.FindAsync(id);
+            var ciudad = await _context.Ciudades.FindAsync(id);
 
-            if (actaAuditoria == null)
+            if (ciudad == null)
             {
                 return NotFound();
             }
 
-            return actaAuditoria;
+            return ciudad;
         }
 
-        // PUT: api/ActasAuditorias/5
+        // PUT: api/Ciudades/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutActaAuditoria(int id, ActaAuditoria actaAuditoria)
+        public async Task<IActionResult> PutCiudad(int id, Ciudad ciudad)
         {
-            if (id != actaAuditoria.Id)
+            if (id != ciudad.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(actaAuditoria).State = EntityState.Modified;
+            _context.Entry(ciudad).State = EntityState.Modified;
 
             try
             {
@@ -59,7 +59,7 @@ namespace SistemaVotacion.API.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ActaAuditoriaExists(id))
+                if (!CiudadExists(id))
                 {
                     return NotFound();
                 }
@@ -72,36 +72,36 @@ namespace SistemaVotacion.API.Controllers
             return NoContent();
         }
 
-        // POST: api/ActasAuditorias
+        // POST: api/Ciudades
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<ActaAuditoria>> PostActaAuditoria(ActaAuditoria actaAuditoria)
+        public async Task<ActionResult<Ciudad>> PostCiudad(Ciudad ciudad)
         {
-            _context.ActasAuditorias.Add(actaAuditoria);
+            _context.Ciudades.Add(ciudad);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetActaAuditoria", new { id = actaAuditoria.Id }, actaAuditoria);
+            return CreatedAtAction("GetCiudad", new { id = ciudad.Id }, ciudad);
         }
 
-        // DELETE: api/ActasAuditorias/5
+        // DELETE: api/Ciudades/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteActaAuditoria(int id)
+        public async Task<IActionResult> DeleteCiudad(int id)
         {
-            var actaAuditoria = await _context.ActasAuditorias.FindAsync(id);
-            if (actaAuditoria == null)
+            var ciudad = await _context.Ciudades.FindAsync(id);
+            if (ciudad == null)
             {
                 return NotFound();
             }
 
-            _context.ActasAuditorias.Remove(actaAuditoria);
+            _context.Ciudades.Remove(ciudad);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool ActaAuditoriaExists(int id)
+        private bool CiudadExists(int id)
         {
-            return _context.ActasAuditorias.Any(e => e.Id == id);
+            return _context.Ciudades.Any(e => e.Id == id);
         }
     }
 }

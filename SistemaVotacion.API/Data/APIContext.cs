@@ -33,4 +33,6 @@ using SistemaVotacion.Modelos;
         public DbSet<SistemaVotacion.Modelos.Dignidad> Dignidades { get; set; } = default!;
 
         public DbSet<SistemaVotacion.Modelos.JuntaReceptora> JuntasReceptoras { get; set; } = default!;
+
+        public DbSet<SistemaVotacion.Modelos.Padron> Padrones { get; set; } = default!;
     }

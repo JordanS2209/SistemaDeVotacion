@@ -37,4 +37,6 @@ using SistemaVotacion.Modelos;
         public DbSet<SistemaVotacion.Modelos.Padron> Padrones { get; set; } = default!;
 
         public DbSet<SistemaVotacion.Modelos.Parroquia> Parroquias { get; set; } = default!;
+
+        public DbSet<SistemaVotacion.Modelos.ProcesoElectoral> ProcesosElectorales { get; set; } = default!;
     }

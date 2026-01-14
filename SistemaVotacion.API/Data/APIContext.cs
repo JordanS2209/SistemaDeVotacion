@@ -25,4 +25,18 @@ using SistemaVotacion.Modelos;
         public DbSet<SistemaVotacion.Modelos.Rol> Roles { get; set; } = default!;
 
         public DbSet<SistemaVotacion.Modelos.Usuario> Usuarios { get; set; } = default!;
+
+public DbSet<SistemaVotacion.Modelos.Provincia> Provincias { get; set; } = default!;
+
+public DbSet<SistemaVotacion.Modelos.RecintoElectoral> RecintoElectorales { get; set; } = default!;
+
+public DbSet<SistemaVotacion.Modelos.ResultadoDetalleAuditoria> ResultadoDetalleAuditorias { get; set; } = default!;
+
+public DbSet<SistemaVotacion.Modelos.TipoIdentificacion> TipoIdentificaciones { get; set; } = default!;
+
+public DbSet<SistemaVotacion.Modelos.TipoProceso> TipoProcesos { get; set; } = default!;
+
+public DbSet<SistemaVotacion.Modelos.TipoVoto> TipoVotos { get; set; } = default!;
+
+public DbSet<SistemaVotacion.Modelos.VotoDetalle> VotoDetalles { get; set; } = default!;
     }

@@ -26,6 +26,7 @@ using SistemaVotacion.Modelos;
 
         public DbSet<SistemaVotacion.Modelos.Usuario> Usuarios { get; set; } = default!;
 
+
 public DbSet<SistemaVotacion.Modelos.Provincia> Provincias { get; set; } = default!;
 
 public DbSet<SistemaVotacion.Modelos.RecintoElectoral> RecintoElectorales { get; set; } = default!;
@@ -39,4 +40,19 @@ public DbSet<SistemaVotacion.Modelos.TipoProceso> TipoProcesos { get; set; } = d
 public DbSet<SistemaVotacion.Modelos.TipoVoto> TipoVotos { get; set; } = default!;
 
 public DbSet<SistemaVotacion.Modelos.VotoDetalle> VotoDetalles { get; set; } = default!;
+
+        public DbSet<SistemaVotacion.Modelos.ActaAuditoria> ActasAuditorias { get; set; } = default!;
+
+        public DbSet<SistemaVotacion.Modelos.Ciudad> Ciudades { get; set; } = default!;
+
+        public DbSet<SistemaVotacion.Modelos.Dignidad> Dignidades { get; set; } = default!;
+
+        public DbSet<SistemaVotacion.Modelos.JuntaReceptora> JuntasReceptoras { get; set; } = default!;
+
+        public DbSet<SistemaVotacion.Modelos.Padron> Padrones { get; set; } = default!;
+
+        public DbSet<SistemaVotacion.Modelos.Parroquia> Parroquias { get; set; } = default!;
+
+        public DbSet<SistemaVotacion.Modelos.ProcesoElectoral> ProcesosElectorales { get; set; } = default!;
+
     }

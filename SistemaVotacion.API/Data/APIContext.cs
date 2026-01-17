@@ -18,7 +18,7 @@ using SistemaVotacion.Modelos;
 
         public DbSet<SistemaVotacion.Modelos.Lista> Listas { get; set; } = default!;
 
-        public DbSet<SistemaVotacion.Modelos.HistorialAcceso> HistorialAccesos { get; set; } = default!;
+        public DbSet<SistemaVotacion.Modelos.ProcesoElectoral> ProcesoElectoral { get; set; } = default!;
 
         public DbSet<SistemaVotacion.Modelos.Multimedia> Multimedias { get; set; } = default!;
 
@@ -52,7 +52,5 @@ public DbSet<SistemaVotacion.Modelos.VotoDetalle> VotoDetalles { get; set; } = d
         public DbSet<SistemaVotacion.Modelos.Padron> Padrones { get; set; } = default!;
 
         public DbSet<SistemaVotacion.Modelos.Parroquia> Parroquias { get; set; } = default!;
-
-        public DbSet<SistemaVotacion.Modelos.ProcesoElectoral> ProcesosElectorales { get; set; } = default!;
 
     }

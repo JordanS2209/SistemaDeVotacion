@@ -12,8 +12,12 @@ namespace SistemaVotacion.Modelos
     {
         [Key] public int Id { get; set; }
 
+
+        [Required, ForeignKey("ActaAuditoria")]
         public int IdActa { get; set; }
 
+
+        [Required, ForeignKey("Lista")]
         public int? IdLista { get; set; }
 
         public int VotosContabilizados { get; set; }

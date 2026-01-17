@@ -11,14 +11,20 @@ namespace SistemaVotacion.Modelos
     public class Candidato
     {
         [Key] public int Id { get; set; }
+
         public string NombreCandidato { get; set; }
+
+
+        [Required, ForeignKey("Lista")]
         public int IdLista { get; set; }
+
+        [Required, ForeignKey("Dignidad")]
         public int IdDignidad { get; set; }
 
         public  Lista? Lista { get; set; }
 
         public  Dignidad? Dignidad { get; set; }
 
-        public virtual List<Multimedia> GaleriaMultimedia { get; set; } = new List<Multimedia>();
+        public  List<Multimedia> GaleriaMultimedia { get; set; } = new List<Multimedia>();
     }
 }

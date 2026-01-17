@@ -12,6 +12,7 @@ namespace SistemaVotacion.Modelos
     {
         [Key] public int Id { get; set; }
 
+
         [Required, ForeignKey("JuntaReceptora")]
         public int IdJunta { get; set; }
 
@@ -22,6 +23,6 @@ namespace SistemaVotacion.Modelos
 
         public  JuntaReceptora? Junta { get; set; }
 
-        public List<Padron> ParticipacionesEnPadron { get; set; }
+        public List<Padron>? VotantesEnPadron { get; set; } = new List<Padron>();
     }
 }

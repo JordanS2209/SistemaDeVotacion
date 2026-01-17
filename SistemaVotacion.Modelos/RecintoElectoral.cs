@@ -18,10 +18,12 @@ namespace SistemaVotacion.Modelos
         
         public string? DireccionRecinto { get; set; }
 
+
+        [Required, ForeignKey("Parroquia")]
         public int IdParroquia { get; set; }
 
         public Parroquia? Parroquia { get; set; }
 
-        public  List<JuntaReceptora> JuntasReceptoras { get; set; } = new List<JuntaReceptora>();
+        public  List<JuntaReceptora>? JuntasReceptoras { get; set; } = new List<JuntaReceptora>();
     }
 }

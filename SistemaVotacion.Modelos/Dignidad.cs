@@ -10,8 +10,11 @@ namespace SistemaVotacion.Modelos
     public class Dignidad
     {
         [Key] public int Id { get; set; }
-        public string NombreDignidad { get; set; } 
 
-        public virtual List<Candidato>? Candidatos { get; set; } = new List<Candidato>();
+        public string NombreDignidad { get; set; }
+
+        public  List<Candidato> Candidatos { get; set; } = new List<Candidato>();
+
+        public  List<VotoDetalle> VotosRecibidos { get; set; } = new List<VotoDetalle>();
     }
 }

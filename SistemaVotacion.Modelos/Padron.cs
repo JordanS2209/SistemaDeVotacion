@@ -14,13 +14,19 @@ namespace SistemaVotacion.Modelos
 
         public bool HaVotado { get; set; }
 
+        public string? CodigoAcceso { get; set; }
+
+
+        [Required, ForeignKey("ProcesoElectoral")]
         public int IdProceso { get; set; }
 
+
+        [Required, ForeignKey("Votante")]
         public int IdVotante { get; set; }
 
 
-        public virtual ProcesoElectoral? Proceso { get; set; }
+        public  ProcesoElectoral? Proceso { get; set; }
 
-        public virtual Votante? Votante { get; set; }
+        public  Votante? Votante { get; set; }
     }
 }

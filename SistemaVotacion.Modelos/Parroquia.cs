@@ -16,6 +16,8 @@ namespace SistemaVotacion.Modelos
 
         public int CodigoPostalParr { get; set; }
 
+
+        [Required, ForeignKey("Ciudad")]
         public int IdCiudad { get; set; }
 
         public  Ciudad? Ciudad { get; set; }

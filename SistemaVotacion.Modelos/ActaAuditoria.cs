@@ -11,17 +11,28 @@ namespace SistemaVotacion.Modelos
     public class ActaAuditoria
     {
         [Key] public int Id { get; set; }
+
+
+        [Required, ForeignKey("ProcesoElectoral")]
         public int IdProceso { get; set; }
+
+        [Required, ForeignKey("JuntaReceptora")]
         public int IdJunta { get; set; }
+
         public int TotalSufragantesPadron { get; set; }
+
         public int VotosEnUrna { get; set; }
+
         public string HashSeguridad { get; set; }
+
         public DateTime FechaCierre { get; set; }
+
+        public string? Observaciones { get; set; }
 
         public  ProcesoElectoral? Procesos { get; set; }
 
         public  JuntaReceptora? Juntas { get; set; }
 
-        public virtual List<ResultadoDetalleAuditoria> DetallesResultados { get; set; } = new List<ResultadoDetalleAuditoria>();
+        public  List<ResultadoDetalleAuditoria> DetallesResultados { get; set; } = new List<ResultadoDetalleAuditoria>();
     }
 }

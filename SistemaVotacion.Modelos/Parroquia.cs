@@ -12,13 +12,14 @@ namespace SistemaVotacion.Modelos
     {
         [Key] public int Id { get; set; }
 
-        [Required, MaxLength(100)]
-        public string NombreParro { get; set; }
+        public string NombreParroquia { get; set; }
 
-        [Required, ForeignKey("Ciudad")]
+        public int CodigoPostalParr { get; set; }
+
         public int IdCiudad { get; set; }
+
         public  Ciudad? Ciudad { get; set; }
 
-        public  List<RecintoElectoral>? Recintos { get; set; }
+        public  List<RecintoElectoral>? Recintos { get; set; } = new List<RecintoElectoral>();
     }
 }

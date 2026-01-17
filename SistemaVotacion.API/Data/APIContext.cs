@@ -18,7 +18,6 @@ using SistemaVotacion.Modelos;
 
         public DbSet<SistemaVotacion.Modelos.Lista> Listas { get; set; } = default!;
 
-        public DbSet<SistemaVotacion.Modelos.HistorialAcceso> HistorialAccesos { get; set; } = default!;
 
         public DbSet<SistemaVotacion.Modelos.Multimedia> Multimedias { get; set; } = default!;
 

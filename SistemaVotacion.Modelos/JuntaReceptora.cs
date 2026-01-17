@@ -12,17 +12,19 @@ namespace SistemaVotacion.Modelos
     {
         [Key] public int Id { get; set; }
         
-        [Required, MaxLength(10)]
         public string NumeroJunta { get; set; }
-        public string? Genero { get; set; }
 
-        [Required, ForeignKey("RecintoElectoral")]
+        public int IdGenero { get; set; }
+
         public int IdRecinto { get; set; }
+
+        public  Genero? Genero { get; set; }
 
         public  RecintoElectoral? Recintos { get; set; }
 
-        public  List<Votante>? Votantes { get; set; } 
-
-        public  List<VotoDetalle>? Votos { get; set; }
+        public  List<Votante> VotantesAsignados { get; set; } = new List<Votante>();
+        public  List<RepresentanteJunta> Representantes { get; set; } = new List<RepresentanteJunta>();
+        public  List<VotoDetalle> VotosRecibidos { get; set; } = new List<VotoDetalle>();
+        public  List<ActaAuditoria> ActasCierre { get; set; } = new List<ActaAuditoria>();
     }
 }

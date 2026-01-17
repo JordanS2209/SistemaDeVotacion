@@ -14,5 +14,7 @@ namespace SistemaVotacion.Modelos
         public string DetalleGenero { get; set; } 
 
         public  List<Usuario>? Usuarios { get; set; } = new List<Usuario>();
+
+        public  List<JuntaReceptora>? Juntas { get; set; } = new List<JuntaReceptora>();
     }
 }

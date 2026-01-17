@@ -19,14 +19,20 @@ namespace SistemaVotacion.Modelos
 
         public DateTime FechaFin { get; set; }
 
+
+        [Required, ForeignKey("TipoProceso")]
         public int IdTipoProceso { get; set; }
+
 
         public  TipoProceso? TipoProceso { get; set; }
 
-        public  List<Lista>? Listas { get; set; } = new List<Lista>();
 
-        public  List<Dignidad>? Dignidades { get; set; } = new List<Dignidad>();
-
-        public  List<Padron>? RegistroPadron { get; set; } = new List<Padron>();
+        public  List<Padron> PadronElectoral { get; set; } = new List<Padron>();
+        public  List<Lista> ListasParticipantes { get; set; } = new List<Lista>();
+        public  List<Dignidad> DignidadesAElegir { get; set; } = new List<Dignidad>();
+        public  List<PreguntaConsulta> PreguntasConsulta { get; set; } = new List<PreguntaConsulta>();
+        public  List<VotoDetalle> VotoDetallados { get; set; } = new List<VotoDetalle>();
+        public  List<RepresentanteJunta> RepresentantesMesas { get; set; } = new List<RepresentanteJunta>();
+        public  List<ActaAuditoria> ActasGeneradas { get; set; } = new List<ActaAuditoria>();
     }
 }

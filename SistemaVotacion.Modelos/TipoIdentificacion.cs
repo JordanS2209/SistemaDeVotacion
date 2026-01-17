@@ -11,8 +11,8 @@ namespace SistemaVotacion.Modelos
     {
         [Key] public int Id { get; set; }
         
-        [Required, MaxLength(20)]
         public string DetalleTipIdentifiacion { get; set; }
+
         public List<Usuario>? Usuarios { get; set; }
     }
 }

@@ -11,11 +11,12 @@ namespace SistemaVotacion.Modelos
     {
         [Key] public int Id { get; set; }
         
-        [Required, MaxLength(50)]
         public string NombreRol { get; set; }
         
-        [Required, MaxLength(100)]
         public string DescripcionRol { get; set; }
+
         public List<Usuario>? Usuarios { get; set; }
+
+        public  List<RepresentanteJunta>? RepresentantesConEsteRol { get; set; } = new List<RepresentanteJunta>();
     }
 }

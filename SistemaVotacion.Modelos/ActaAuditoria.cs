@@ -33,6 +33,6 @@ namespace SistemaVotacion.Modelos
 
         public  JuntaReceptora? Juntas { get; set; }
 
-        public  List<ResultadoDetalleAuditoria> DetallesResultados { get; set; } = new List<ResultadoDetalleAuditoria>();
+        public  List<ResultadoDetalleAuditoria>? DetallesResultados { get; set; }
     }
 }

@@ -14,15 +14,12 @@ namespace SistemaVotacion.Modelos
         
         public string NombreCiudad{ get; set; }
 
-        public int CodigoPostalCiudad { get; set; }
-
-
         [Required, ForeignKey("Provincia")]
         public int IdProvincia { get; set; }
 
         public  Provincia? Provincia { get; set; }
 
-        public List <Parroquia>? Parroquias { get; set; } = new List<Parroquia>();
+        public List <Parroquia>? Parroquias { get; set; } 
 
     }
 }

@@ -13,8 +13,8 @@ namespace SistemaVotacion.Modelos
 
         public string NombreDignidad { get; set; }
 
-        public  List<Candidato> Candidatos { get; set; } = new List<Candidato>();
+        public  List<Candidato>? Candidatos { get; set; } 
 
-        public  List<VotoDetalle> VotosRecibidos { get; set; } = new List<VotoDetalle>();
+        public  List<VotoDetalle>? VotosRecibidos { get; set; }
     }
 }

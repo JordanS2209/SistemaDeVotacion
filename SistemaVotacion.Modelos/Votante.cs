@@ -22,7 +22,8 @@ namespace SistemaVotacion.Modelos
         public virtual Usuario? Usuario { get; set; }
 
         public  JuntaReceptora? Junta { get; set; }
+        public bool Estado { get; set; } = false;
 
-        public List<Padron>? VotantesEnPadron { get; set; } = new List<Padron>();
+        public List<Padron>? VotantesEnPadron { get; set; }
     }
 }

@@ -15,6 +15,6 @@ namespace SistemaVotacion.Modelos
 
         public string? Descripcion { get; set; }
 
-        public  List<ProcesoElectoral>? ProcesosAsociados { get; set; } = new List<ProcesoElectoral>();
+        public  List<ProcesoElectoral>? ProcesosAsociados { get; set; } 
     }
 }

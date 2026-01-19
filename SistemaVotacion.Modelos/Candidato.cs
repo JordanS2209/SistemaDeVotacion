@@ -25,6 +25,6 @@ namespace SistemaVotacion.Modelos
 
         public  Dignidad? Dignidad { get; set; }
 
-        public  List<Multimedia> GaleriaMultimedia { get; set; } = new List<Multimedia>();
+        public  List<Multimedia>? GaleriaMultimedia { get; set; } 
     }
 }

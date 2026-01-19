@@ -14,14 +14,11 @@ namespace SistemaVotacion.Modelos
 
         public string NombreParroquia { get; set; }
 
-        public int CodigoPostalParr { get; set; }
-
-
         [Required, ForeignKey("Ciudad")]
         public int IdCiudad { get; set; }
 
         public  Ciudad? Ciudad { get; set; }
 
-        public  List<RecintoElectoral>? Recintos { get; set; } = new List<RecintoElectoral>();
+        public  List<RecintoElectoral>? Recintos { get; set; }
     }
 }

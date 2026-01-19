@@ -20,8 +20,8 @@ namespace SistemaVotacion.Modelos
         [Required, ForeignKey("ProcesoElectoral")]
         public int IdProceso { get; set; }
 
-        public  ProcesoElectoral? ProcesosElectorales { get; set; } = new ProcesoElectoral();
-        public  List<OpcionConsulta>? OpcionesConsulta { get; set; } = new List<OpcionConsulta>();
-        public  List<VotoDetalle>? VotosRecibidos { get; set; } = new List<VotoDetalle>();
+        public  ProcesoElectoral? ProcesosElectorales { get; set; } 
+        public  List<OpcionConsulta>? OpcionesConsulta { get; set; } 
+        public  List<VotoDetalle>? VotosRecibidos { get; set; } 
     }
 }

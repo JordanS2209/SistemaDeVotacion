@@ -13,6 +13,6 @@ namespace SistemaVotacion.Modelos
 
         public string NombreTipo { get; set; }
 
-        public  List<VotoDetalle>? VotosAsociados { get; set; } = new List<VotoDetalle>();
+        public List<VotoDetalle>? VotosAsociados { get; set; }
     }
 }

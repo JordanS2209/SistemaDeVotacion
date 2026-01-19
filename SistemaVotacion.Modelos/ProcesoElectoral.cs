@@ -26,13 +26,12 @@ namespace SistemaVotacion.Modelos
 
         public  TipoProceso? TipoProceso { get; set; }
 
-
-        public  List<Padron> PadronElectoral { get; set; } = new List<Padron>();
-        public  List<Lista> ListasParticipantes { get; set; } = new List<Lista>();
-        public  List<Dignidad> DignidadesAElegir { get; set; } = new List<Dignidad>();
-        public  List<PreguntaConsulta> PreguntasConsulta { get; set; } = new List<PreguntaConsulta>();
-        public  List<VotoDetalle> VotoDetallados { get; set; } = new List<VotoDetalle>();
-        public  List<RepresentanteJunta> RepresentantesMesas { get; set; } = new List<RepresentanteJunta>();
-        public  List<ActaAuditoria> ActasGeneradas { get; set; } = new List<ActaAuditoria>();
+        public  List<Padron>? PadronElectoral { get; set; } 
+        public  List<Lista>? ListasParticipantes { get; set; }
+        public  List<Dignidad>? DignidadesAElegir { get; set; } 
+        public  List<PreguntaConsulta>? PreguntasConsulta { get; set; }
+        public  List<VotoDetalle>? VotoDetallados { get; set; } 
+        public  List<RepresentanteJunta>? RepresentantesMesas { get; set; } 
+        public  List<ActaAuditoria>? ActasGeneradas { get; set; }
     }
 }

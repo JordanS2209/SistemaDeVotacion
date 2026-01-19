@@ -24,6 +24,6 @@ namespace SistemaVotacion.Modelos
 
         public Parroquia? Parroquia { get; set; }
 
-        public  List<JuntaReceptora>? JuntasReceptoras { get; set; } = new List<JuntaReceptora>();
+        public  List<JuntaReceptora>? JuntasReceptoras { get; set; } 
     }
 }

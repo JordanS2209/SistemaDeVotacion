@@ -17,6 +17,6 @@ namespace SistemaVotacion.Modelos
 
         public List<Usuario>? Usuarios { get; set; }
 
-        public  List<RepresentanteJunta>? RepresentantesConEsteRol { get; set; } = new List<RepresentanteJunta>();
+        public  List<RepresentanteJunta>? RepresentantesConEsteRol { get; set; } 
     }
 }

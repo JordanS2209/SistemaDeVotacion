@@ -20,6 +20,6 @@ namespace SistemaVotacion.Modelos
 
         public  PreguntaConsulta? Pregunta { get; set; }
 
-        public  List<VotoDetalle>? VotosRecibidos { get; set; } = new List<VotoDetalle>();
+        public  List<VotoDetalle>? VotosRecibidos { get; set; }
     }
 }

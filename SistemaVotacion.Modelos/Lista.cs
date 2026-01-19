@@ -21,10 +21,10 @@ namespace SistemaVotacion.Modelos
 
          public  ProcesoElectoral? Procesos { get; set; }
 
-        public  List<Candidato>? Candidatos { get; set; } = new List<Candidato>();
+        public  List<Candidato>? Candidatos { get; set; } 
 
-        public  List<Multimedia>? RecursosMultimedia { get; set; } = new List<Multimedia>();
+        public  List<Multimedia>? RecursosMultimedia { get; set; }
 
-        public  List<VotoDetalle>? VotosRecibidos { get; set; } = new List<VotoDetalle>();
+        public  List<VotoDetalle>? VotosRecibidos { get; set; }
     }
 }

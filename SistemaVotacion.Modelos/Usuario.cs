@@ -15,7 +15,6 @@ namespace SistemaVotacion.Modelos
         public string Nombres { get; set; }
 
         public string Apellidos { get; set; }
-
         public string Email { get; set; }
 
         public DateTime FechaNacimiento { get; set; }
@@ -36,20 +35,16 @@ namespace SistemaVotacion.Modelos
 
         public string CodigoDactilar { get; set; }
 
-        public DateTime FechaExpedicion { get; set; }
-
-
-
         public TipoIdentificacion? TipoIdentificacion { get; set; }
 
         public  Rol? Rol { get; set; }
 
         public  Genero? Genero { get; set; }
 
-        public  List<Login> Logins { get; set; } = new List<Login>();
+        public  List<HistorialLogin>? HistorialLogins{ get; set; } 
 
-        public  List<Votante> PerfilesVotante { get; set; } = new List<Votante>();
+        public  List<Votante>? PerfilesVotante { get; set; } 
 
-        public  List<RepresentanteJunta> FuncionesComoRepresentante { get; set; } = new List<RepresentanteJunta>();
+        public  List<RepresentanteJunta>? FuncionesComoRepresentante { get; set; } 
     }
 }

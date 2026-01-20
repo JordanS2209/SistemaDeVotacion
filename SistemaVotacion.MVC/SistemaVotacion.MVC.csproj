@@ -6,4 +6,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SistemaVotacion.ApiConsumer\SistemaVotacion.ApiConsumer.csproj" />
+    <ProjectReference Include="..\SistemaVotacion.Modelos\SistemaVotacion.Modelos.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.23" />
+  </ItemGroup>
+
 </Project>

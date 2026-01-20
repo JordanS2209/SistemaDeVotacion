@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SistemaVotacion.API", "Sist
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SistemaVotacion.MVC", "SistemaVotacion.MVC\SistemaVotacion.MVC.csproj", "{5FC2E902-5FD6-4709-A7CF-1B5CC9869E00}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SistemaVotacion.Servicios", "SistemaVotacion.Servicios\SistemaVotacion.Servicios.csproj", "{127D3B89-435C-4472-B97F-507DA78FCF00}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SistemaVotacion.ApiConsumer", "SistemaVotacion.ApiConsumer\SistemaVotacion.ApiConsumer.csproj", "{ED7DDA9D-68CB-424F-87A3-62C3F4ADE9BA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{5FC2E902-5FD6-4709-A7CF-1B5CC9869E00}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FC2E902-5FD6-4709-A7CF-1B5CC9869E00}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5FC2E902-5FD6-4709-A7CF-1B5CC9869E00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{127D3B89-435C-4472-B97F-507DA78FCF00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{127D3B89-435C-4472-B97F-507DA78FCF00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{127D3B89-435C-4472-B97F-507DA78FCF00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{127D3B89-435C-4472-B97F-507DA78FCF00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED7DDA9D-68CB-424F-87A3-62C3F4ADE9BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED7DDA9D-68CB-424F-87A3-62C3F4ADE9BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED7DDA9D-68CB-424F-87A3-62C3F4ADE9BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED7DDA9D-68CB-424F-87A3-62C3F4ADE9BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

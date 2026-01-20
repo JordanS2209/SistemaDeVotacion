@@ -10,11 +10,11 @@ namespace SistemaVotacion.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RecintosElectorales : ControllerBase
+    public class RecintosElectoralesController : ControllerBase
     {
         private readonly SistemaVotacionAPIContext _context;
 
-        public RecintosElectorales(SistemaVotacionAPIContext context)
+        public RecintosElectoralesController(SistemaVotacionAPIContext context)
         {
             _context = context;
         }

@@ -18,11 +18,11 @@ namespace SistemaVotacion.Modelos
 
          [Required, ForeignKey("Usuario")]
         public int IdUsuario { get; set; }
+        public bool Estado { get; set; } = false;
 
-        public virtual Usuario? Usuario { get; set; }
+        public  Usuario? Usuario { get; set; }
 
         public  JuntaReceptora? Junta { get; set; }
-        public bool Estado { get; set; } = false;
 
         public List<Padron>? VotantesEnPadron { get; set; }
     }

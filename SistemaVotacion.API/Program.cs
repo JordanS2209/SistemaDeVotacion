@@ -1,3 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 
 namespace SistemaVotacion.API
 {
@@ -6,6 +10,8 @@ namespace SistemaVotacion.API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddDbContext<SistemaVotacionAPIContext>(options =>
+                options.UseNpgsql(builder.Configuration.GetConnectionString("SistemaVotacionAPIContext") ?? throw new InvalidOperationException("Connection string 'SistemaVotacionAPIContext' not found.")));
 
             // Add services to the container.
 

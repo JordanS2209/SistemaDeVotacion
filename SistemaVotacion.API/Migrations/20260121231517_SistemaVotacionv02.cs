@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace SistemaVotacion.API.Migrations
 {
     /// <inheritdoc />
-    public partial class v01SistemaVotacion : Migration
+    public partial class SistemaVotacionv02 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -143,7 +143,10 @@ namespace SistemaVotacion.API.Migrations
                     Nombres = table.Column<string>(type: "text", nullable: false),
                     Apellidos = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
+                    ContrasenaHash = table.Column<string>(type: "text", nullable: false),
                     FechaNacimiento = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IntentosFallidos = table.Column<int>(type: "integer", nullable: false),
+                    CuentaBloqueada = table.Column<bool>(type: "boolean", nullable: true),
                     IdRol = table.Column<int>(type: "integer", nullable: false),
                     IdTipoIdentificacion = table.Column<int>(type: "integer", nullable: false),
                     NumeroIdentificacion = table.Column<string>(type: "text", nullable: false),
@@ -252,27 +255,6 @@ namespace SistemaVotacion.API.Migrations
                         column: x => x.ProcesosElectoralesId,
                         principalTable: "ProcesosElectorales",
                         principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "HistoralesLogins",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    IdUsuario = table.Column<int>(type: "integer", nullable: false),
-                    IntentosFallidos = table.Column<int>(type: "integer", nullable: false),
-                    CuentaBloqueada = table.Column<bool>(type: "boolean", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_HistoralesLogins", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_HistoralesLogins_Usuarios_IdUsuario",
-                        column: x => x.IdUsuario,
-                        principalTable: "Usuarios",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -644,11 +626,6 @@ namespace SistemaVotacion.API.Migrations
                 column: "ProcesoElectoralId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_HistoralesLogins_IdUsuario",
-                table: "HistoralesLogins",
-                column: "IdUsuario");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_JuntasReceptoras_IdGenero",
                 table: "JuntasReceptoras",
                 column: "IdGenero");
@@ -802,9 +779,6 @@ namespace SistemaVotacion.API.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "HistoralesLogins");
-
             migrationBuilder.DropTable(
                 name: "Multimedias");
 

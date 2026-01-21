@@ -42,7 +42,6 @@ namespace SistemaVotacion.API.Controllers
                     .Include(u => u.TipoIdentificacion)
                     .Include(u => u.Rol)
                     .Include(u => u.Genero)
-                    .Include(u => u.HistorialLogins)
                     .Include(u => u.PerfilesVotante)
                     .Include(u => u.FuncionesComoRepresentante)
                     .FirstOrDefaultAsync(u => u.Id == id);

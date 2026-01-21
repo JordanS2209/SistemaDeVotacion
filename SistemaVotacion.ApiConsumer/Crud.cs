@@ -1,7 +1,6 @@
-﻿using SistemaVotacion.Modelos;
+﻿using Newtonsoft.Json;
+using SistemaVotacion.Modelos;
 using System.Text;
-using Newtonsoft.Json;
-
 
 namespace SistemaVotacion.ApiConsumer
 {
@@ -21,12 +20,10 @@ namespace SistemaVotacion.ApiConsumer
                 }
                 else
                 {
-                    throw new Exception($"Error:{response.StatusCode}");
+                    throw new Exception($"Error: {response.StatusCode}");
                 }
             }
-
         }
-
 
         public static T GetById(int id)
         {
@@ -40,21 +37,24 @@ namespace SistemaVotacion.ApiConsumer
                 }
                 else
                 {
-                    throw new Exception($"Error:{response.StatusCode}");
+                    throw new Exception($"Error: {response.StatusCode}");
                 }
             }
-
         }
-
 
         public static T Create(T item)
         {
             using (var client = new HttpClient())
             {
                 var response = client.PostAsync(
-                    EndPoint, new StringContent(JsonConvert.SerializeObject(item),
-                    Encoding.UTF8, "application/json")
-                ).Result;
+                        EndPoint,
+                        new StringContent(
+                            JsonConvert.SerializeObject(item),
+                            Encoding.UTF8,
+                            "application/json"
+                        )
+                    ).Result;
+
                 if (response.IsSuccessStatusCode)
                 {
                     var json = response.Content.ReadAsStringAsync().Result;
@@ -62,7 +62,7 @@ namespace SistemaVotacion.ApiConsumer
                 }
                 else
                 {
-                    throw new Exception($"Error:{response.StatusCode}");
+                    throw new Exception($"Error: {response.StatusCode}");
                 }
             }
         }
@@ -72,9 +72,13 @@ namespace SistemaVotacion.ApiConsumer
             using (var client = new HttpClient())
             {
                 var response = client.PutAsync(
-                    $"{EndPoint}/{id}", new StringContent(JsonConvert.SerializeObject(item),
-                    Encoding.UTF8, "application/json")
-                ).Result;
+                        $"{EndPoint}/{id}",
+                        new StringContent(
+                            JsonConvert.SerializeObject(item),
+                            Encoding.UTF8,
+                            "application/json"
+                        )
+                    ).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -82,7 +86,7 @@ namespace SistemaVotacion.ApiConsumer
                 }
                 else
                 {
-                    throw new Exception($"Error:{response.StatusCode}");
+                    throw new Exception($"Error: {response.StatusCode}");
                 }
             }
         }

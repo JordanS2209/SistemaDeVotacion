@@ -1,132 +1,105 @@
 ﻿using SistemaVotacion.Modelos;
+using System.Text;
+using Newtonsoft.Json;
+
 
 namespace SistemaVotacion.ApiConsumer
 {
     public static class Crud<T>
     {
-        public static string UrlBase = "";
+        public static string EndPoint { get; set; }
 
-        // consumir una API y ejecutar el vervo POST
-        public static ApiResult<T> Create(T data)
+        public static List<T> GetAll()
         {
-            try
+            using (var client = new HttpClient())
             {
-                using (var httpClient = new HttpClient())
+                var response = client.GetAsync(EndPoint).Result;
+                if (response.IsSuccessStatusCode)
                 {
-                    // invocar al servicio web
-                    var json = Newtonsoft.Json.JsonConvert.SerializeObject(data);
-                    var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-                    var response = httpClient.PostAsync(UrlBase, content).Result;
-                    if (response.IsSuccessStatusCode)
-                    {
-                        json = response.Content.ReadAsStringAsync().Result;
-                        // deserializar la respuesta
-                        var newData = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<T>>(json);
-                        return newData;
-                    }
-                    else
-                    {
-                        return ApiResult<T>.Fail($"Error: {response.StatusCode}");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                return ApiResult<T>.Fail(ex.Message);
-            }
-        }
-
-        public static ApiResult<List<T>> ReadAll()
-        {
-            // consumir una API y ejecutar el verbo GET
-            try
-            {
-                using (var httpClient = new HttpClient())
-                {
-                    // invocar al servicio web
-                    var response = httpClient.GetAsync(UrlBase).Result;
                     var json = response.Content.ReadAsStringAsync().Result;
-                    // deserializar la respuesta
-                    var data = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<List<T>>>(json);
-                    return data;
+                    return JsonConvert.DeserializeObject<List<T>>(json);
+                }
+                else
+                {
+                    throw new Exception($"Error:{response.StatusCode}");
                 }
             }
-            catch (Exception ex)
-            {
-                return ApiResult<List<T>>.Fail(ex.Message);
-            }
+
         }
 
-        public static ApiResult<T> ReadBy(string field, string value)
+
+        public static T GetById(int id)
         {
-            // consumir una API y ejecutar el verbo GET con parámetros
-            try
+            using (var client = new HttpClient())
             {
-                using (var httpClient = new HttpClient())
+                var response = client.GetAsync($"{EndPoint}/{id}").Result;
+                if (response.IsSuccessStatusCode)
                 {
-                    // invocar al servicio web
-                    var response = httpClient.GetAsync($"{UrlBase}/{field}/{value}").Result;
                     var json = response.Content.ReadAsStringAsync().Result;
-                    // deserializar la respuesta
-                    var data = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<T>>(json);
-                    return data;
+                    return JsonConvert.DeserializeObject<T>(json);
+                }
+                else
+                {
+                    throw new Exception($"Error:{response.StatusCode}");
                 }
             }
-            catch (Exception ex)
+
+        }
+
+
+        public static T Create(T item)
+        {
+            using (var client = new HttpClient())
             {
-                return ApiResult<T>.Fail(ex.Message);
+                var response = client.PostAsync(
+                    EndPoint, new StringContent(JsonConvert.SerializeObject(item),
+                    Encoding.UTF8, "application/json")
+                ).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = response.Content.ReadAsStringAsync().Result;
+                    return JsonConvert.DeserializeObject<T>(json);
+                }
+                else
+                {
+                    throw new Exception($"Error:{response.StatusCode}");
+                }
             }
         }
 
-        public static ApiResult<bool> Update(string id, T data)
+        public static bool Update(int id, T item)
         {
-            // consumir una API y ejecutar el verbo PUT
-            try
+            using (var client = new HttpClient())
             {
-                using (var httpClient = new HttpClient())
+                var response = client.PutAsync(
+                    $"{EndPoint}/{id}", new StringContent(JsonConvert.SerializeObject(item),
+                    Encoding.UTF8, "application/json")
+                ).Result;
+
+                if (response.IsSuccessStatusCode)
                 {
-                    // invocar al servicio web
-                    var json = Newtonsoft.Json.JsonConvert.SerializeObject(data);
-                    var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-                    var response = httpClient.PutAsync($"{UrlBase}/{id}", content).Result;
-                    if (response.IsSuccessStatusCode)
-                    {
-                        return ApiResult<bool>.Ok(true);
-                    }
-                    else
-                    {
-                        return ApiResult<bool>.Fail($"Error: {response.StatusCode}");
-                    }
+                    return true;
                 }
-            }
-            catch (Exception ex)
-            {
-                return ApiResult<bool>.Fail(ex.Message);
+                else
+                {
+                    throw new Exception($"Error:{response.StatusCode}");
+                }
             }
         }
 
-        public static ApiResult<bool> Delete(string id)
+        public static bool Delete(int id)
         {
-            // consumir una API y ejecutar el verbo DELETE
-            try
+            using (var client = new HttpClient())
             {
-                using (var httpClient = new HttpClient())
+                var response = client.DeleteAsync($"{EndPoint}/{id}").Result;
+                if (response.IsSuccessStatusCode)
                 {
-                    // invocar al servicio web
-                    var response = httpClient.DeleteAsync($"{UrlBase}/{id}").Result;
-                    if (response.IsSuccessStatusCode)
-                    {
-                        return ApiResult<bool>.Ok(true);
-                    }
-                    else
-                    {
-                        return ApiResult<bool>.Fail($"Error: {response.StatusCode}");
-                    }
+                    return true;
                 }
-            }
-            catch (Exception ex)
-            {
-                return ApiResult<bool>.Fail(ex.Message);
+                else
+                {
+                    throw new Exception($"Error: {response.StatusCode}");
+                }
             }
         }
     }

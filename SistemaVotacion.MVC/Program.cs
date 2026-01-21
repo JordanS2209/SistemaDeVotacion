@@ -7,7 +7,7 @@ namespace SistemaVotacion.MVC
     {
         public static void Main(string[] args)
         {
-            Crud<Usuario>.UrlBase = "https://localhost:7202/api/Usuarios";
+            Crud<Usuario>.EndPoint = "https://localhost:7202/api/Usuarios";
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.

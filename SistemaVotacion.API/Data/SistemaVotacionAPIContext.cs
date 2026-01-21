@@ -12,7 +12,6 @@ public class SistemaVotacionAPIContext : DbContext
     public DbSet<SistemaVotacion.Modelos.Ciudad> Ciudades {get;set;} = default!;
     public DbSet<SistemaVotacion.Modelos.Dignidad> Dignidades{get;set;} = default!;
     public DbSet<SistemaVotacion.Modelos.Genero> Generos {get;set;} = default!;
-    public DbSet<SistemaVotacion.Modelos.HistorialLogin> HistoralesLogins {get;set;} = default!;
     public DbSet<SistemaVotacion.Modelos.JuntaReceptora> JuntasReceptoras {get;set;} = default!;
     public DbSet<SistemaVotacion.Modelos.Lista> Listas {get;set;} = default!;
     public DbSet<SistemaVotacion.Modelos.Multimedia> Multimedias{get;set;} = default!;

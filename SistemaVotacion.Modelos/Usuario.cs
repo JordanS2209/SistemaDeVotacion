@@ -16,9 +16,13 @@ namespace SistemaVotacion.Modelos
 
         public string Apellidos { get; set; }
         public string Email { get; set; }
+        public string ContrasenaHash { get; set; }
 
         public DateTime FechaNacimiento { get; set; }
 
+        public int IntentosFallidos { get; set; }
+
+        public bool? CuentaBloqueada { get; set; }
 
         [Required, ForeignKey("Rol")]
         public int IdRol { get; set; }
@@ -40,8 +44,6 @@ namespace SistemaVotacion.Modelos
         public  Rol? Rol { get; set; }
 
         public  Genero? Genero { get; set; }
-
-        public  List<HistorialLogin>? HistorialLogins{ get; set; } 
 
         public  List<Votante>? PerfilesVotante { get; set; } 
 

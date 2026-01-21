@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace SistemaVotacion.API.Migrations
 {
     [DbContext(typeof(SistemaVotacionAPIContext))]
-    [Migration("20260120012407_v01SistemaVotacion")]
-    partial class v01SistemaVotacion
+    [Migration("20260121231517_SistemaVotacionv02")]
+    partial class SistemaVotacionv02
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -155,30 +155,6 @@ namespace SistemaVotacion.API.Migrations
                     b.HasKey("IdGenero");
 
                     b.ToTable("Generos");
-                });
-
-            modelBuilder.Entity("SistemaVotacion.Modelos.HistorialLogin", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<bool?>("CuentaBloqueada")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("IdUsuario")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("IntentosFallidos")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdUsuario");
-
-                    b.ToTable("HistoralesLogins");
                 });
 
             modelBuilder.Entity("SistemaVotacion.Modelos.JuntaReceptora", b =>
@@ -612,6 +588,13 @@ namespace SistemaVotacion.API.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("ContrasenaHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool?>("CuentaBloqueada")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("text");
@@ -626,6 +609,9 @@ namespace SistemaVotacion.API.Migrations
                         .HasColumnType("integer");
 
                     b.Property<int>("IdTipoIdentificacion")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("IntentosFallidos")
                         .HasColumnType("integer");
 
                     b.Property<string>("Nombres")
@@ -790,17 +776,6 @@ namespace SistemaVotacion.API.Migrations
                     b.HasOne("SistemaVotacion.Modelos.ProcesoElectoral", null)
                         .WithMany("DignidadesAElegir")
                         .HasForeignKey("ProcesoElectoralId");
-                });
-
-            modelBuilder.Entity("SistemaVotacion.Modelos.HistorialLogin", b =>
-                {
-                    b.HasOne("SistemaVotacion.Modelos.Usuario", "Usuario")
-                        .WithMany("HistorialLogins")
-                        .HasForeignKey("IdUsuario")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("SistemaVotacion.Modelos.JuntaReceptora", b =>
@@ -1177,8 +1152,6 @@ namespace SistemaVotacion.API.Migrations
             modelBuilder.Entity("SistemaVotacion.Modelos.Usuario", b =>
                 {
                     b.Navigation("FuncionesComoRepresentante");
-
-                    b.Navigation("HistorialLogins");
 
                     b.Navigation("PerfilesVotante");
                 });

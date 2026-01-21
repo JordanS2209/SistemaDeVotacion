@@ -10,8 +10,8 @@ namespace SistemaVotacion.MVC.Controllers
         // GET: UsuariosControllercs
         public ActionResult Index()
         {
-            var data = Crud<Usuario>.ReadAll();
-            var total = data.Data.Count;
+            var data = Crud<Usuario>.GetAll();
+            var total = data;
             
             return View(data);
         }

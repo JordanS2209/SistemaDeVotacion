@@ -2,6 +2,7 @@ using SistemaVotacion.ApiConsumer;
 using SistemaVotacion.Modelos;
 using SistemaVotacion.Servicios;
 using SistemaVotacion.Servicios.Interfaces;
+using SistemaVotacion.API;
 
 namespace SistemaVotacion.MVC
 {

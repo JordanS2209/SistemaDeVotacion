@@ -76,7 +76,7 @@ namespace SistemaVotacion.Servicios
                     Nombres = nombre,
                     Apellidos = apellido,
                     // CIFRAMOS LA CONTRASEÑA ANTES DE GUARDAR
-                    ContrasenaHash = BCrypt.Net.BCrypt.HashPassword(password),
+                    ContrasenaHash = password,
                     FechaNacimiento = fechaNacimiento,
                     NumeroIdentificacion = numeroIdentificacion,
                     CodigoDactilar = codigoDactilar,

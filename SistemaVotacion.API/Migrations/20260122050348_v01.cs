@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace SistemaVotacion.API.Migrations
 {
     /// <inheritdoc />
-    public partial class SistemaVotacionv02 : Migration
+    public partial class v01 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -119,8 +119,8 @@ namespace SistemaVotacion.API.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     NombreProceso = table.Column<string>(type: "text", nullable: false),
-                    FechaInicio = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    FechaFin = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    FechaInicio = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    FechaFin = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     IdTipoProceso = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -144,7 +144,7 @@ namespace SistemaVotacion.API.Migrations
                     Apellidos = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
                     ContrasenaHash = table.Column<string>(type: "text", nullable: false),
-                    FechaNacimiento = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    FechaNacimiento = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     IntentosFallidos = table.Column<int>(type: "integer", nullable: false),
                     CuentaBloqueada = table.Column<bool>(type: "boolean", nullable: true),
                     IdRol = table.Column<int>(type: "integer", nullable: false),
@@ -392,7 +392,7 @@ namespace SistemaVotacion.API.Migrations
                     TotalSufragantesPadron = table.Column<int>(type: "integer", nullable: false),
                     VotosEnUrna = table.Column<int>(type: "integer", nullable: false),
                     HashSeguridad = table.Column<string>(type: "text", nullable: false),
-                    FechaCierre = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    FechaCierre = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     Observaciones = table.Column<string>(type: "text", nullable: true),
                     ProcesosId = table.Column<int>(type: "integer", nullable: true),
                     JuntasId = table.Column<int>(type: "integer", nullable: true)

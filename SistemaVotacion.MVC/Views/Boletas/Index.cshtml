@@ -1,0 +1,100 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Boleta Electoral</title>
+
+    <!-- CSS desde wwwroot -->
+    <link rel="stylesheet" href="~/css/Boleta.css" />
+</head>
+<body>
+
+    <form method="post">
+        <div class="boleta-container">
+
+            <div class="boleta-header">
+                <h1>Elecciones Generales</h1>
+                <p>Seleccione un binomio presidencial</p>
+            </div>
+
+            <div class="boleta-opciones">
+
+                <!-- OPCIÓN 1 -->
+                <label class="opcion-card">
+                    <input type="radio" name="binomio" value="1" required>
+
+                    <div class="opcion-content">
+                        <div class="partido">
+                            <img src="~/img/partido1.png" alt="Partido 1">
+                            <div>
+                                <strong>Movimiento Democrático</strong><br>
+                                <span class="lista">Lista 1</span>
+                            </div>
+                        </div>
+
+                        <div class="binomio">
+                            <div class="persona">
+                                <img src="~/img/presidente1.jpg" alt="Presidente">
+                                <span class="cargo">Presidente</span>
+                                <span class="nombre">Juan Pérez</span>
+                            </div>
+
+                            <div class="persona">
+                                <img src="~/img/vice1.jpg" alt="Vicepresidente">
+                                <span class="cargo">Vicepresidente</span>
+                                <span class="nombre">María López</span>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+
+                <!-- OPCIÓN 2 -->
+                <label class="opcion-card">
+                    <input type="radio" name="binomio" value="2">
+
+                    <div class="opcion-content">
+                        <div class="partido">
+                            <img src="~/img/partido2.png" alt="Partido 2">
+                            <div>
+                                <strong>Unidad Nacional</strong><br>
+                                <span class="lista">Lista 7</span>
+                            </div>
+                        </div>
+
+                        <div class="binomio">
+                            <div class="persona">
+                                <img src="~/img/presidente2.jpg" alt="Presidente">
+                                <span class="cargo">Presidente</span>
+                                <span class="nombre">Carlos Andrade</span>
+                            </div>
+
+                            <div class="persona">
+                                <img src="~/img/vice2.jpg" alt="Vicepresidente">
+                                <span class="cargo">Vicepresidente</span>
+                                <span class="nombre">Ana Torres</span>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+
+            </div>
+
+            <div class="acciones">
+                <button type="submit" class="btn-votar">VOTAR</button>
+            </div>
+
+        </div>
+    </form>
+
+    <!-- CONTADOR -->
+    <div class="contador-elecciones">
+        <span class="titulo">Tiempo restante</span>
+        <span id="tiempo-restante">00:15:00</span>
+    </div>
+
+</body>
+</html>

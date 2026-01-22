@@ -1,0 +1,261 @@
+﻿/* =========================
+   CONFIGURACIÓN GENERAL
+========================= */
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    background: linear-gradient(180deg, #e9eff5, #f5f7fa);
+}
+
+/* =========================
+   CONTENEDOR PRINCIPAL
+========================= */
+.boleta-container {
+    width: 100%;
+    min-height: 100vh;
+    padding: 40px 30px 100px;
+    background: #ffffff;
+}
+
+/* =========================
+   ENCABEZADO
+========================= */
+.boleta-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+    .boleta-header h1 {
+        margin: 0;
+        font-size: 30px;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .boleta-header p {
+        margin-top: 8px;
+        color: #4b5563;
+        font-size: 16px;
+    }
+
+/* =========================
+   OPCIONES (GRID)
+========================= */
+.boleta-opciones {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+}
+
+/* =========================
+   TARJETA DE OPCIÓN
+========================= */
+.opcion-card {
+    position: relative;
+    cursor: pointer;
+}
+
+    .opcion-card input {
+        position: absolute;
+        opacity: 0;
+    }
+
+.opcion-content {
+    background: #f8fafc;
+    border-radius: 18px;
+    padding: 22px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+/* Hover */
+.opcion-card:hover .opcion-content {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+}
+
+/* Seleccionado */
+.opcion-card input:checked + .opcion-content {
+    border-color: #2563eb;
+    background: #eef4ff;
+    box-shadow: 0 0 0 4px rgba(37,99,235,0.15);
+}
+
+/* =========================
+   PARTIDO / LISTA
+========================= */
+.partido {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+}
+
+    .partido img {
+        width: 55px;
+        height: 55px;
+        object-fit: contain;
+    }
+
+    .partido strong {
+        display: block;
+        font-size: 15px;
+        color: #111827;
+    }
+
+    .partido .lista {
+        display: inline-block;
+        margin-top: 4px;
+        background: #1d4ed8;
+        color: #ffffff;
+        padding: 4px 12px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+/* =========================
+   BINOMIO
+========================= */
+.binomio {
+    display: flex;
+    gap: 20px;
+}
+
+/* =========================
+   PERSONA
+========================= */
+.persona {
+    flex: 1;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+}
+
+    .persona img {
+        width: 100%;
+        max-width: 130px;
+        height: auto;
+        aspect-ratio: 3 / 4;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-bottom: 10px;
+    }
+
+.cargo {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1d4ed8;
+}
+
+.nombre {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: #111827;
+}
+
+/* =========================
+   BOTÓN VOTAR
+========================= */
+.acciones {
+    margin-top: 50px;
+    text-align: center;
+}
+
+.btn-votar {
+    background: linear-gradient(135deg, #1d4ed8, #2563eb);
+    color: #ffffff;
+    border: none;
+    padding: 16px 50px;
+    border-radius: 999px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .btn-votar:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(37,99,235,0.4);
+    }
+
+/* =========================
+   CONTADOR DE TIEMPO
+========================= */
+.contador-elecciones {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(17, 24, 39, 0.95);
+    color: #ffffff;
+    padding: 22px 32px; /* MÁS GRANDE */
+    border-radius: 20px; /* Bordes más suaves */
+
+    box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 260px; /* Ancho mínimo */
+    z-index: 999;
+}
+
+    /* Texto "Tiempo restante" */
+    .contador-elecciones .titulo {
+        font-size: 14px; /* Antes 12px */
+        color: #9ca3af;
+        margin-bottom: 6px;
+    }
+
+/* Tiempo 00:15:00 */
+#tiempo-restante {
+    font-size: 30px; /* MÁS GRANDE */
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #38bdf8;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 900px) {
+    .boleta-opciones {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .boleta-header h1 {
+        font-size: 24px;
+    }
+
+    .binomio {
+        flex-direction: column;
+    }
+
+    .btn-votar {
+        width: 100%;
+        padding: 18px;
+    }
+
+    .contador-elecciones {
+        bottom: 10px;
+        right: 10px;
+    }
+}

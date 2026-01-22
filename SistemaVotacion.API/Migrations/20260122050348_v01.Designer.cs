@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace SistemaVotacion.API.Migrations
 {
     [DbContext(typeof(SistemaVotacionAPIContext))]
-    [Migration("20260121231517_SistemaVotacionv02")]
-    partial class SistemaVotacionv02
+    [Migration("20260122050348_v01")]
+    partial class v01
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,7 +33,7 @@ namespace SistemaVotacion.API.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("FechaCierre")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("HashSeguridad")
                         .IsRequired()
@@ -363,10 +363,10 @@ namespace SistemaVotacion.API.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("FechaFin")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("FechaInicio")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("IdTipoProceso")
                         .HasColumnType("integer");
@@ -600,7 +600,7 @@ namespace SistemaVotacion.API.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("FechaNacimiento")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("IdGenero")
                         .HasColumnType("integer");

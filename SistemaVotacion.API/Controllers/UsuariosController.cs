@@ -19,22 +19,25 @@ namespace SistemaVotacion.API.Controllers
             _context = context;
         }
 
+        // GET: api/Usuarios
         [HttpGet]
-        public async Task<ActionResult<ApiResult<List<Usuario>>>> GetUsuarios()
+        public async Task<ActionResult<List<Usuario>>> GetUsuarios()
         {
             try
             {
                 var usuarios = await _context.Usuarios.ToListAsync();
-                return ApiResult<List<Usuario>>.Ok(usuarios);
+                return Ok(usuarios);
             }
             catch (Exception ex)
             {
-                return ApiResult<List<Usuario>>.Fail(ex.Message);
+                Console.WriteLine($"Error al obtener usuarios: {ex.Message}");
+                return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
 
+        // GET: api/Usuarios/Codigo/5
         [HttpGet("Codigo/{id}")]
-        public async Task<ActionResult<ApiResult<Usuario>>> GetUsuario(int id)
+        public async Task<ActionResult<Usuario>> GetUsuario(int id)
         {
             try
             {
@@ -48,23 +51,25 @@ namespace SistemaVotacion.API.Controllers
 
                 if (usuario == null)
                 {
-                    return ApiResult<Usuario>.Fail("Usuario no encontrado.");
+                    return NotFound($"No se encontró el usuario con ID {id}.");
                 }
 
-                return ApiResult<Usuario>.Ok(usuario);
+                return Ok(usuario);
             }
             catch (Exception ex)
             {
-                return ApiResult<Usuario>.Fail(ex.Message);
+                Console.WriteLine($"Error al obtener usuario {id}: {ex.Message}");
+                return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
 
+        // PUT: api/Usuarios/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResult<Usuario>>> PutUsuario(int id, Usuario usuario)
+        public async Task<IActionResult> PutUsuario(int id, Usuario usuario)
         {
             if (id != usuario.Id)
             {
-                return ApiResult<Usuario>.Fail("ID de Usuario no coincide.");
+                return BadRequest("El ID de la URL no coincide con el ID del usuario.");
             }
 
             _context.Entry(usuario).State = EntityState.Modified;
@@ -72,56 +77,67 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                return NoContent(); // Respuesta estándar para una actualización exitosa sin retorno de datos
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (DbUpdateConcurrencyException)
             {
                 if (!UsuarioExists(id))
                 {
-                    return ApiResult<Usuario>.Fail("Usuario no encontrado.");
+                    return NotFound("El usuario no existe.");
                 }
                 else
                 {
-                    return ApiResult<Usuario>.Fail(ex.Message);
+                    throw;
                 }
-            }
-
-            return ApiResult<Usuario>.Ok(null);
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<ApiResult<Usuario>>> PostUsuario(Usuario usuario)
-        {
-            try
-            {
-                _context.Usuarios.Add(usuario);
-                await _context.SaveChangesAsync();
-                return ApiResult<Usuario>.Ok(usuario);
             }
             catch (Exception ex)
             {
-                return ApiResult<Usuario>.Fail(ex.Message);
+                return StatusCode(500, $"Error al actualizar: {ex.Message}");
             }
         }
 
+        // POST: api/Usuarios
+        [HttpPost]
+        public async Task<ActionResult<Usuario>> PostUsuario(Usuario usuario)
+        {
+            try
+            {
+                // Hasheamos la contraseña antes de guardarla
+                usuario.ContrasenaHash = BCrypt.Net.BCrypt.HashPassword(usuario.ContrasenaHash);
+
+                _context.Usuarios.Add(usuario);
+                await _context.SaveChangesAsync();
+
+                // Respuesta estándar 201 Created que indica la ubicación del nuevo recurso
+                return CreatedAtAction(nameof(GetUsuario), new { id = usuario.Id }, usuario);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al crear usuario: {ex.Message}");
+                return StatusCode(500, $"Error al guardar: {ex.Message}");
+            }
+        }
+
+        // DELETE: api/Usuarios/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ApiResult<Usuario>>> DeleteUsuario(int id)
+        public async Task<ActionResult<Usuario>> DeleteUsuario(int id)
         {
             try
             {
                 var usuario = await _context.Usuarios.FindAsync(id);
                 if (usuario == null)
                 {
-                    return ApiResult<Usuario>.Fail("Usuario no encontrado.");
+                    return NotFound("Usuario no encontrado.");
                 }
 
                 _context.Usuarios.Remove(usuario);
                 await _context.SaveChangesAsync();
 
-                return ApiResult<Usuario>.Ok(usuario);
+                return Ok(usuario); // Retornamos el usuario eliminado
             }
             catch (Exception ex)
             {
-                return ApiResult<Usuario>.Fail(ex.Message);
+                return StatusCode(500, $"Error al eliminar: {ex.Message}");
             }
         }
 

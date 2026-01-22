@@ -38,6 +38,9 @@ namespace SistemaVotacion.MVC.Controllers
         [HttpGet]
         public IActionResult Register()
         {
+            ViewBag.Roles = Crud<Rol>.GetAll();
+            ViewBag.Generos = Crud<Genero>.GetAll();
+            ViewBag.TiposIdentificacion = Crud<TipoIdentificacion>.GetAll();
             return View();
         }
 
@@ -47,7 +50,6 @@ namespace SistemaVotacion.MVC.Controllers
             string nombre,
             string apellido,
             string password,
-            string ConfPassword,
             DateTime fechaNac,
             string cedula,
             string codigoDactilar,
@@ -58,11 +60,6 @@ namespace SistemaVotacion.MVC.Controllers
             // 1. Limpieza y validaciones básicas
             email = email.Trim().ToLower();
 
-            if (password != ConfPassword)
-            {
-                ViewBag.ErrorMessage = "Las contraseñas no coinciden.";
-                return View();
-            }
 
             // 2. Verificar si el usuario ya existe (por Email o Cédula)
             var usuarios = Crud<Usuario>.GetAll();

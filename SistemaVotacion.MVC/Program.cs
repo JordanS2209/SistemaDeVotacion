@@ -10,6 +10,10 @@ namespace SistemaVotacion.MVC
         public static void Main(string[] args)
         {
             Crud<Usuario>.EndPoint = "https://localhost:7202/api/Usuarios";
+            Crud<Rol>.EndPoint = "https://localhost:7202/api/Roles";
+            Crud<TipoIdentificacion>.EndPoint = "https://localhost:7202/api/TiposIdentificaciones";
+            Crud<Genero>.EndPoint = "https://localhost:7202/api/Generos";
+
 
 
             var builder = WebApplication.CreateBuilder(args);

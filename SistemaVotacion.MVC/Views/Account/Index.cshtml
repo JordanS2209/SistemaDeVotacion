@@ -1,0 +1,43 @@
+﻿@{
+    ViewData["Title"] = "Iniciar Sesión";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <div class="card shadow p-4">
+                <h2 class="text-center mb-4">Sistema de Votación</h2>
+                <p class="text-center text-muted small">Ingrese sus credenciales para acceder</p>
+
+                <form asp-action="Login" asp-controller="Account" method="post">
+
+                    <div class="form-group mb-3">
+                        <label for="email" class="form-label">Correo Electrónico</label>
+                        <input type="email" class="form-control" name="email" id="email"
+                               required placeholder="nombre@correo.com">
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" name="password" id="password"
+                               required placeholder="********">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2">Ingresar al Sistema</button>
+
+                    @if (ViewBag.ErrorMessage != null)
+                    {
+                        <div class="alert alert-danger mt-3 text-center py-2" style="font-size: 0.9em;">
+                            <i class="bi bi-exclamation-triangle-fill"></i> @ViewBag.ErrorMessage
+                        </div>
+                    }
+                </form>
+
+                <div class="mt-4 text-center border-top pt-3">
+                    <span class="text-muted">¿No tienes cuenta?</span> <br />
+                    <a asp-action="Register" asp-controller="Account" class="text-decoration-none">Regístrate aquí</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

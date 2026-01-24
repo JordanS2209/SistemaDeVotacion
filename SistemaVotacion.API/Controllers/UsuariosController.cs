@@ -25,7 +25,12 @@ namespace SistemaVotacion.API.Controllers
         {
             try
             {
-                var usuarios = await _context.Usuarios.ToListAsync();
+                var usuarios = await _context.Usuarios
+                    .Include(u => u.Rol)
+                    .Include(u => u.TipoIdentificacion)
+                    .Include(u => u.Genero)
+                    .ToListAsync();
+
                 return Ok(usuarios);
             }
             catch (Exception ex)
@@ -35,7 +40,6 @@ namespace SistemaVotacion.API.Controllers
             }
         }
 
-        // GET: api/Usuarios/Codigo/5
         [HttpGet("Codigo/{id}")]
         public async Task<ActionResult<Usuario>> GetUsuario(int id)
         {

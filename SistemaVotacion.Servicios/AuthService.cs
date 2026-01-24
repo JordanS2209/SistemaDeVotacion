@@ -35,7 +35,7 @@ namespace SistemaVotacion.Servicios
                         new Claim(ClaimTypes.Name, usuario.Nombres),
                         new Claim(ClaimTypes.Email, usuario.Email),
                         new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
-                        new Claim(ClaimTypes.Role, usuario.IdRol.ToString()) // Agregamos el rol a la identidad
+                        new Claim(ClaimTypes.Role, usuario.Rol?.NombreRol ?? "Usuario") // Agregamos el rol a la identidad
                     };
 
                     var credencialDigital = new ClaimsIdentity(datosUsuario, "Cookies");

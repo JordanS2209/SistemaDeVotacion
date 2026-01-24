@@ -5,7 +5,7 @@ using SistemaVotacion.Modelos;
 
 namespace SistemaVotacion.MVC.Controllers
 {
-    [Authorize(Roles = "Admin,SuperAdmin")]
+    //[Authorize(Roles = "Admin,SuperAdmin")]
     public class CreationController : Controller
     {
         // NIVEL 1: Dashboard Principal

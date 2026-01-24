@@ -1,0 +1,42 @@
+﻿@model IEnumerable<SistemaVotacion.Modelos.Rol>
+
+@{
+    ViewData["Title"] = "Listado de Roles";
+}
+
+<div class="container mt-4">
+    <h2>Listado de Roles</h2>
+    <hr />
+
+    <div class="mb-3">
+        <a asp-action="Index" class="btn btn-secondary">Volver al Dashboard</a>
+        <a asp-action="CreateRol" class="btn btn-primary">Crear Nuevo Rol</a>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Nombre del Rol</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null)
+            {
+                @foreach (var rol in Model)
+                {
+                    <tr>
+                        <td>@rol.Id</td>
+                        <td>@rol.NombreRol</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="2" class="text-center">No hay datos disponibles</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

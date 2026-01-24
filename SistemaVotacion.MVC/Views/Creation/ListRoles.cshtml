@@ -1,0 +1,34 @@
+﻿@model IEnumerable<SistemaVotacion.Modelos.Rol>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Gestión de Roles</h3>
+        <a asp-action="CreateRol" class="btn btn-success">Nuevo Rol</a>
+    </div>
+
+    <table class="table table-hover shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th class="text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.NombreRol</td>
+                    <td>@item.DescripcionRol</td>
+                    <td class="text-center">
+                        <a asp-action="DeleteRol" asp-route-id="@item.Id" class="btn btn-sm btn-danger">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

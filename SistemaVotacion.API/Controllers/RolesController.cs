@@ -36,7 +36,7 @@ namespace SistemaVotacion.API.Controllers
         }
 
         // GET: api/Roles/Codigo/5
-        [HttpGet("Codigo/{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<Rol>> GetRol(int id)
         {
             try

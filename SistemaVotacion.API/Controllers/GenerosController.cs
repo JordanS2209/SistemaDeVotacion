@@ -36,7 +36,7 @@ namespace SistemaVotacion.API.Controllers
         }
 
         // GET: api/Generos/Codigo/5
-        [HttpGet("Codigo/{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<Genero>> GetGenero(int id)
         {
             try

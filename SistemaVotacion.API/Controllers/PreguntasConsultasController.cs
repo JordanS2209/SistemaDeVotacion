@@ -33,7 +33,7 @@ namespace SistemaVotacion.API.Controllers
             }
         }
 
-        [HttpGet("Codigo/{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<ApiResult<PreguntaConsulta>>> GetPreguntaConsulta(int id)
         {
             try

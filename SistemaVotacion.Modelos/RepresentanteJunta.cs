@@ -10,7 +10,9 @@ namespace SistemaVotacion.Modelos
 {
     public class RepresentanteJunta
     {
-        [Key] public int Id { get; set; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
 
         [Required, ForeignKey("Usuario")]
         public int IdUsuario { get; set; }

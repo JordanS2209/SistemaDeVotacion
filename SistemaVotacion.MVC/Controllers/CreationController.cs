@@ -34,9 +34,21 @@ namespace SistemaVotacion.MVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                Crud<Rol>.Create(nuevoRol);
-                return RedirectToAction(nameof(ListRoles));
+                try
+                {
+                    // Intentamos crear el rol
+                    Crud<Rol>.Create(nuevoRol);
+                    return RedirectToAction(nameof(ListRoles));
+                }
+                catch (Exception ex)
+                {
+                    // Si la API falla, agregamos el error al modelo
+                    // El primer parámetro vacío "" significa que es un error de todo el formulario
+                    ModelState.AddModelError("", "Error al conectar con la API: " + ex.Message);
+                }
             }
+
+            // Si llegamos aquí, es porque el modelo no era válido o hubo una excepción
             return View(nuevoRol);
         }
     }

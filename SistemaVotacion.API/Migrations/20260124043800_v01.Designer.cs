@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace SistemaVotacion.API.Migrations
 {
     [DbContext(typeof(SistemaVotacionAPIContext))]
-    [Migration("20260124033659_v01")]
+    [Migration("20260124043800_v01")]
     partial class v01
     {
         /// <inheritdoc />

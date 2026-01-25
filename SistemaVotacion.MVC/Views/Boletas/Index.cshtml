@@ -1,14 +1,15 @@
-﻿@{
+﻿@model List<SistemaVotacion.Modelos.Lista>
+
+@{
     Layout = null;
 }
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Boleta Electoral</title>
-
-    <!-- CSS desde wwwroot -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="~/css/Boleta.css" />
 </head>
 <body>
@@ -23,64 +24,54 @@
 
             <div class="boleta-opciones">
 
-                <!-- OPCIÓN 1 -->
-                <label class="opcion-card">
-                    <input type="radio" name="binomio" value="1" required>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var lista in Model)
+                    {
+                        var presidente = lista.Candidatos?
+                        .FirstOrDefault(c => c.Dignidad.NombreDignidad == "Presidente");
 
-                    <div class="opcion-content">
-                        <div class="partido">
-                            <img src="~/img/partido1.png" alt="Partido 1">
-                            <div>
-                                <strong>Movimiento Democrático</strong><br>
-                                <span class="lista">Lista 1</span>
+                        var vicepresidente = lista.Candidatos?
+                        .FirstOrDefault(c => c.Dignidad.NombreDignidad == "Vicepresidente");
+
+                        var logoLista = lista.RecursosMultimedia?
+                        .FirstOrDefault()?.UrlFoto ?? "img/default-lista.png";
+
+                        var fotoPresidente = presidente?.GaleriaMultimedia?
+                        .FirstOrDefault()?.UrlFoto ?? "img/default-persona.png";
+
+                        var fotoVicepresidente = vicepresidente?.GaleriaMultimedia?
+                        .FirstOrDefault()?.UrlFoto ?? "img/default-persona.png";
+
+                        <label class="opcion-card">
+                            <input type="radio" name="IdLista" value="@lista.Id" required />
+
+                            <div class="opcion-content">
+                                <div class="partido">
+                                    <img src="~/@logoLista" />
+                                    <div>
+                                        <strong>@lista.NombreLista</strong><br />
+                                        <span class="lista">Lista @lista.NumeroLista</span>
+                                    </div>
+                                </div>
+
+                                <div class="binomio">
+                                    <div class="persona">
+                                        <img src="~/@fotoPresidente" />
+                                        <span class="cargo">Presidente</span>
+                                        <span class="nombre">@presidente?.NombreCandidato</span>
+                                    </div>
+
+                                    <div class="persona">
+                                        <img src="~/@fotoVicepresidente" />
+                                        <span class="cargo">Vicepresidente</span>
+                                        <span class="nombre">@vicepresidente?.NombreCandidato</span>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-
-                        <div class="binomio">
-                            <div class="persona">
-                                <img src="~/img/presidente1.jpg" alt="Presidente">
-                                <span class="cargo">Presidente</span>
-                                <span class="nombre">Juan Pérez</span>
-                            </div>
-
-                            <div class="persona">
-                                <img src="~/img/vice1.jpg" alt="Vicepresidente">
-                                <span class="cargo">Vicepresidente</span>
-                                <span class="nombre">María López</span>
-                            </div>
-                        </div>
-                    </div>
-                </label>
-
-                <!-- OPCIÓN 2 -->
-                <label class="opcion-card">
-                    <input type="radio" name="binomio" value="2">
-
-                    <div class="opcion-content">
-                        <div class="partido">
-                            <img src="~/img/partido2.png" alt="Partido 2">
-                            <div>
-                                <strong>Unidad Nacional</strong><br>
-                                <span class="lista">Lista 7</span>
-                            </div>
-                        </div>
-
-                        <div class="binomio">
-                            <div class="persona">
-                                <img src="~/img/presidente2.jpg" alt="Presidente">
-                                <span class="cargo">Presidente</span>
-                                <span class="nombre">Carlos Andrade</span>
-                            </div>
-
-                            <div class="persona">
-                                <img src="~/img/vice2.jpg" alt="Vicepresidente">
-                                <span class="cargo">Vicepresidente</span>
-                                <span class="nombre">Ana Torres</span>
-                            </div>
-                        </div>
-                    </div>
-                </label>
-
+                        </label>
+                    }
+                }
             </div>
 
             <div class="acciones">
@@ -90,7 +81,6 @@
         </div>
     </form>
 
-    <!-- CONTADOR -->
     <div class="contador-elecciones">
         <span class="titulo">Tiempo restante</span>
         <span id="tiempo-restante">00:15:00</span>

@@ -19,8 +19,17 @@ namespace SistemaVotacion.MVC.Controllers
 
         public IActionResult ListRoles()
         {
-            var roles = Crud<Rol>.GetAll();
-            return View(roles);
+            try
+            {
+                var roles = Crud<Rol>.GetAll();
+                return View(roles);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
+                return View(new List<Rol>());
+            }
+            
         }
 
         // NIVEL 3: Formulario para crear (Vista)

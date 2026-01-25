@@ -19,22 +19,28 @@ namespace SistemaVotacion.API.Controllers
             _context = context;
         }
 
+        // GET: api/Parroquias
         [HttpGet]
-        public async Task<ActionResult<ApiResult<List<Parroquia>>>> GetParroquias()
+        public async Task<ActionResult<List<Parroquia>>> GetParroquias()
         {
             try
             {
-                var parroquias = await _context.Parroquias.ToListAsync();
-                return ApiResult<List<Parroquia>>.Ok(parroquias);
+                // Incluimos Recintos para que el MVC pueda mostrar el conteo por parroquia
+                var parroquias = await _context.Parroquias
+                    .Include(p => p.Recintos)
+                    .ToListAsync();
+                return Ok(parroquias);
             }
             catch (Exception ex)
             {
-                return ApiResult<List<Parroquia>>.Fail(ex.Message);
+                Console.WriteLine($"Error al obtener parroquias: {ex.Message}");
+                return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
 
+        // GET: api/Parroquias/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ApiResult<Parroquia>>> GetParroquia(int id)
+        public async Task<ActionResult<Parroquia>> GetParroquia(int id)
         {
             try
             {
@@ -45,23 +51,25 @@ namespace SistemaVotacion.API.Controllers
 
                 if (parroquia == null)
                 {
-                    return ApiResult<Parroquia>.Fail("Parroquia no encontrada.");
+                    return NotFound($"No se encontró la parroquia con ID {id}.");
                 }
 
-                return ApiResult<Parroquia>.Ok(parroquia);
+                return Ok(parroquia);
             }
             catch (Exception ex)
             {
-                return ApiResult<Parroquia>.Fail(ex.Message);
+                Console.WriteLine($"Error en GetParroquia: {ex.Message}");
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
             }
         }
 
+        // PUT: api/Parroquias/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResult<Parroquia>>> PutParroquia(int id, Parroquia parroquia)
+        public async Task<IActionResult> PutParroquia(int id, Parroquia parroquia)
         {
             if (id != parroquia.Id)
             {
-                return ApiResult<Parroquia>.Fail("ID de Parroquia no coincide.");
+                return BadRequest("El ID de la URL no coincide con el ID de la parroquia.");
             }
 
             _context.Entry(parroquia).State = EntityState.Modified;
@@ -69,56 +77,63 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                return NoContent(); // 204 No Content
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (DbUpdateConcurrencyException)
             {
                 if (!ParroquiaExists(id))
                 {
-                    return ApiResult<Parroquia>.Fail("Parroquia no encontrada.");
+                    return NotFound("La parroquia no existe.");
                 }
                 else
                 {
-                    return ApiResult<Parroquia>.Fail(ex.Message);
+                    throw;
                 }
             }
-
-            return ApiResult<Parroquia>.Ok(null);
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al actualizar: {ex.Message}");
+            }
         }
 
+        // POST: api/Parroquias
         [HttpPost]
-        public async Task<ActionResult<ApiResult<Parroquia>>> PostParroquia(Parroquia parroquia)
+        public async Task<ActionResult<Parroquia>> PostParroquia(Parroquia parroquia)
         {
             try
             {
                 _context.Parroquias.Add(parroquia);
                 await _context.SaveChangesAsync();
-                return ApiResult<Parroquia>.Ok(parroquia);
+
+                return CreatedAtAction(nameof(GetParroquia), new { id = parroquia.Id }, parroquia);
             }
             catch (Exception ex)
             {
-                return ApiResult<Parroquia>.Fail(ex.Message);
+                Console.WriteLine($"Error al crear parroquia: {ex.Message}");
+                return StatusCode(500, $"Error al guardar la parroquia: {ex.Message}");
             }
         }
 
+        // DELETE: api/Parroquias/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ApiResult<Parroquia>>> DeleteParroquia(int id)
+        public async Task<ActionResult<Parroquia>> DeleteParroquia(int id)
         {
             try
             {
                 var parroquia = await _context.Parroquias.FindAsync(id);
                 if (parroquia == null)
                 {
-                    return ApiResult<Parroquia>.Fail("Parroquia no encontrada.");
+                    return NotFound("Parroquia no encontrada.");
                 }
 
                 _context.Parroquias.Remove(parroquia);
                 await _context.SaveChangesAsync();
 
-                return ApiResult<Parroquia>.Ok(parroquia);
+                return Ok(parroquia);
             }
             catch (Exception ex)
             {
-                return ApiResult<Parroquia>.Fail(ex.Message);
+                return StatusCode(500, $"Error al eliminar la parroquia: {ex.Message}");
             }
         }
 

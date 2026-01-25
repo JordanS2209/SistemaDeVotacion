@@ -75,7 +75,6 @@ namespace SistemaVotacion.Servicios
                     Email = email,
                     Nombres = nombre,
                     Apellidos = apellido,
-                    // CIFRAMOS LA CONTRASEÑA ANTES DE GUARDAR
                     ContrasenaHash = password,
                     FechaNacimiento = fechaNacimiento,
                     NumeroIdentificacion = numeroIdentificacion,

@@ -1,0 +1,26 @@
+﻿@model SistemaVotacion.Modelos.Dignidad
+
+<div class="container mt-5">
+    <div class="card border-danger mx-auto" style="max-width: 500px;">
+        <div class="card-header bg-danger text-white text-center">
+            <h4>¿Eliminar esta Dignidad?</h4>
+        </div>
+        <div class="card-body">
+            <p><strong>Nombre:</strong> @Model.NombreDignidad</p>
+
+            <form asp-action="DeleteDignidad" method="post">
+                <input type="hidden" asp-for="Id" />
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-danger text-white">Confirmar Eliminación</button>
+                    <a asp-action="ListDignidades" class="btn btn-light">Cancelar</a>
+                </div>
+            </form>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-warning mt-3 small">@ViewBag.Error</div>
+            }
+        </div>
+    </div>
+</div>

@@ -14,7 +14,9 @@ namespace SistemaVotacion.MVC.Controllers
             return View();
         }
 
-        // NIVEL 2: Listado de Roles
+
+        //ROLES
+
         public IActionResult ListRoles()
         {
             var roles = Crud<Rol>.GetAll();
@@ -78,7 +80,7 @@ namespace SistemaVotacion.MVC.Controllers
         // ACCIÓN: Ejecutar Borrado (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteRol(Rol rol) // El formulario envía el objeto completo
+        public IActionResult DeleteRol(Rol rol) 
         {
             try
             {
@@ -93,5 +95,101 @@ namespace SistemaVotacion.MVC.Controllers
                 return View(rol); // Regresamos a la vista de confirmación con el error
             }
         }
+
+
+
+        //DIGNIDADES
+
+        public IActionResult ListDignidades()
+        {
+            try
+            {
+                var dignidades = Crud<Dignidad>.GetAll();
+                return View(dignidades);
+            }
+            catch (Exception ex)
+            {
+                // Esto te dirá en la consola de Visual Studio exactamente qué falló
+                Console.WriteLine("Error en ListDignidades: " + ex.Message);
+
+                // Enviamos una lista vacía para que la vista no se rompa, 
+                // pero mostramos el error en un ViewBag
+                ViewBag.Error = "No se pudo conectar con la API de Dignidades.";
+                return View(new List<Dignidad>());
+            }
+        }
+
+
+        public IActionResult CreateDignidad()
+        {
+            return View();
+        }
+
+        // ACCIÓN: Procesar Creación (POST)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CreateDignidad(Dignidad nuevaDignidad)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // Intentamos crear el rol
+                    Crud<Dignidad>.Create(nuevaDignidad);
+                    return RedirectToAction(nameof(ListDignidades));
+                }
+                catch (Exception ex)
+                {
+                    // Si la API falla, agregamos el error al modelo
+                    // El primer parámetro vacío "" significa que es un error de todo el formulario
+                    ModelState.AddModelError("", "Error al conectar con la API: " + ex.Message);
+                }
+            }
+
+            // Si llegamos aquí, es porque el modelo no era válido o hubo una excepción
+            return View(nuevaDignidad);
+        }
+
+        public IActionResult DeleteDignidad(int id)
+        {
+            try
+            {
+                // Buscamos el rol específico para mostrarlo en la vista de confirmación
+                var dignidad = Crud<Dignidad>.GetById(id);
+
+                if (dignidad == null)
+                {
+                    return NotFound();
+                }
+
+                return View(dignidad);
+            }
+            catch (Exception ex)
+            {
+                // Si hay error de conexión con la API
+                TempData["Error"] = "Error al obtener el rol: " + ex.Message;
+                return RedirectToAction(nameof(ListDignidades));
+            }
+        }
+
+        // ACCIÓN: Ejecutar Borrado (POST)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteDignidad(Dignidad dignidad)
+        {
+            try
+            {
+                // Usamos el Id del modelo para eliminarlo en la API
+                Crud<Dignidad>.Delete(dignidad.Id);
+                return RedirectToAction(nameof(ListDignidades));
+            }
+            catch (Exception ex)
+            {
+                // Si falla (por ejemplo, si el rol está siendo usado por un usuario)
+                ViewBag.Error = "No se pudo eliminar el rol. Detalles: " + ex.Message;
+                return View(dignidad); // Regresamos a la vista de confirmación con el error
+            }
+        }
+
     }
 }

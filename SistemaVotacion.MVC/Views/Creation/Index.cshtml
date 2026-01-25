@@ -1,0 +1,59 @@
+﻿@{
+    ViewData["Title"] = "Panel de Configuración";
+}
+
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary">Administración del Sistema</h1>
+        <p class="lead text-muted">Seleccione el proceso que desea gestionar</p>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+
+        <div class="col-md-4 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 dashboard-card">
+                <div class="card-body text-center p-4">
+                    <div class="icon-box mb-3 mx-auto bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-person-badge-fill fs-1"></i>
+                    </div>
+                    <h4 class="card-title fw-bold">Gestionar Roles</h4>
+                    <p class="card-text text-muted small">Administre los permisos y niveles de acceso de los usuarios.</p>
+                    <a asp-action="ListRoles" class="btn btn-primary w-100 mt-3 stretched-link">
+                        Entrar a Roles
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 dashboard-card">
+                <div class="card-body text-center p-4">
+                    <div class="icon-box mb-3 mx-auto bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-check2-square fs-1"></i>
+                    </div>
+                    <h4 class="card-title fw-bold">Tipo de Dignidades</h4>
+                    <p class="card-text text-muted small">Configure las diferentes dignidades que habra (Presidente, Vocal, etc.).</p>
+                    <a asp-action="ListDignidades" class="btn btn-primary w-100 mt-3 stretched-link">
+                        Entrar a Dignidades
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 dashboard-card">
+                <div class="card-body text-center p-4">
+                    <div class="icon-box mb-3 mx-auto bg-info bg-opacity-10 text-info">
+                        <i class="bi bi-card-text fs-1"></i>
+                    </div>
+                    <h4 class="card-title fw-bold">Identificaciones</h4>
+                    <p class="card-text text-muted small">Gestión de Cédulas, Pasaportes y carnets registrados.</p>
+                    <a href="#" class="btn btn-info w-100 text-white mt-3 stretched-link">
+                        Entrar a IDs
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

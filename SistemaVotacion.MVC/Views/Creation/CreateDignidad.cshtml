@@ -1,0 +1,40 @@
+﻿@model SistemaVotacion.Modelos.Dignidad
+
+@{
+    ViewData["Title"] = "Crear Nuevo Rol";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Registrar Nueva Dignidad</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreateDignidad" method="post">
+
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+
+                        <div class="mb-3">
+                            <label asp-for="NombreDignidad" class="form-label fw-bold">Nombre Dignidad</label>
+                            <input asp-for="NombreDignidad" class="form-control" placeholder="Ej: Presidente" required />
+                            <span asp-validation-for="NombreDignidad" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-save"></i> Guardar Dignidad
+                            </button>
+                            <a asp-action="ListDignidades" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

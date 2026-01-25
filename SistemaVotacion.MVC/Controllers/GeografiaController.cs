@@ -111,13 +111,26 @@ namespace SistemaVotacion.MVC.Controllers
 
         public IActionResult CreateCiudad()
         {
-            return View();
+            try
+            {
+                // Obtenemos la lista de provincias para el dropdown
+                var provincias = Crud<Provincia>.GetAll();
+                ViewBag.Provincias = provincias;
+
+                return View();
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "No se pudieron cargar las provincias: " + ex.Message;
+                return RedirectToAction(nameof(ListCiudades));
+            }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult CreateCiudad(Ciudad nuevaCiudad)
         {
+
             if (ModelState.IsValid)
             {
                 try
@@ -127,9 +140,12 @@ namespace SistemaVotacion.MVC.Controllers
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("", "Error: " + ex.Message);
+                    ModelState.AddModelError("", "Error al guardar en la API: " + ex.Message);
                 }
             }
+
+            // Si hubo un error, RECARGAMOS las provincias antes de devolver la vista
+            ViewBag.Provincias = Crud<Provincia>.GetAll();
             return View(nuevaCiudad);
         }
 

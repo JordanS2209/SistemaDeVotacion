@@ -1,16 +1,31 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using SistemaVotacion.ApiConsumer;
+using SistemaVotacion.Modelos;
 
 namespace SistemaVotacion.MVC.Controllers
 {
     public class BoletasController : Controller
     {
-        // GET: BoletaController
-        public ActionResult Index()
+        [HttpGet]
+        public IActionResult Index()
         {
-            return View();
-        }
+            try
+            {
+                var listas = Crud<Lista>.GetAll();
 
-        // GET: BoletaController/Details/5
+                if (listas == null || !listas.Any())
+                {
+                    return View("ProcesoNoDisponible");
+                }
+
+                return View(listas);
+            }
+            catch (Exception ex)
+            {
+                // Aquí puedes loguear el error si quieres
+                ViewBag.Error = ex.Message;
+                return View("ProcesoNoDisponible");
+            }
+        }
     }
 }

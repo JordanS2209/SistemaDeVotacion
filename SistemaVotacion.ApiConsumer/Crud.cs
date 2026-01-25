@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using SistemaVotacion.Modelos;
+using System.Net.Http;
 using System.Text;
 
 namespace SistemaVotacion.ApiConsumer
@@ -8,19 +9,46 @@ namespace SistemaVotacion.ApiConsumer
     {
         public static string EndPoint { get; set; }
 
+        private static HttpClient CreateClient()
+        {
+            var client = new HttpClient();
+
+            
+            return client;
+        }
+
         public static List<T> GetAll()
         {
-            using (var client = new HttpClient())
+            if (string.IsNullOrWhiteSpace(EndPoint))
             {
-                var response = client.GetAsync(EndPoint).Result;
-                if (response.IsSuccessStatusCode)
+                throw new InvalidOperationException($"El EndPoint de Crud<{typeof(T).Name}> no está configurado.");
+            }
+
+            using (var client = CreateClient())
+            {
+                try
                 {
+                    var response = client.GetAsync(EndPoint).Result;
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        throw new Exception($"Error HTTP {(int)response.StatusCode} al llamar a {EndPoint}");
+                    }
+
                     var json = response.Content.ReadAsStringAsync().Result;
-                    return JsonConvert.DeserializeObject<List<T>>(json);
+
+                    if (string.IsNullOrWhiteSpace(json))
+                    {
+                        return new List<T>();
+                    }
+
+                    var result = JsonConvert.DeserializeObject<List<T>>(json);
+                    return result ?? new List<T>();
                 }
-                else
+                catch (HttpRequestException ex)
                 {
-                    throw new Exception($"Error: {response.StatusCode}");
+                    // Error típico cuando el puerto no está escuchando
+                    throw new Exception($"No se pudo conectar con la API ({EndPoint}). Detalle: {ex.Message}", ex);
                 }
             }
         }

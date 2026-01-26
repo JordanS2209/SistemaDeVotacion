@@ -19,22 +19,24 @@ namespace SistemaVotacion.API.Controllers
             _context = context;
         }
 
+        // GET: api/Dignidades
         [HttpGet]
-        public async Task<ActionResult<ApiResult<List<Dignidad>>>> GetDignidades()
+        public async Task<ActionResult<List<Dignidad>>> GetDignidades()
         {
             try
             {
                 var dignidades = await _context.Dignidades.ToListAsync();
-                return ApiResult<List<Dignidad>>.Ok(dignidades);
+                return Ok(dignidades);
             }
             catch (Exception ex)
             {
-                return ApiResult<List<Dignidad>>.Fail(ex.Message);
+                return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
 
-        [HttpGet("Codigo/{id}")]
-        public async Task<ActionResult<ApiResult<Dignidad>>> GetDignidad(int id)
+        // GET: api/Dignidades/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Dignidad>> GetDignidad(int id)
         {
             try
             {
@@ -45,23 +47,24 @@ namespace SistemaVotacion.API.Controllers
 
                 if (dignidad == null)
                 {
-                    return ApiResult<Dignidad>.Fail("Dignidad no encontrada.");
+                    return NotFound($"Dignidad con ID {id} no encontrada.");
                 }
 
-                return ApiResult<Dignidad>.Ok(dignidad);
+                return Ok(dignidad); 
             }
             catch (Exception ex)
             {
-                return ApiResult<Dignidad>.Fail(ex.Message);
+                return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
 
+        // PUT: api/Dignidades/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResult<Dignidad>>> PutDignidad(int id, Dignidad dignidad)
+        public async Task<IActionResult> PutDignidad(int id, Dignidad dignidad)
         {
             if (id != dignidad.Id)
             {
-                return ApiResult<Dignidad>.Fail("ID de Dignidad no coincide.");
+                return BadRequest("ID de Dignidad no coincide.");
             }
 
             _context.Entry(dignidad).State = EntityState.Modified;
@@ -69,56 +72,62 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                return NoContent(); 
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (DbUpdateConcurrencyException)
             {
                 if (!DignidadExists(id))
                 {
-                    return ApiResult<Dignidad>.Fail("Dignidad no encontrada.");
+                    return NotFound("Dignidad no encontrada.");
                 }
                 else
                 {
-                    return ApiResult<Dignidad>.Fail(ex.Message);
+                    throw;
                 }
             }
-
-            return ApiResult<Dignidad>.Ok(null);
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al actualizar: {ex.Message}");
+            }
         }
 
+        // POST: api/Dignidades
         [HttpPost]
-        public async Task<ActionResult<ApiResult<Dignidad>>> PostDignidad(Dignidad dignidad)
+        public async Task<ActionResult<Dignidad>> PostDignidad(Dignidad dignidad)
         {
             try
             {
                 _context.Dignidades.Add(dignidad);
                 await _context.SaveChangesAsync();
-                return ApiResult<Dignidad>.Ok(dignidad);
+
+                return CreatedAtAction(nameof(GetDignidad), new { id = dignidad.Id }, dignidad);
             }
             catch (Exception ex)
             {
-                return ApiResult<Dignidad>.Fail(ex.Message);
+                return StatusCode(500, $"Error al guardar: {ex.Message}");
             }
         }
 
+        // DELETE: api/Dignidades/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ApiResult<Dignidad>>> DeleteDignidad(int id)
+        public async Task<ActionResult<Dignidad>> DeleteDignidad(int id)
         {
             try
             {
                 var dignidad = await _context.Dignidades.FindAsync(id);
                 if (dignidad == null)
                 {
-                    return ApiResult<Dignidad>.Fail("Dignidad no encontrada.");
+                    return NotFound("Dignidad no encontrada.");
                 }
 
                 _context.Dignidades.Remove(dignidad);
                 await _context.SaveChangesAsync();
 
-                return ApiResult<Dignidad>.Ok(dignidad);
+                return Ok(dignidad); 
             }
             catch (Exception ex)
             {
-                return ApiResult<Dignidad>.Fail(ex.Message);
+                return StatusCode(500, $"Error al eliminar: {ex.Message}");
             }
         }
 

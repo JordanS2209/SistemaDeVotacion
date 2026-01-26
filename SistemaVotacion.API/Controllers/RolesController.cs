@@ -19,22 +19,25 @@ namespace SistemaVotacion.API.Controllers
             _context = context;
         }
 
+        // GET: api/Roles
         [HttpGet]
-        public async Task<ActionResult<ApiResult<List<Rol>>>> GetRoles()
+        public async Task<ActionResult<List<Rol>>> GetRoles()
         {
             try
             {
                 var roles = await _context.Roles.ToListAsync();
-                return ApiResult<List<Rol>>.Ok(roles);
+                return Ok(roles);
             }
             catch (Exception ex)
             {
-                return ApiResult<List<Rol>>.Fail(ex.Message);
+                Console.WriteLine($"Error al obtener roles: {ex.Message}");
+                return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
 
-        [HttpGet("Codigo/{id}")]
-        public async Task<ActionResult<ApiResult<Rol>>> GetRol(int id)
+        // GET: api/Roles/Codigo/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Rol>> GetRol(int id)
         {
             try
             {
@@ -45,23 +48,25 @@ namespace SistemaVotacion.API.Controllers
 
                 if (rol == null)
                 {
-                    return ApiResult<Rol>.Fail("Rol no encontrado.");
+                    return NotFound($"No se encontró el rol con ID {id}.");
                 }
 
-                return ApiResult<Rol>.Ok(rol);
+                return Ok(rol);
             }
             catch (Exception ex)
             {
-                return ApiResult<Rol>.Fail(ex.Message);
+                Console.WriteLine($"Error en GetRol: {ex.Message}");
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
             }
         }
 
+        // PUT: api/Roles/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResult<Rol>>> PutRol(int id, Rol rol)
+        public async Task<IActionResult> PutRol(int id, Rol rol)
         {
             if (id != rol.Id)
             {
-                return ApiResult<Rol>.Fail("ID de Rol no coincide.");
+                return BadRequest("El ID de la URL no coincide con el ID del rol.");
             }
 
             _context.Entry(rol).State = EntityState.Modified;
@@ -69,56 +74,63 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                return NoContent(); 
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (DbUpdateConcurrencyException)
             {
                 if (!RolExists(id))
                 {
-                    return ApiResult<Rol>.Fail("Rol no encontrado.");
+                    return NotFound("El rol no existe.");
                 }
                 else
                 {
-                    return ApiResult<Rol>.Fail(ex.Message);
+                    throw;
                 }
             }
-
-            return ApiResult<Rol>.Ok(null);
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al actualizar el rol: {ex.Message}");
+            }
         }
 
+        // POST: api/Roles
         [HttpPost]
-        public async Task<ActionResult<ApiResult<Rol>>> PostRol(Rol rol)
+        public async Task<ActionResult<Rol>> PostRol(Rol rol)
         {
             try
             {
                 _context.Roles.Add(rol);
                 await _context.SaveChangesAsync();
-                return ApiResult<Rol>.Ok(rol);
+
+                return CreatedAtAction(nameof(GetRol), new { id = rol.Id }, rol);
             }
             catch (Exception ex)
             {
-                return ApiResult<Rol>.Fail(ex.Message);
+                Console.WriteLine($"Error al crear rol: {ex.Message}");
+                return StatusCode(500, $"Error al guardar el rol: {ex.Message}");
             }
         }
 
+        // DELETE: api/Roles/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ApiResult<Rol>>> DeleteRol(int id)
+        public async Task<ActionResult<Rol>> DeleteRol(int id)
         {
             try
             {
                 var rol = await _context.Roles.FindAsync(id);
                 if (rol == null)
                 {
-                    return ApiResult<Rol>.Fail("Rol no encontrado.");
+                    return NotFound("Rol no encontrado.");
                 }
 
                 _context.Roles.Remove(rol);
                 await _context.SaveChangesAsync();
 
-                return ApiResult<Rol>.Ok(rol);
+                return Ok(rol); 
             }
             catch (Exception ex)
             {
-                return ApiResult<Rol>.Fail(ex.Message);
+                return StatusCode(500, $"Error al eliminar el rol: {ex.Message}");
             }
         }
 

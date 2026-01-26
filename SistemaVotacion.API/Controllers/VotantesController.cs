@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemaVotacion.Modelos;
@@ -19,22 +20,28 @@ namespace SistemaVotacion.API.Controllers
             _context = context;
         }
 
+        // GET: api/Votantes
         [HttpGet]
-        public async Task<ActionResult<ApiResult<List<Votante>>>> GetVotantes()
+        public async Task<ActionResult<List<Votante>>> GetVotantes()
         {
             try
             {
-                var votantes = await _context.Votantes.ToListAsync();
-                return ApiResult<List<Votante>>.Ok(votantes);
+                // Incluimos la Junta para saber su ubicación básica en el listado
+                var votantes = await _context.Votantes
+                    .Include(v => v.Junta)
+                    .ToListAsync();
+                return Ok(votantes);
             }
             catch (Exception ex)
             {
-                return ApiResult<List<Votante>>.Fail(ex.Message);
+                Console.WriteLine($"Error al obtener votantes: {ex.Message}");
+                return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
 
-        [HttpGet("Codigo/{id}")]
-        public async Task<ActionResult<ApiResult<Votante>>> GetVotante(int id)
+        // GET: api/Votantes/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Votante>> GetVotante(int id)
         {
             try
             {
@@ -46,23 +53,25 @@ namespace SistemaVotacion.API.Controllers
 
                 if (votante == null)
                 {
-                    return ApiResult<Votante>.Fail("Votante no encontrado.");
+                    return NotFound($"No se encontró el votante con ID {id}.");
                 }
 
-                return ApiResult<Votante>.Ok(votante);
+                return Ok(votante);
             }
             catch (Exception ex)
             {
-                return ApiResult<Votante>.Fail(ex.Message);
+                Console.WriteLine($"Error en GetVotante: {ex.Message}");
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
             }
         }
 
+        // PUT: api/Votantes/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResult<Votante>>> PutVotante(int id, Votante votante)
+        public async Task<IActionResult> PutVotante(int id, Votante votante)
         {
             if (id != votante.Id)
             {
-                return ApiResult<Votante>.Fail("ID de Votante no coincide.");
+                return BadRequest("El ID de la URL no coincide con el ID del votante.");
             }
 
             _context.Entry(votante).State = EntityState.Modified;
@@ -70,56 +79,65 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                return NoContent(); 
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (DbUpdateConcurrencyException)
             {
                 if (!VotanteExists(id))
                 {
-                    return ApiResult<Votante>.Fail("Votante no encontrado.");
+                    return NotFound("El votante no existe.");
                 }
                 else
                 {
-                    return ApiResult<Votante>.Fail(ex.Message);
+                    throw;
                 }
             }
-
-            return ApiResult<Votante>.Ok(null);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al actualizar votante: {ex.Message}");
+                return StatusCode(500, $"Error al actualizar: {ex.Message}");
+            }
         }
 
+        // POST: api/Votantes
         [HttpPost]
-        public async Task<ActionResult<ApiResult<Votante>>> PostVotante(Votante votante)
+        public async Task<ActionResult<Votante>> PostVotante(Votante votante)
         {
             try
             {
                 _context.Votantes.Add(votante);
                 await _context.SaveChangesAsync();
-                return ApiResult<Votante>.Ok(votante);
+
+                return CreatedAtAction(nameof(GetVotante), new { id = votante.Id }, votante);
             }
             catch (Exception ex)
             {
-                return ApiResult<Votante>.Fail(ex.Message);
+                Console.WriteLine($"Error al crear votante: {ex.Message}");
+                return StatusCode(500, $"Error al guardar el votante: {ex.Message}");
             }
         }
 
+        // DELETE: api/Votantes/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ApiResult<Votante>>> DeleteVotante(int id)
+        public async Task<ActionResult<Votante>> DeleteVotante(int id)
         {
             try
             {
                 var votante = await _context.Votantes.FindAsync(id);
                 if (votante == null)
                 {
-                    return ApiResult<Votante>.Fail("Votante no encontrado.");
+                    return NotFound("Votante no encontrado.");
                 }
 
                 _context.Votantes.Remove(votante);
                 await _context.SaveChangesAsync();
 
-                return ApiResult<Votante>.Ok(votante);
+                return Ok(votante); 
             }
             catch (Exception ex)
             {
-                return ApiResult<Votante>.Fail(ex.Message);
+                Console.WriteLine($"Error al eliminar votante: {ex.Message}");
+                return StatusCode(500, $"Error al eliminar: {ex.Message}");
             }
         }
 

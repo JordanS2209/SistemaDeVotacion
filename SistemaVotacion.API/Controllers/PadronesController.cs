@@ -19,22 +19,29 @@ namespace SistemaVotacion.API.Controllers
             _context = context;
         }
 
+        // GET: api/Padrones
         [HttpGet]
-        public async Task<ActionResult<ApiResult<List<Padron>>>> GetPadrones()
+        public async Task<ActionResult<List<Padron>>> GetPadrones()
         {
             try
             {
-                var padrones = await _context.Padrones.ToListAsync();
-                return ApiResult<List<Padron>>.Ok(padrones);
+                // Incluimos Proceso y Votante para mostrar quién vota y en qué elección
+                var padrones = await _context.Padrones
+                    .Include(p => p.Proceso)
+                    .Include(p => p.Votante)
+                    .ToListAsync();
+                return Ok(padrones);
             }
             catch (Exception ex)
             {
-                return ApiResult<List<Padron>>.Fail(ex.Message);
+                Console.WriteLine($"Error al obtener el padrón electoral: {ex.Message}");
+                return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
 
-        [HttpGet("Codigo/{id}")]
-        public async Task<ActionResult<ApiResult<Padron>>> GetPadron(int id)
+        // GET: api/Padrones/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Padron>> GetPadron(int id)
         {
             try
             {
@@ -45,23 +52,25 @@ namespace SistemaVotacion.API.Controllers
 
                 if (padron == null)
                 {
-                    return ApiResult<Padron>.Fail("Padron no encontrado.");
+                    return NotFound($"Registro de padrón con ID {id} no encontrado.");
                 }
 
-                return ApiResult<Padron>.Ok(padron);
+                return Ok(padron);
             }
             catch (Exception ex)
             {
-                return ApiResult<Padron>.Fail(ex.Message);
+                Console.WriteLine($"Error en GetPadron: {ex.Message}");
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
             }
         }
 
+        // PUT: api/Padrones/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResult<Padron>>> PutPadron(int id, Padron padron)
+        public async Task<IActionResult> PutPadron(int id, Padron padron)
         {
             if (id != padron.Id)
             {
-                return ApiResult<Padron>.Fail("ID de Padron no coincide.");
+                return BadRequest("El ID de la URL no coincide con el ID del registro de padrón.");
             }
 
             _context.Entry(padron).State = EntityState.Modified;
@@ -69,56 +78,65 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                return NoContent();
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (DbUpdateConcurrencyException)
             {
                 if (!PadronExists(id))
                 {
-                    return ApiResult<Padron>.Fail("Padron no encontrado.");
+                    return NotFound("El registro de padrón no existe.");
                 }
                 else
                 {
-                    return ApiResult<Padron>.Fail(ex.Message);
+                    throw;
                 }
             }
-
-            return ApiResult<Padron>.Ok(null);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al actualizar padrón: {ex.Message}");
+                return StatusCode(500, $"Error al actualizar: {ex.Message}");
+            }
         }
 
+        // POST: api/Padrones
         [HttpPost]
-        public async Task<ActionResult<ApiResult<Padron>>> PostPadron(Padron padron)
+        public async Task<ActionResult<Padron>> PostPadron(Padron padron)
         {
             try
             {
                 _context.Padrones.Add(padron);
                 await _context.SaveChangesAsync();
-                return ApiResult<Padron>.Ok(padron);
+
+                return CreatedAtAction(nameof(GetPadron), new { id = padron.Id }, padron);
             }
             catch (Exception ex)
             {
-                return ApiResult<Padron>.Fail(ex.Message);
+                Console.WriteLine($"Error al crear registro en el padrón: {ex.Message}");
+                return StatusCode(500, $"Error al guardar: {ex.Message}");
             }
         }
 
+        // DELETE: api/Padrones/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ApiResult<Padron>>> DeletePadron(int id)
+        public async Task<ActionResult<Padron>> DeletePadron(int id)
         {
             try
             {
                 var padron = await _context.Padrones.FindAsync(id);
                 if (padron == null)
                 {
-                    return ApiResult<Padron>.Fail("Padron no encontrado.");
+                    return NotFound("Registro de padrón no encontrado.");
                 }
 
                 _context.Padrones.Remove(padron);
                 await _context.SaveChangesAsync();
 
-                return ApiResult<Padron>.Ok(padron);
+                return Ok(padron);
             }
             catch (Exception ex)
             {
-                return ApiResult<Padron>.Fail(ex.Message);
+                Console.WriteLine($"Error al eliminar del padrón: {ex.Message}");
+                return StatusCode(500, $"Error al eliminar: {ex.Message}");
             }
         }
 

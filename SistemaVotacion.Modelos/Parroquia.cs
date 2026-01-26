@@ -10,7 +10,9 @@ namespace SistemaVotacion.Modelos
 {
     public class Parroquia
     {
-        [Key] public int Id { get; set; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
 
         public string NombreParroquia { get; set; }
 

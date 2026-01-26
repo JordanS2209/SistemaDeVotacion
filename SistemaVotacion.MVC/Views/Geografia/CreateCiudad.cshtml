@@ -1,0 +1,47 @@
+﻿@model SistemaVotacion.Modelos.Ciudad
+
+@{
+    ViewData["Title"] = "Crear Ciudad";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0">
+                <div class="card-header bg-success text-white py-3">
+                    <h4 class="mb-0"><i class="bi bi-building-add"></i> Nueva Ciudad</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="CreateCiudad" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Provincia a la que pertenece</label>
+                            <select asp-for="IdProvincia" class="form-select"
+                                    asp-items="@(new SelectList(ViewBag.Provincias, "Id", "NombreProvincia"))"
+                                    required>
+                                <option value="">-- Seleccione una Provincia --</option>
+                            </select>
+                            <span asp-validation-for="IdProvincia" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="NombreCiudad" class="form-label fw-bold">Nombre de la Ciudad / Cantón</label>
+                            <input asp-for="NombreCiudad" class="form-control" placeholder="Ej: Otavalo" required />
+                            <span asp-validation-for="NombreCiudad" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success py-2">
+                                <i class="bi bi-save"></i> Guardar Ciudad
+                            </button>
+                            <a asp-action="ListCiudades" class="btn btn-outline-secondary">
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

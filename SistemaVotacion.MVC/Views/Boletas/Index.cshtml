@@ -1,0 +1,90 @@
+﻿@model List<SistemaVotacion.Modelos.Lista>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Boleta Electoral</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="~/css/Boleta.css" />
+</head>
+<body>
+
+    <form method="post">
+        <div class="boleta-container">
+
+            <div class="boleta-header">
+                <h1>Elecciones Generales</h1>
+                <p>Seleccione un binomio presidencial</p>
+            </div>
+
+            <div class="boleta-opciones">
+
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var lista in Model)
+                    {
+                        var presidente = lista.Candidatos?
+                        .FirstOrDefault(c => c.Dignidad.NombreDignidad == "Presidente");
+
+                        var vicepresidente = lista.Candidatos?
+                        .FirstOrDefault(c => c.Dignidad.NombreDignidad == "Vicepresidente");
+
+                        var logoLista = lista.RecursosMultimedia?
+                        .FirstOrDefault()?.UrlFoto ?? "img/default-lista.png";
+
+                        var fotoPresidente = presidente?.GaleriaMultimedia?
+                        .FirstOrDefault()?.UrlFoto ?? "img/default-persona.png";
+
+                        var fotoVicepresidente = vicepresidente?.GaleriaMultimedia?
+                        .FirstOrDefault()?.UrlFoto ?? "img/default-persona.png";
+
+                        <label class="opcion-card">
+                            <input type="radio" name="IdLista" value="@lista.Id" required />
+
+                            <div class="opcion-content">
+                                <div class="partido">
+                                    <img src="~/@logoLista" />
+                                    <div>
+                                        <strong>@lista.NombreLista</strong><br />
+                                        <span class="lista">Lista @lista.NumeroLista</span>
+                                    </div>
+                                </div>
+
+                                <div class="binomio">
+                                    <div class="persona">
+                                        <img src="~/@fotoPresidente" />
+                                        <span class="cargo">Presidente</span>
+                                        <span class="nombre">@presidente?.NombreCandidato</span>
+                                    </div>
+
+                                    <div class="persona">
+                                        <img src="~/@fotoVicepresidente" />
+                                        <span class="cargo">Vicepresidente</span>
+                                        <span class="nombre">@vicepresidente?.NombreCandidato</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+                    }
+                }
+            </div>
+
+            <div class="acciones">
+                <button type="submit" class="btn-votar">VOTAR</button>
+            </div>
+
+        </div>
+    </form>
+
+    <div class="contador-elecciones">
+        <span class="titulo">Tiempo restante</span>
+        <span id="tiempo-restante">00:15:00</span>
+    </div>
+
+</body>
+</html>

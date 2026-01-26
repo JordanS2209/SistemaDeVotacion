@@ -10,7 +10,9 @@ namespace SistemaVotacion.Modelos
 {
     public class Ciudad
     {
-        [Key] public int Id { get; set; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
         
         public string NombreCiudad{ get; set; }
 

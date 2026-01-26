@@ -9,6 +9,10 @@ namespace SistemaVotacion.API
     {
         public static void Main(string[] args)
         {
+
+            //Ignora restriccion de Postgres y permite ingresar Fecha sin zona horario obligatoria
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddDbContext<SistemaVotacionAPIContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("SistemaVotacionAPIContext") ?? throw new InvalidOperationException("Connection string 'SistemaVotacionAPIContext' not found.")));

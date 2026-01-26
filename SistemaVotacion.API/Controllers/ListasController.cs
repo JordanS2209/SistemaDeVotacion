@@ -19,22 +19,27 @@ namespace SistemaVotacion.API.Controllers
             _context = context;
         }
 
+        // GET: api/Listas
         [HttpGet]
-        public async Task<ActionResult<ApiResult<List<Lista>>>> GetListas()
+        public async Task<ActionResult<List<Lista>>> GetListas()
         {
             try
             {
-                var listas = await _context.Listas.ToListAsync();
-                return ApiResult<List<Lista>>.Ok(listas);
+                var listas = await _context.Listas
+                    .Include(l => l.Procesos)
+                    .ToListAsync();
+                return Ok(listas);
             }
             catch (Exception ex)
             {
-                return ApiResult<List<Lista>>.Fail(ex.Message);
+                Console.WriteLine($"Error al obtener las listas políticas: {ex.Message}");
+                return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
 
-        [HttpGet("Codigo/{id}")]
-        public async Task<ActionResult<ApiResult<Lista>>> GetLista(int id)
+        // GET: api/Listas/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Lista>> GetLista(int id)
         {
             try
             {
@@ -47,23 +52,25 @@ namespace SistemaVotacion.API.Controllers
 
                 if (lista == null)
                 {
-                    return ApiResult<Lista>.Fail("Lista no encontrada.");
+                    return NotFound($"No se encontró la lista política con ID {id}.");
                 }
 
-                return ApiResult<Lista>.Ok(lista);
+                return Ok(lista);
             }
             catch (Exception ex)
             {
-                return ApiResult<Lista>.Fail(ex.Message);
+                Console.WriteLine($"Error en GetLista: {ex.Message}");
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
             }
         }
 
+        // PUT: api/Listas/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResult<Lista>>> PutLista(int id, Lista lista)
+        public async Task<IActionResult> PutLista(int id, Lista lista)
         {
             if (id != lista.Id)
             {
-                return ApiResult<Lista>.Fail("ID de Lista no coincide.");
+                return BadRequest("El ID de la URL no coincide con el ID de la lista.");
             }
 
             _context.Entry(lista).State = EntityState.Modified;
@@ -71,56 +78,65 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                return NoContent(); 
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (DbUpdateConcurrencyException)
             {
                 if (!ListaExists(id))
                 {
-                    return ApiResult<Lista>.Fail("Lista no encontrada.");
+                    return NotFound("La lista política no existe.");
                 }
                 else
                 {
-                    return ApiResult<Lista>.Fail(ex.Message);
+                    throw;
                 }
             }
-
-            return ApiResult<Lista>.Ok(null);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al actualizar la lista: {ex.Message}");
+                return StatusCode(500, $"Error al actualizar: {ex.Message}");
+            }
         }
 
+        // POST: api/Listas
         [HttpPost]
-        public async Task<ActionResult<ApiResult<Lista>>> PostLista(Lista lista)
+        public async Task<ActionResult<Lista>> PostLista(Lista lista)
         {
             try
             {
                 _context.Listas.Add(lista);
                 await _context.SaveChangesAsync();
-                return ApiResult<Lista>.Ok(lista);
+
+                return CreatedAtAction(nameof(GetLista), new { id = lista.Id }, lista);
             }
             catch (Exception ex)
             {
-                return ApiResult<Lista>.Fail(ex.Message);
+                Console.WriteLine($"Error al crear la lista política: {ex.Message}");
+                return StatusCode(500, $"Error al guardar la lista: {ex.Message}");
             }
         }
 
+        // DELETE: api/Listas/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ApiResult<Lista>>> DeleteLista(int id)
+        public async Task<ActionResult<Lista>> DeleteLista(int id)
         {
             try
             {
                 var lista = await _context.Listas.FindAsync(id);
                 if (lista == null)
                 {
-                    return ApiResult<Lista>.Fail("Lista no encontrada.");
+                    return NotFound("Lista política no encontrada.");
                 }
 
                 _context.Listas.Remove(lista);
                 await _context.SaveChangesAsync();
 
-                return ApiResult<Lista>.Ok(lista);
+                return Ok(lista);
             }
             catch (Exception ex)
             {
-                return ApiResult<Lista>.Fail(ex.Message);
+                Console.WriteLine($"Error al eliminar la lista: {ex.Message}");
+                return StatusCode(500, $"Error al eliminar: {ex.Message}");
             }
         }
 

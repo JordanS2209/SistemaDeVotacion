@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemaVotacion.Modelos;
@@ -19,22 +20,29 @@ namespace SistemaVotacion.API.Controllers
             _context = context;
         }
 
+        // GET: api/JuntasReceptoras
         [HttpGet]
-        public async Task<ActionResult<ApiResult<List<JuntaReceptora>>>> GetJuntasReceptoras()
+        public async Task<ActionResult<List<JuntaReceptora>>> GetJuntasReceptoras()
         {
             try
             {
-                var juntas = await _context.JuntasReceptoras.ToListAsync();
-                return ApiResult<List<JuntaReceptora>>.Ok(juntas);
+                // Incluimos Recintos y Genero para mostrar ubicación y tipo de junta en el listado
+                var juntas = await _context.JuntasReceptoras
+                    .Include(j => j.Recintos)
+                    .Include(j => j.Genero)
+                    .ToListAsync();
+                return Ok(juntas);
             }
             catch (Exception ex)
             {
-                return ApiResult<List<JuntaReceptora>>.Fail(ex.Message);
+                Console.WriteLine($"Error al obtener Juntas Receptoras: {ex.Message}");
+                return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
 
-        [HttpGet("Codigo/{id}")]
-        public async Task<ActionResult<ApiResult<JuntaReceptora>>> GetJuntaReceptora(int id)
+        // GET: api/JuntasReceptoras/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<JuntaReceptora>> GetJuntaReceptora(int id)
         {
             try
             {
@@ -49,23 +57,25 @@ namespace SistemaVotacion.API.Controllers
 
                 if (junta == null)
                 {
-                    return ApiResult<JuntaReceptora>.Fail("Junta Receptora no encontrada.");
+                    return NotFound($"No se encontró la Junta Receptora con ID {id}.");
                 }
 
-                return ApiResult<JuntaReceptora>.Ok(junta);
+                return Ok(junta);
             }
             catch (Exception ex)
             {
-                return ApiResult<JuntaReceptora>.Fail(ex.Message);
+                Console.WriteLine($"Error en GetJuntaReceptora: {ex.Message}");
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
             }
         }
 
+        // PUT: api/JuntasReceptoras/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResult<JuntaReceptora>>> PutJuntaReceptora(int id, JuntaReceptora junta)
+        public async Task<IActionResult> PutJuntaReceptora(int id, JuntaReceptora junta)
         {
             if (id != junta.Id)
             {
-                return ApiResult<JuntaReceptora>.Fail("ID de Junta Receptora no coincide.");
+                return BadRequest("El ID de la URL no coincide con el ID de la junta.");
             }
 
             _context.Entry(junta).State = EntityState.Modified;
@@ -73,56 +83,65 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                return NoContent();
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (DbUpdateConcurrencyException)
             {
                 if (!JuntaReceptoraExists(id))
                 {
-                    return ApiResult<JuntaReceptora>.Fail("Junta Receptora no encontrada.");
+                    return NotFound("La Junta Receptora no existe.");
                 }
                 else
                 {
-                    return ApiResult<JuntaReceptora>.Fail(ex.Message);
+                    throw;
                 }
             }
-
-            return ApiResult<JuntaReceptora>.Ok(null);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al actualizar Junta Receptora: {ex.Message}");
+                return StatusCode(500, $"Error al actualizar: {ex.Message}");
+            }
         }
 
+        // POST: api/JuntasReceptoras
         [HttpPost]
-        public async Task<ActionResult<ApiResult<JuntaReceptora>>> PostJuntaReceptora(JuntaReceptora junta)
+        public async Task<ActionResult<JuntaReceptora>> PostJuntaReceptora(JuntaReceptora junta)
         {
             try
             {
                 _context.JuntasReceptoras.Add(junta);
                 await _context.SaveChangesAsync();
-                return ApiResult<JuntaReceptora>.Ok(junta);
+
+                return CreatedAtAction(nameof(GetJuntaReceptora), new { id = junta.Id }, junta);
             }
             catch (Exception ex)
             {
-                return ApiResult<JuntaReceptora>.Fail(ex.Message);
+                Console.WriteLine($"Error al crear Junta Receptora: {ex.Message}");
+                return StatusCode(500, $"Error al guardar: {ex.Message}");
             }
         }
 
+        // DELETE: api/JuntasReceptoras/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ApiResult<JuntaReceptora>>> DeleteJuntaReceptora(int id)
+        public async Task<ActionResult<JuntaReceptora>> DeleteJuntaReceptora(int id)
         {
             try
             {
                 var junta = await _context.JuntasReceptoras.FindAsync(id);
                 if (junta == null)
                 {
-                    return ApiResult<JuntaReceptora>.Fail("Junta Receptora no encontrada.");
+                    return NotFound("Junta Receptora no encontrada.");
                 }
 
                 _context.JuntasReceptoras.Remove(junta);
                 await _context.SaveChangesAsync();
 
-                return ApiResult<JuntaReceptora>.Ok(junta);
+                return Ok(junta);
             }
             catch (Exception ex)
             {
-                return ApiResult<JuntaReceptora>.Fail(ex.Message);
+                Console.WriteLine($"Error al eliminar Junta Receptora: {ex.Message}");
+                return StatusCode(500, $"Error al eliminar: {ex.Message}");
             }
         }
 

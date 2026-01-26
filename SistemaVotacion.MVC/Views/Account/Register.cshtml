@@ -1,0 +1,128 @@
+﻿@using SistemaVotacion.Modelos
+@{
+    ViewData["Title"] = "Registro de Usuario";
+}
+
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white text-center py-3">
+                    <h3 class="mb-0">Crear Nueva Cuenta de Usuario</h3>
+                </div>
+                <div class="card-body p-4">
+
+                    <form asp-action="Register" asp-controller="Account" method="post">
+
+                        <div class="row">
+                            <div class="col-md-6 border-end">
+                                <h5 class="text-secondary mb-3"><i class="bi bi-person-fill"></i> Datos Personales</h5>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Nombres</label>
+                                    <input type="text" class="form-control" name="nombre" required placeholder="Ej: Juan Alberto">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Apellidos</label>
+                                    <input type="text" class="form-control" name="apellido" required placeholder="Ej: Pérez Castro">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Fecha de Nacimiento</label>
+                                    <input type="date" class="form-control" name="fechaNac" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Género</label>
+                                    <select class="form-select" name="idGenero" required>
+                                        <option value="">-- Seleccione Género --</option>
+                                        @if (ViewBag.Generos != null)
+                                        {
+                                            @foreach (var g in (List<Genero>)ViewBag.Generos)
+                                            {
+                                                <option value="@g.IdGenero">@g.DetalleGenero</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 ps-md-4">
+                                <h5 class="text-secondary mb-3"><i class="bi bi-card-checklist"></i> Identificación</h5>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Tipo de Documento</label>
+                                    <select class="form-select" name="idTipoIdent" required>
+                                        <option value="">-- Seleccione Tipo --</option>
+                                        @if (ViewBag.TiposIdentificacion != null)
+                                        {
+                                            @foreach (var t in (List<TipoIdentificacion>)ViewBag.TiposIdentificacion)
+                                            {
+                                                <option value="@t.Id">@t.DetalleTipIdentifiacion</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Número de Identificación (Cédula)</label>
+                                    <input type="text" class="form-control" name="cedula" required placeholder="0000000000">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Código Dactilar</label>
+                                    <input type="text" class="form-control" name="codigoDactilar" required placeholder="Ej: V1234V1234">
+                                    <small class="text-muted">Ubicado al reverso de su cédula.</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Rol en el Sistema</label>
+                                    <select class="form-select" name="idRol" required>
+                                        <option value="">-- Seleccione Rol --</option>
+                                        @if (ViewBag.Roles != null)
+                                        {
+                                            @foreach (var r in (List<Rol>)ViewBag.Roles)
+                                            {
+                                                <option value="@r.Id">@r.NombreRol</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="text-secondary mb-3"><i class="bi bi-lock-fill"></i> Seguridad de la Cuenta</h5>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Correo Electrónico</label>
+                            <input type="email" class="form-control" name="email" required placeholder="usuario@ejemplo.com">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Contraseña</label>
+                                <input type="password" class="form-control" name="password" required placeholder="Mínimo 8 caracteres">
+                            </div>
+                            
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">Crear Cuenta Ahora</button>
+                            <a asp-action="Index" asp-controller="Account" class="btn btn-outline-secondary">Cancelar y volver al Login</a>
+                        </div>
+
+                        @if (ViewBag.ErrorMessage != null)
+                        {
+                            <div class="alert alert-danger mt-3 text-center animate__animated animate__shakeX">
+                                <i class="bi bi-exclamation-octagon-fill"></i> @ViewBag.ErrorMessage
+                            </div>
+                        }
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

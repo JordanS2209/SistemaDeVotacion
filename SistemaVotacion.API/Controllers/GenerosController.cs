@@ -19,22 +19,25 @@ namespace SistemaVotacion.API.Controllers
             _context = context;
         }
 
+        // GET: api/Generos
         [HttpGet]
-        public async Task<ActionResult<ApiResult<List<Genero>>>> GetGeneros()
+        public async Task<ActionResult<List<Genero>>> GetGeneros()
         {
             try
             {
                 var generos = await _context.Generos.ToListAsync();
-                return ApiResult<List<Genero>>.Ok(generos);
+                return Ok(generos); 
             }
             catch (Exception ex)
             {
-                return ApiResult<List<Genero>>.Fail(ex.Message);
+                Console.WriteLine($"Error al obtener géneros: {ex.Message}");
+                return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
 
-        [HttpGet("Codigo/{id}")]
-        public async Task<ActionResult<ApiResult<Genero>>> GetGenero(int id)
+        // GET: api/Generos/Codigo/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Genero>> GetGenero(int id)
         {
             try
             {
@@ -45,23 +48,25 @@ namespace SistemaVotacion.API.Controllers
 
                 if (genero == null)
                 {
-                    return ApiResult<Genero>.Fail("Genero no encontrado.");
+                    return NotFound($"No se encontró el género con ID {id}.");
                 }
 
-                return ApiResult<Genero>.Ok(genero);
+                return Ok(genero);
             }
             catch (Exception ex)
             {
-                return ApiResult<Genero>.Fail(ex.Message);
+                Console.WriteLine($"Error en GetGenero: {ex.Message}");
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
             }
         }
 
+        // PUT: api/Generos/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResult<Genero>>> PutGenero(int id, Genero genero)
+        public async Task<IActionResult> PutGenero(int id, Genero genero)
         {
             if (id != genero.IdGenero)
             {
-                return ApiResult<Genero>.Fail("ID de Genero no coincide.");
+                return BadRequest("El ID de la URL no coincide con el ID del objeto.");
             }
 
             _context.Entry(genero).State = EntityState.Modified;
@@ -69,56 +74,63 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                return NoContent(); 
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (DbUpdateConcurrencyException)
             {
                 if (!GeneroExists(id))
                 {
-                    return ApiResult<Genero>.Fail("Genero no encontrado.");
+                    return NotFound("Género no encontrado.");
                 }
                 else
                 {
-                    return ApiResult<Genero>.Fail(ex.Message);
+                    throw;
                 }
             }
-
-            return ApiResult<Genero>.Ok(null);
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al actualizar: {ex.Message}");
+            }
         }
 
+        // POST: api/Generos
         [HttpPost]
-        public async Task<ActionResult<ApiResult<Genero>>> PostGenero(Genero genero)
+        public async Task<ActionResult<Genero>> PostGenero(Genero genero)
         {
             try
             {
                 _context.Generos.Add(genero);
                 await _context.SaveChangesAsync();
-                return ApiResult<Genero>.Ok(genero);
+
+                return CreatedAtAction(nameof(GetGenero), new { id = genero.IdGenero }, genero);
             }
             catch (Exception ex)
             {
-                return ApiResult<Genero>.Fail(ex.Message);
+                Console.WriteLine($"Error al crear género: {ex.Message}");
+                return StatusCode(500, $"Error al guardar: {ex.Message}");
             }
         }
 
+        // DELETE: api/Generos/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ApiResult<Genero>>> DeleteGenero(int id)
+        public async Task<ActionResult<Genero>> DeleteGenero(int id)
         {
             try
             {
                 var genero = await _context.Generos.FindAsync(id);
                 if (genero == null)
                 {
-                    return ApiResult<Genero>.Fail("Genero no encontrado.");
+                    return NotFound("Género no encontrado.");
                 }
 
                 _context.Generos.Remove(genero);
                 await _context.SaveChangesAsync();
 
-                return ApiResult<Genero>.Ok(genero);
+                return Ok(genero); 
             }
             catch (Exception ex)
             {
-                return ApiResult<Genero>.Fail(ex.Message);
+                return StatusCode(500, $"Error al eliminar: {ex.Message}");
             }
         }
 

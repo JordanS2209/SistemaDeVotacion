@@ -19,22 +19,25 @@ namespace SistemaVotacion.API.Controllers
             _context = context;
         }
 
+        // GET: api/TiposIdentificaciones
         [HttpGet]
-        public async Task<ActionResult<ApiResult<List<TipoIdentificacion>>>> GetTiposIdentificaciones()
+        public async Task<ActionResult<List<TipoIdentificacion>>> GetTiposIdentificaciones()
         {
             try
             {
                 var tipos = await _context.TiposIdentificaciones.ToListAsync();
-                return ApiResult<List<TipoIdentificacion>>.Ok(tipos);
+                return Ok(tipos);
             }
             catch (Exception ex)
             {
-                return ApiResult<List<TipoIdentificacion>>.Fail(ex.Message);
+                Console.WriteLine($"Error al obtener tipos de identificación: {ex.Message}");
+                return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
 
-        [HttpGet("Codigo/{id}")]
-        public async Task<ActionResult<ApiResult<TipoIdentificacion>>> GetTipoIdentificacion(int id)
+        // GET: api/TiposIdentificaciones/Codigo/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<TipoIdentificacion>> GetTipoIdentificacion(int id)
         {
             try
             {
@@ -44,23 +47,25 @@ namespace SistemaVotacion.API.Controllers
 
                 if (tipo == null)
                 {
-                    return ApiResult<TipoIdentificacion>.Fail("Tipo de identificación no encontrado.");
+                    return NotFound($"No se encontró el tipo de identificación con ID {id}.");
                 }
 
-                return ApiResult<TipoIdentificacion>.Ok(tipo);
+                return Ok(tipo);
             }
             catch (Exception ex)
             {
-                return ApiResult<TipoIdentificacion>.Fail(ex.Message);
+                Console.WriteLine($"Error en GetTipoIdentificacion: {ex.Message}");
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
             }
         }
 
+        // PUT: api/TiposIdentificaciones/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResult<TipoIdentificacion>>> PutTipoIdentificacion(int id, TipoIdentificacion tipo)
+        public async Task<IActionResult> PutTipoIdentificacion(int id, TipoIdentificacion tipo)
         {
             if (id != tipo.Id)
             {
-                return ApiResult<TipoIdentificacion>.Fail("ID de Tipo de identificación no coincide.");
+                return BadRequest("El ID de la URL no coincide con el ID del objeto.");
             }
 
             _context.Entry(tipo).State = EntityState.Modified;
@@ -68,56 +73,63 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                return NoContent(); 
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (DbUpdateConcurrencyException)
             {
                 if (!TipoIdentificacionExists(id))
                 {
-                    return ApiResult<TipoIdentificacion>.Fail("Tipo de identificación no encontrado.");
+                    return NotFound("Tipo de identificación no encontrado.");
                 }
                 else
                 {
-                    return ApiResult<TipoIdentificacion>.Fail(ex.Message);
+                    throw;
                 }
             }
-
-            return ApiResult<TipoIdentificacion>.Ok(null);
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al actualizar: {ex.Message}");
+            }
         }
 
+        // POST: api/TiposIdentificaciones
         [HttpPost]
-        public async Task<ActionResult<ApiResult<TipoIdentificacion>>> PostTipoIdentificacion(TipoIdentificacion tipo)
+        public async Task<ActionResult<TipoIdentificacion>> PostTipoIdentificacion(TipoIdentificacion tipo)
         {
             try
             {
                 _context.TiposIdentificaciones.Add(tipo);
                 await _context.SaveChangesAsync();
-                return ApiResult<TipoIdentificacion>.Ok(tipo);
+
+                return CreatedAtAction(nameof(GetTipoIdentificacion), new { id = tipo.Id }, tipo);
             }
             catch (Exception ex)
             {
-                return ApiResult<TipoIdentificacion>.Fail(ex.Message);
+                Console.WriteLine($"Error al crear tipo de identificación: {ex.Message}");
+                return StatusCode(500, $"Error al guardar: {ex.Message}");
             }
         }
 
+        // DELETE: api/TiposIdentificaciones/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ApiResult<TipoIdentificacion>>> DeleteTipoIdentificacion(int id)
+        public async Task<ActionResult<TipoIdentificacion>> DeleteTipoIdentificacion(int id)
         {
             try
             {
                 var tipo = await _context.TiposIdentificaciones.FindAsync(id);
                 if (tipo == null)
                 {
-                    return ApiResult<TipoIdentificacion>.Fail("Tipo de identificación no encontrado.");
+                    return NotFound("Tipo de identificación no encontrado.");
                 }
 
                 _context.TiposIdentificaciones.Remove(tipo);
                 await _context.SaveChangesAsync();
 
-                return ApiResult<TipoIdentificacion>.Ok(tipo);
+                return Ok(tipo);
             }
             catch (Exception ex)
             {
-                return ApiResult<TipoIdentificacion>.Fail(ex.Message);
+                return StatusCode(500, $"Error al eliminar: {ex.Message}");
             }
         }
 

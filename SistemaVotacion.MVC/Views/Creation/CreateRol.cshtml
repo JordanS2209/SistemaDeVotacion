@@ -1,0 +1,47 @@
+﻿@model SistemaVotacion.Modelos.Rol
+
+@{
+    ViewData["Title"] = "Crear Nuevo Rol";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Registrar Nuevo Rol</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreateRol" method="post">
+                        
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+
+                        <div class="mb-3">
+                            <label asp-for="NombreRol" class="form-label fw-bold">Nombre del Rol</label>
+                            <input asp-for="NombreRol" class="form-control" placeholder="Ej: SuperAdmin" required />
+                            <span asp-validation-for="NombreRol" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="DescripcionRol" class="form-label fw-bold">Descripción</label>
+                            <textarea asp-for="DescripcionRol" class="form-control" rows="3"
+                                      placeholder="Describa brevemente las funciones de este rol..." required></textarea>
+                            <span asp-validation-for="DescripcionRol" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-save"></i> Guardar Rol
+                            </button>
+                            <a asp-action="ListRoles" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

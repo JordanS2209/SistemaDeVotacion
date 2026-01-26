@@ -1,5 +1,8 @@
 using SistemaVotacion.ApiConsumer;
 using SistemaVotacion.Modelos;
+using SistemaVotacion.Servicios;
+using SistemaVotacion.Servicios.Interfaces;
+using SistemaVotacion.API;
 
 namespace SistemaVotacion.MVC
 {
@@ -8,10 +11,34 @@ namespace SistemaVotacion.MVC
         public static void Main(string[] args)
         {
             Crud<Usuario>.EndPoint = "https://localhost:7202/api/Usuarios";
+            Crud<Rol>.EndPoint = "https://localhost:7202/api/Roles";
+            Crud<TipoIdentificacion>.EndPoint = "https://localhost:7202/api/TiposIdentificaciones";
+            Crud<Genero>.EndPoint = "https://localhost:7202/api/Generos";
+            Crud<Lista>.EndPoint = "https://localhost:7202/api/Boletas/activas";
+            Crud<Dignidad>.EndPoint = "https://localhost:7202/api/Dignidades";
+            Crud<Provincia>.EndPoint = "https://localhost:7202/api/Provincias";
+            Crud<Ciudad>.EndPoint = "https://localhost:7202/api/Ciudades";
+            Crud<Parroquia>.EndPoint = "https://localhost:7202/api/Parroquias";
+
+
+
+
+
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddScoped<IAuthService, AuthService>();
+
+            builder.Services.AddAuthentication("Cookies") //cokies
+                            .AddCookie("Cookies", options =>
+                            {
+                                options.LoginPath = "/Account/Index"; // Ruta de inicio de sesión
+
+
+                            });
+            builder.Services.AddHttpContextAccessor();
 
             var app = builder.Build();
 
@@ -27,7 +54,7 @@ namespace SistemaVotacion.MVC
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(

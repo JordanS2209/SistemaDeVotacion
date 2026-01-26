@@ -1,0 +1,33 @@
+﻿@model SistemaVotacion.Modelos.Provincia
+
+@{
+    ViewData["Title"] = "Crear Provincia";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Nueva Provincia</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreateProvincia" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="NombreProvincia" class="form-label">Nombre de la Provincia</label>
+                            <input asp-for="NombreProvincia" class="form-control" placeholder="Ej: Imbabura" required />
+                            <span asp-validation-for="NombreProvincia" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success">Guardar Provincia</button>
+                            <a asp-action="ListProvincias" class="btn btn-outline-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

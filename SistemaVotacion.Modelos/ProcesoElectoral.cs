@@ -11,7 +11,9 @@ namespace SistemaVotacion.Modelos
 {
     public class ProcesoElectoral
     {
-        [Key] public int Id { get; set; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
 
         public string NombreProceso { get; set; }
 

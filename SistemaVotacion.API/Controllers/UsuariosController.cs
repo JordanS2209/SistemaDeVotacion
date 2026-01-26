@@ -81,7 +81,7 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-                return NoContent(); // Respuesta estándar para una actualización exitosa sin retorno de datos
+                return NoContent(); 
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -137,7 +137,7 @@ namespace SistemaVotacion.API.Controllers
                 _context.Usuarios.Remove(usuario);
                 await _context.SaveChangesAsync();
 
-                return Ok(usuario); // Retornamos el usuario eliminado
+                return Ok(usuario); 
             }
             catch (Exception ex)
             {

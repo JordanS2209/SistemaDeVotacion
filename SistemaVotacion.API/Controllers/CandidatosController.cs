@@ -20,22 +20,29 @@ namespace SistemaVotacion.API.Controllers
             _context = context;
         }
 
+        // GET: api/Candidatos
         [HttpGet]
-        public async Task<ActionResult<ApiResult<List<Candidato>>>> GetCandidatos()
+        public async Task<ActionResult<List<Candidato>>> GetCandidatos()
         {
             try
             {
-                var candidatos = await _context.Candidatos.ToListAsync();
-                return ApiResult<List<Candidato>>.Ok(candidatos);
+                // Incluimos Lista y Dignidad para que el MVC muestre los nombres directamente
+                var candidatos = await _context.Candidatos
+                    .Include(c => c.Lista)
+                    .Include(c => c.Dignidad)
+                    .ToListAsync();
+                return Ok(candidatos);
             }
             catch (Exception ex)
             {
-                return ApiResult<List<Candidato>>.Fail(ex.Message);
+                Console.WriteLine($"Error al obtener candidatos: {ex.Message}");
+                return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
 
+        // GET: api/Candidatos/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ApiResult<Candidato>>> GetCandidato(int id)
+        public async Task<ActionResult<Candidato>> GetCandidato(int id)
         {
             try
             {
@@ -47,23 +54,25 @@ namespace SistemaVotacion.API.Controllers
 
                 if (candidato == null)
                 {
-                    return ApiResult<Candidato>.Fail("Candidato no encontrado.");
+                    return NotFound($"No se encontró el candidato con ID {id}.");
                 }
 
-                return ApiResult<Candidato>.Ok(candidato);
+                return Ok(candidato);
             }
             catch (Exception ex)
             {
-                return ApiResult<Candidato>.Fail(ex.Message);
+                Console.WriteLine($"Error en GetCandidato: {ex.Message}");
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
             }
         }
 
+        // PUT: api/Candidatos/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResult<Candidato>>> PutCandidato(int id, Candidato candidato)
+        public async Task<IActionResult> PutCandidato(int id, Candidato candidato)
         {
             if (id != candidato.Id)
             {
-                return ApiResult<Candidato>.Fail("ID de Candidato no coincide.");
+                return BadRequest("El ID de la URL no coincide con el ID del candidato.");
             }
 
             _context.Entry(candidato).State = EntityState.Modified;
@@ -71,56 +80,65 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                return NoContent(); 
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (DbUpdateConcurrencyException)
             {
                 if (!CandidatoExists(id))
                 {
-                    return ApiResult<Candidato>.Fail("Datos de Candidato no encontrado.");
+                    return NotFound("El candidato no existe.");
                 }
                 else
                 {
-                    return ApiResult<Candidato>.Fail(ex.Message);
+                    throw;
                 }
             }
-
-            return ApiResult<Candidato>.Ok(null);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al actualizar candidato: {ex.Message}");
+                return StatusCode(500, $"Error al actualizar: {ex.Message}");
+            }
         }
 
+        // POST: api/Candidatos
         [HttpPost]
-        public async Task<ActionResult<ApiResult<Candidato>>> PostCandidato(Candidato candidato)
+        public async Task<ActionResult<Candidato>> PostCandidato(Candidato candidato)
         {
             try
             {
                 _context.Candidatos.Add(candidato);
                 await _context.SaveChangesAsync();
-                return ApiResult<Candidato>.Ok(candidato);
+
+                return CreatedAtAction(nameof(GetCandidato), new { id = candidato.Id }, candidato);
             }
             catch (Exception ex)
             {
-                return ApiResult<Candidato>.Fail(ex.Message);
+                Console.WriteLine($"Error al crear candidato: {ex.Message}");
+                return StatusCode(500, $"Error al guardar el candidato: {ex.Message}");
             }
         }
 
+        // DELETE: api/Candidatos/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ApiResult<Candidato>>> DeleteCandidato(int id)
+        public async Task<ActionResult<Candidato>> DeleteCandidato(int id)
         {
             try
             {
                 var candidato = await _context.Candidatos.FindAsync(id);
                 if (candidato == null)
                 {
-                    return ApiResult<Candidato>.Fail("Datos de Candidato no encontrado.");
+                    return NotFound("Candidato no encontrado.");
                 }
 
                 _context.Candidatos.Remove(candidato);
                 await _context.SaveChangesAsync();
 
-                return ApiResult<Candidato>.Ok(candidato);
+                return Ok(candidato);
             }
             catch (Exception ex)
             {
-                return ApiResult<Candidato>.Fail(ex.Message);
+                Console.WriteLine($"Error al eliminar candidato: {ex.Message}");
+                return StatusCode(500, $"Error al eliminar: {ex.Message}");
             }
         }
 

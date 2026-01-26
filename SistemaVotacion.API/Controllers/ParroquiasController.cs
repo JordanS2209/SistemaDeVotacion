@@ -78,7 +78,7 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-                return NoContent(); // 204 No Content
+                return NoContent(); 
             }
             catch (DbUpdateConcurrencyException)
             {

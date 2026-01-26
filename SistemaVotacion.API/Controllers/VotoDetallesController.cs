@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemaVotacion.Modelos;
@@ -19,22 +20,30 @@ namespace SistemaVotacion.API.Controllers
             _context = context;
         }
 
+        // GET: api/VotoDetalles
         [HttpGet]
-        public async Task<ActionResult<ApiResult<List<VotoDetalle>>>> GetVotoDetalles()
+        public async Task<ActionResult<List<VotoDetalle>>> GetVotoDetalles()
         {
             try
             {
-                var votos = await _context.VotoDetalles.ToListAsync();
-                return ApiResult<List<VotoDetalle>>.Ok(votos);
+                // Incluimos información básica para el listado general
+                var votos = await _context.VotoDetalles
+                    .Include(v => v.TipoVoto)
+                    .Include(v => v.Junta)
+                    .Include(v => v.Dignidad)
+                    .ToListAsync();
+                return Ok(votos);
             }
             catch (Exception ex)
             {
-                return ApiResult<List<VotoDetalle>>.Fail(ex.Message);
+                Console.WriteLine($"Error al obtener detalles de votos: {ex.Message}");
+                return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
 
+        // GET: api/VotoDetalles/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ApiResult<VotoDetalle>>> GetVotoDetalle(int id)
+        public async Task<ActionResult<VotoDetalle>> GetVotoDetalle(int id)
         {
             try
             {
@@ -50,23 +59,25 @@ namespace SistemaVotacion.API.Controllers
 
                 if (voto == null)
                 {
-                    return ApiResult<VotoDetalle>.Fail("Detalle de voto no encontrado.");
+                    return NotFound($"No se encontró el detalle de voto con ID {id}.");
                 }
 
-                return ApiResult<VotoDetalle>.Ok(voto);
+                return Ok(voto);
             }
             catch (Exception ex)
             {
-                return ApiResult<VotoDetalle>.Fail(ex.Message);
+                Console.WriteLine($"Error en GetVotoDetalle: {ex.Message}");
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
             }
         }
 
+        // PUT: api/VotoDetalles/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResult<VotoDetalle>>> PutVotoDetalle(int id, VotoDetalle voto)
+        public async Task<IActionResult> PutVotoDetalle(int id, VotoDetalle voto)
         {
             if (id != voto.Id)
             {
-                return ApiResult<VotoDetalle>.Fail("ID de VotoDetalle no coincide.");
+                return BadRequest("El ID de la URL no coincide con el ID del registro de voto.");
             }
 
             _context.Entry(voto).State = EntityState.Modified;
@@ -74,56 +85,65 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                return NoContent();
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (DbUpdateConcurrencyException)
             {
                 if (!VotoDetalleExists(id))
                 {
-                    return ApiResult<VotoDetalle>.Fail("Detalle de voto no encontrado.");
+                    return NotFound("El detalle de voto no existe.");
                 }
                 else
                 {
-                    return ApiResult<VotoDetalle>.Fail(ex.Message);
+                    throw;
                 }
             }
-
-            return ApiResult<VotoDetalle>.Ok(null);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al actualizar detalle de voto: {ex.Message}");
+                return StatusCode(500, $"Error al actualizar: {ex.Message}");
+            }
         }
 
+        // POST: api/VotoDetalles
         [HttpPost]
-        public async Task<ActionResult<ApiResult<VotoDetalle>>> PostVotoDetalle(VotoDetalle voto)
+        public async Task<ActionResult<VotoDetalle>> PostVotoDetalle(VotoDetalle voto)
         {
             try
             {
                 _context.VotoDetalles.Add(voto);
                 await _context.SaveChangesAsync();
-                return ApiResult<VotoDetalle>.Ok(voto);
+
+                return CreatedAtAction(nameof(GetVotoDetalle), new { id = voto.Id }, voto);
             }
             catch (Exception ex)
             {
-                return ApiResult<VotoDetalle>.Fail(ex.Message);
+                Console.WriteLine($"Error al crear detalle de voto: {ex.Message}");
+                return StatusCode(500, $"Error al guardar: {ex.Message}");
             }
         }
 
+        // DELETE: api/VotoDetalles/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ApiResult<VotoDetalle>>> DeleteVotoDetalle(int id)
+        public async Task<ActionResult<VotoDetalle>> DeleteVotoDetalle(int id)
         {
             try
             {
                 var voto = await _context.VotoDetalles.FindAsync(id);
                 if (voto == null)
                 {
-                    return ApiResult<VotoDetalle>.Fail("Detalle de voto no encontrado.");
+                    return NotFound("Detalle de voto no encontrado.");
                 }
 
                 _context.VotoDetalles.Remove(voto);
                 await _context.SaveChangesAsync();
 
-                return ApiResult<VotoDetalle>.Ok(voto);
+                return Ok(voto); 
             }
             catch (Exception ex)
             {
-                return ApiResult<VotoDetalle>.Fail(ex.Message);
+                Console.WriteLine($"Error al eliminar detalle de voto: {ex.Message}");
+                return StatusCode(500, $"Error al eliminar: {ex.Message}");
             }
         }
 

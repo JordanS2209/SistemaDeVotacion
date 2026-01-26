@@ -26,7 +26,7 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 var dignidades = await _context.Dignidades.ToListAsync();
-                return Ok(dignidades); // Retorna []
+                return Ok(dignidades);
             }
             catch (Exception ex)
             {
@@ -50,7 +50,7 @@ namespace SistemaVotacion.API.Controllers
                     return NotFound($"Dignidad con ID {id} no encontrada.");
                 }
 
-                return Ok(dignidad); // Retorna {}
+                return Ok(dignidad); 
             }
             catch (Exception ex)
             {
@@ -72,7 +72,7 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-                return NoContent(); // 204: Éxito sin contenido
+                return NoContent(); 
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -100,7 +100,6 @@ namespace SistemaVotacion.API.Controllers
                 _context.Dignidades.Add(dignidad);
                 await _context.SaveChangesAsync();
 
-                // Retorna 201 Created y el objeto creado
                 return CreatedAtAction(nameof(GetDignidad), new { id = dignidad.Id }, dignidad);
             }
             catch (Exception ex)
@@ -124,7 +123,7 @@ namespace SistemaVotacion.API.Controllers
                 _context.Dignidades.Remove(dignidad);
                 await _context.SaveChangesAsync();
 
-                return Ok(dignidad); // Retorna el objeto eliminado
+                return Ok(dignidad); 
             }
             catch (Exception ex)
             {

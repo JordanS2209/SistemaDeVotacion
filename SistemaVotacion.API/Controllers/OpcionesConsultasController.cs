@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemaVotacion.Modelos;
@@ -19,22 +20,28 @@ namespace SistemaVotacion.API.Controllers
             _context = context;
         }
 
+        // GET: api/OpcionesConsultas
         [HttpGet]
-        public async Task<ActionResult<ApiResult<List<OpcionConsulta>>>> GetOpcionConsultas()
+        public async Task<ActionResult<List<OpcionConsulta>>> GetOpcionConsultas()
         {
             try
             {
-                var opciones = await _context.OpcionConsultas.ToListAsync();
-                return ApiResult<List<OpcionConsulta>>.Ok(opciones);
+                // Incluimos la Pregunta para saber a qué consulta pertenece cada opción
+                var opciones = await _context.OpcionConsultas
+                    .Include(o => o.Pregunta)
+                    .ToListAsync();
+                return Ok(opciones);
             }
             catch (Exception ex)
             {
-                return ApiResult<List<OpcionConsulta>>.Fail(ex.Message);
+                Console.WriteLine($"Error al obtener opciones de consulta: {ex.Message}");
+                return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
 
+        // GET: api/OpcionesConsultas/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ApiResult<OpcionConsulta>>> GetOpcionConsulta(int id)
+        public async Task<ActionResult<OpcionConsulta>> GetOpcionConsulta(int id)
         {
             try
             {
@@ -45,23 +52,25 @@ namespace SistemaVotacion.API.Controllers
 
                 if (opcion == null)
                 {
-                    return ApiResult<OpcionConsulta>.Fail("Opción de consulta no encontrada.");
+                    return NotFound($"No se encontró la opción de consulta con ID {id}.");
                 }
 
-                return ApiResult<OpcionConsulta>.Ok(opcion);
+                return Ok(opcion);
             }
             catch (Exception ex)
             {
-                return ApiResult<OpcionConsulta>.Fail(ex.Message);
+                Console.WriteLine($"Error en GetOpcionConsulta: {ex.Message}");
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
             }
         }
 
+        // PUT: api/OpcionesConsultas/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResult<OpcionConsulta>>> PutOpcionConsulta(int id, OpcionConsulta opcion)
+        public async Task<IActionResult> PutOpcionConsulta(int id, OpcionConsulta opcion)
         {
             if (id != opcion.Id)
             {
-                return ApiResult<OpcionConsulta>.Fail("ID de Opción de consulta no coincide.");
+                return BadRequest("El ID de la URL no coincide con el ID de la opción.");
             }
 
             _context.Entry(opcion).State = EntityState.Modified;
@@ -69,56 +78,65 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                return NoContent(); 
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (DbUpdateConcurrencyException)
             {
                 if (!OpcionConsultaExists(id))
                 {
-                    return ApiResult<OpcionConsulta>.Fail("Opción de consulta no encontrada.");
+                    return NotFound("La opción de consulta no existe.");
                 }
                 else
                 {
-                    return ApiResult<OpcionConsulta>.Fail(ex.Message);
+                    throw;
                 }
             }
-
-            return ApiResult<OpcionConsulta>.Ok(null);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al actualizar la opción: {ex.Message}");
+                return StatusCode(500, $"Error al actualizar: {ex.Message}");
+            }
         }
 
+        // POST: api/OpcionesConsultas
         [HttpPost]
-        public async Task<ActionResult<ApiResult<OpcionConsulta>>> PostOpcionConsulta(OpcionConsulta opcion)
+        public async Task<ActionResult<OpcionConsulta>> PostOpcionConsulta(OpcionConsulta opcion)
         {
             try
             {
                 _context.OpcionConsultas.Add(opcion);
                 await _context.SaveChangesAsync();
-                return ApiResult<OpcionConsulta>.Ok(opcion);
+
+                return CreatedAtAction(nameof(GetOpcionConsulta), new { id = opcion.Id }, opcion);
             }
             catch (Exception ex)
             {
-                return ApiResult<OpcionConsulta>.Fail(ex.Message);
+                Console.WriteLine($"Error al crear la opción de consulta: {ex.Message}");
+                return StatusCode(500, $"Error al guardar la opción: {ex.Message}");
             }
         }
 
+        // DELETE: api/OpcionesConsultas/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ApiResult<OpcionConsulta>>> DeleteOpcionConsulta(int id)
+        public async Task<ActionResult<OpcionConsulta>> DeleteOpcionConsulta(int id)
         {
             try
             {
                 var opcion = await _context.OpcionConsultas.FindAsync(id);
                 if (opcion == null)
                 {
-                    return ApiResult<OpcionConsulta>.Fail("Opción de consulta no encontrada.");
+                    return NotFound("Opción de consulta no encontrada.");
                 }
 
                 _context.OpcionConsultas.Remove(opcion);
                 await _context.SaveChangesAsync();
 
-                return ApiResult<OpcionConsulta>.Ok(opcion);
+                return Ok(opcion); 
             }
             catch (Exception ex)
             {
-                return ApiResult<OpcionConsulta>.Fail(ex.Message);
+                Console.WriteLine($"Error al eliminar la opción: {ex.Message}");
+                return StatusCode(500, $"Error al eliminar: {ex.Message}");
             }
         }
 

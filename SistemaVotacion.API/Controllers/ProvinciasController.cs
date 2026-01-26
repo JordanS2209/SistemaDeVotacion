@@ -76,7 +76,7 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-                return NoContent(); // 204 No Content
+                return NoContent(); 
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -104,7 +104,6 @@ namespace SistemaVotacion.API.Controllers
                 _context.Provincias.Add(provincia);
                 await _context.SaveChangesAsync();
 
-                // Retorna 201 Created con la ruta para obtener el recurso
                 return CreatedAtAction(nameof(GetProvincia), new { id = provincia.Id }, provincia);
             }
             catch (Exception ex)
@@ -129,11 +128,10 @@ namespace SistemaVotacion.API.Controllers
                 _context.Provincias.Remove(provincia);
                 await _context.SaveChangesAsync();
 
-                return Ok(provincia); // Retorna el objeto eliminado
+                return Ok(provincia); 
             }
             catch (Exception ex)
             {
-                // Este error suele suceder si hay ciudades asociadas (Error de FK)
                 return StatusCode(500, $"Error al eliminar la provincia: {ex.Message}");
             }
         }

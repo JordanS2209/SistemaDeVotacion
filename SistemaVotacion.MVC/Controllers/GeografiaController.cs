@@ -203,8 +203,22 @@ namespace SistemaVotacion.MVC.Controllers
             }
         }
 
-        public IActionResult CreateParroquia() => View();
+        public IActionResult CreateParroquia()
+        {
+            try
+            {
+                // Obtenemos la lista de provincias para el dropdown
+                var ciudad = Crud<Ciudad>.GetAll();
+                ViewBag.Ciudad = ciudad;
 
+                return View();
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "No se pudieron cargar las provincias: " + ex.Message;
+                return RedirectToAction(nameof(ListCiudades));
+            }
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult CreateParroquia(Parroquia nuevaParroquia)
@@ -221,6 +235,7 @@ namespace SistemaVotacion.MVC.Controllers
                     ModelState.AddModelError("", "Error: " + ex.Message);
                 }
             }
+            ViewBag.Ciudad = Crud<Ciudad>.GetAll();
             return View(nuevaParroquia);
         }
 

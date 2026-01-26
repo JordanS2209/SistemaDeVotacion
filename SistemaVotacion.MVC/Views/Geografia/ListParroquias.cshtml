@@ -1,17 +1,17 @@
-﻿@model IEnumerable<SistemaVotacion.Modelos.Ciudad>
+﻿@model IEnumerable<SistemaVotacion.Modelos.Parroquia>
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3>Gestión de Ciudades</h3>
-        <a asp-action="CreateCiudad" class="btn btn-success">Nueva Ciudad</a>
+        <h3>Gestión de Parroquias</h3>
+        <a asp-action="CreateParroquia" class="btn btn-success">Nueva Parroquia</a>
     </div>
 
     <table class="table table-hover shadow-sm">
         <thead class="table-dark">
             <tr>
                 <th>ID</th>
-                <th>Nombre de Ciudad</th>
-                <th>Provincia</th>
+                <th>Nombre de Parroquia</th>
+                <th>Ciudades</th>
                 <th class="text-center">Acciones</th>
             </tr>
         </thead>
@@ -22,13 +22,13 @@
                 {
                     <tr>
                         <td>@item.Id</td>
-                        <td>@item.NombreCiudad</td>
+                        <td>@item.NombreParroquia</td>
                         <td>
-                            @(item.Provincia?.NombreProvincia ?? "Sin Provincia")
+                            @(item.Ciudad?.NombreCiudad ?? "Sin Ciudad")
                         </td>
                         
                         <td class="text-center">
-                            <a asp-action="DeleteCiudad" asp-route-id="@item.Id" class="btn btn-sm btn-danger">
+                            <a asp-action="DeleteParroquia" asp-route-id="@item.Id" class="btn btn-sm btn-danger">
                                 <i class="bi bi-trash"></i> Eliminar
                             </a>
                         </td>

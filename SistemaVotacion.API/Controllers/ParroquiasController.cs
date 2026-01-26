@@ -28,6 +28,7 @@ namespace SistemaVotacion.API.Controllers
                 // Incluimos Recintos para que el MVC pueda mostrar el conteo por parroquia
                 var parroquias = await _context.Parroquias
                     .Include(p => p.Recintos)
+                    .Include(p => p.Ciudad)
                     .ToListAsync();
                 return Ok(parroquias);
             }

@@ -19,22 +19,29 @@ namespace SistemaVotacion.API.Controllers
             _context = context;
         }
 
+        // GET: api/Ciudades
         [HttpGet]
-        public async Task<ActionResult<ApiResult<List<Ciudad>>>> GetCiudades()
+        public async Task<ActionResult<List<Ciudad>>> GetCiudades()
         {
             try
             {
-                var ciudades = await _context.Ciudades.ToListAsync();
-                return ApiResult<List<Ciudad>>.Ok(ciudades);
+                // Incluimos Parroquias para poder contarlas en el listado del MVC
+                var ciudades = await _context.Ciudades
+                    .Include(c => c.Provincia)
+                    .Include(c => c.Parroquias)
+                    .ToListAsync();
+                return Ok(ciudades);
             }
             catch (Exception ex)
             {
-                return ApiResult<List<Ciudad>>.Fail(ex.Message);
+                Console.WriteLine($"Error al obtener ciudades: {ex.Message}");
+                return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
 
+        // GET: api/Ciudades/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ApiResult<Ciudad>>> GetCiudad(int id)
+        public async Task<ActionResult<Ciudad>> GetCiudad(int id)
         {
             try
             {
@@ -45,23 +52,25 @@ namespace SistemaVotacion.API.Controllers
 
                 if (ciudad == null)
                 {
-                    return ApiResult<Ciudad>.Fail("Ciudad no encontrada.");
+                    return NotFound($"No se encontró la ciudad con ID {id}.");
                 }
 
-                return ApiResult<Ciudad>.Ok(ciudad);
+                return Ok(ciudad);
             }
             catch (Exception ex)
             {
-                return ApiResult<Ciudad>.Fail(ex.Message);
+                Console.WriteLine($"Error en GetCiudad: {ex.Message}");
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
             }
         }
 
+        // PUT: api/Ciudades/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResult<Ciudad>>> PutCiudad(int id, Ciudad ciudad)
+        public async Task<IActionResult> PutCiudad(int id, Ciudad ciudad)
         {
             if (id != ciudad.Id)
             {
-                return ApiResult<Ciudad>.Fail("ID de Ciudad no coincide.");
+                return BadRequest("El ID de la URL no coincide con el ID de la ciudad.");
             }
 
             _context.Entry(ciudad).State = EntityState.Modified;
@@ -69,56 +78,63 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                return NoContent(); // 204 No Content
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (DbUpdateConcurrencyException)
             {
                 if (!CiudadExists(id))
                 {
-                    return ApiResult<Ciudad>.Fail("Ciudad no encontrada.");
+                    return NotFound("La ciudad no existe.");
                 }
                 else
                 {
-                    return ApiResult<Ciudad>.Fail(ex.Message);
+                    throw;
                 }
             }
-
-            return ApiResult<Ciudad>.Ok(null);
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al actualizar: {ex.Message}");
+            }
         }
 
+        // POST: api/Ciudades
         [HttpPost]
-        public async Task<ActionResult<ApiResult<Ciudad>>> PostCiudad(Ciudad ciudad)
+        public async Task<ActionResult<Ciudad>> PostCiudad(Ciudad ciudad)
         {
             try
             {
                 _context.Ciudades.Add(ciudad);
                 await _context.SaveChangesAsync();
-                return ApiResult<Ciudad>.Ok(ciudad);
+
+                return CreatedAtAction(nameof(GetCiudad), new { id = ciudad.Id }, ciudad);
             }
             catch (Exception ex)
             {
-                return ApiResult<Ciudad>.Fail(ex.Message);
+                Console.WriteLine($"Error al crear ciudad: {ex.Message}");
+                return StatusCode(500, $"Error al guardar la ciudad: {ex.Message}");
             }
         }
 
+        // DELETE: api/Ciudades/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ApiResult<Ciudad>>> DeleteCiudad(int id)
+        public async Task<ActionResult<Ciudad>> DeleteCiudad(int id)
         {
             try
             {
                 var ciudad = await _context.Ciudades.FindAsync(id);
                 if (ciudad == null)
                 {
-                    return ApiResult<Ciudad>.Fail("Ciudad no encontrada.");
+                    return NotFound("Ciudad no encontrada.");
                 }
 
                 _context.Ciudades.Remove(ciudad);
                 await _context.SaveChangesAsync();
 
-                return ApiResult<Ciudad>.Ok(ciudad);
+                return Ok(ciudad);
             }
             catch (Exception ex)
             {
-                return ApiResult<Ciudad>.Fail(ex.Message);
+                return StatusCode(500, $"Error al eliminar la ciudad: {ex.Message}");
             }
         }
 

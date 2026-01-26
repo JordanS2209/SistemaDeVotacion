@@ -19,22 +19,28 @@ namespace SistemaVotacion.API.Controllers
             _context = context;
         }
 
+        // GET: api/Provincias
         [HttpGet]
-        public async Task<ActionResult<ApiResult<List<Provincia>>>> GetProvincias()
+        public async Task<ActionResult<List<Provincia>>> GetProvincias()
         {
             try
             {
-                var provincias = await _context.Provincias.ToListAsync();
-                return ApiResult<List<Provincia>>.Ok(provincias);
+                // Incluimos Ciudades para que el MVC pueda contar cuántas tiene cada provincia
+                var provincias = await _context.Provincias
+                    .Include(p => p.Ciudades)
+                    .ToListAsync();
+                return Ok(provincias);
             }
             catch (Exception ex)
             {
-                return ApiResult<List<Provincia>>.Fail(ex.Message);
+                Console.WriteLine($"Error al obtener provincias: {ex.Message}");
+                return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
 
+        // GET: api/Provincias/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ApiResult<Provincia>>> GetProvincia(int id)
+        public async Task<ActionResult<Provincia>> GetProvincia(int id)
         {
             try
             {
@@ -44,23 +50,25 @@ namespace SistemaVotacion.API.Controllers
 
                 if (provincia == null)
                 {
-                    return ApiResult<Provincia>.Fail("Provincia no encontrada.");
+                    return NotFound($"No se encontró la provincia con ID {id}.");
                 }
 
-                return ApiResult<Provincia>.Ok(provincia);
+                return Ok(provincia);
             }
             catch (Exception ex)
             {
-                return ApiResult<Provincia>.Fail(ex.Message);
+                Console.WriteLine($"Error en GetProvincia: {ex.Message}");
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
             }
         }
 
+        // PUT: api/Provincias/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResult<Provincia>>> PutProvincia(int id, Provincia provincia)
+        public async Task<IActionResult> PutProvincia(int id, Provincia provincia)
         {
             if (id != provincia.Id)
             {
-                return ApiResult<Provincia>.Fail("ID de Provincia no coincide.");
+                return BadRequest("El ID de la URL no coincide con el ID de la provincia.");
             }
 
             _context.Entry(provincia).State = EntityState.Modified;
@@ -68,56 +76,63 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                return NoContent(); 
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (DbUpdateConcurrencyException)
             {
                 if (!ProvinciaExists(id))
                 {
-                    return ApiResult<Provincia>.Fail("Provincia no encontrada.");
+                    return NotFound("La provincia no existe.");
                 }
                 else
                 {
-                    return ApiResult<Provincia>.Fail(ex.Message);
+                    throw;
                 }
             }
-
-            return ApiResult<Provincia>.Ok(null);
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al actualizar la provincia: {ex.Message}");
+            }
         }
 
+        // POST: api/Provincias
         [HttpPost]
-        public async Task<ActionResult<ApiResult<Provincia>>> PostProvincia(Provincia provincia)
+        public async Task<ActionResult<Provincia>> PostProvincia(Provincia provincia)
         {
             try
             {
                 _context.Provincias.Add(provincia);
                 await _context.SaveChangesAsync();
-                return ApiResult<Provincia>.Ok(provincia);
+
+                return CreatedAtAction(nameof(GetProvincia), new { id = provincia.Id }, provincia);
             }
             catch (Exception ex)
             {
-                return ApiResult<Provincia>.Fail(ex.Message);
+                Console.WriteLine($"Error al crear provincia: {ex.Message}");
+                return StatusCode(500, $"Error al guardar la provincia: {ex.Message}");
             }
         }
 
+        // DELETE: api/Provincias/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ApiResult<Provincia>>> DeleteProvincia(int id)
+        public async Task<ActionResult<Provincia>> DeleteProvincia(int id)
         {
             try
             {
                 var provincia = await _context.Provincias.FindAsync(id);
                 if (provincia == null)
                 {
-                    return ApiResult<Provincia>.Fail("Provincia no encontrada.");
+                    return NotFound("Provincia no encontrada.");
                 }
 
                 _context.Provincias.Remove(provincia);
                 await _context.SaveChangesAsync();
 
-                return ApiResult<Provincia>.Ok(provincia);
+                return Ok(provincia); 
             }
             catch (Exception ex)
             {
-                return ApiResult<Provincia>.Fail(ex.Message);
+                return StatusCode(500, $"Error al eliminar la provincia: {ex.Message}");
             }
         }
 

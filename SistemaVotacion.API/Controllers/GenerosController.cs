@@ -26,7 +26,7 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 var generos = await _context.Generos.ToListAsync();
-                return Ok(generos); // Retorna la lista directamente
+                return Ok(generos); 
             }
             catch (Exception ex)
             {
@@ -74,7 +74,7 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-                return NoContent(); // 204 No Content: Éxito sin datos de retorno
+                return NoContent(); 
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -102,7 +102,6 @@ namespace SistemaVotacion.API.Controllers
                 _context.Generos.Add(genero);
                 await _context.SaveChangesAsync();
 
-                // Retorna 201 Created y la ubicación para consultar el nuevo recurso
                 return CreatedAtAction(nameof(GetGenero), new { id = genero.IdGenero }, genero);
             }
             catch (Exception ex)
@@ -127,7 +126,7 @@ namespace SistemaVotacion.API.Controllers
                 _context.Generos.Remove(genero);
                 await _context.SaveChangesAsync();
 
-                return Ok(genero); // Retornamos el objeto que fue eliminado
+                return Ok(genero); 
             }
             catch (Exception ex)
             {

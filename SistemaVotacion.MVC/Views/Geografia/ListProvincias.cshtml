@@ -1,0 +1,41 @@
+﻿@model IEnumerable<SistemaVotacion.Modelos.Provincia>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Gestión de Provincias</h3>
+        <a asp-action="CreateProvincia" class="btn btn-success">Nueva Provincia</a>
+    </div>
+
+    <table class="table table-hover shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Nombre de Provincia</th>
+                <th class="text-center">Nro. Ciudades</th>
+                <th class="text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null)
+            {
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.NombreProvincia</td>
+                        <td class="text-center">
+                            <span class="badge bg-info text-dark">
+                                @(item.Ciudades?.Count ?? 0)
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <a asp-action="DeleteProvincia" asp-route-id="@item.Id" class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

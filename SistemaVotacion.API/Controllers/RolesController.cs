@@ -74,7 +74,7 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-                return NoContent(); // 204 No Content: Éxito sin datos de retorno
+                return NoContent(); 
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -102,7 +102,6 @@ namespace SistemaVotacion.API.Controllers
                 _context.Roles.Add(rol);
                 await _context.SaveChangesAsync();
 
-                // Retorna 201 Created con la ruta para obtener el nuevo rol
                 return CreatedAtAction(nameof(GetRol), new { id = rol.Id }, rol);
             }
             catch (Exception ex)
@@ -127,7 +126,7 @@ namespace SistemaVotacion.API.Controllers
                 _context.Roles.Remove(rol);
                 await _context.SaveChangesAsync();
 
-                return Ok(rol); // Retorna el objeto eliminado
+                return Ok(rol); 
             }
             catch (Exception ex)
             {

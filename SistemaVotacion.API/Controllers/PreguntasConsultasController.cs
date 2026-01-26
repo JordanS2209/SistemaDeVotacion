@@ -19,50 +19,58 @@ namespace SistemaVotacion.API.Controllers
             _context = context;
         }
 
+        // GET: api/PreguntasConsultas
         [HttpGet]
-        public async Task<ActionResult<ApiResult<List<PreguntaConsulta>>>> GetPreguntasConsultas()
+        public async Task<ActionResult<List<PreguntaConsulta>>> GetPreguntasConsultas()
         {
             try
             {
-                var preguntas = await _context.PreguntasConsultas.ToListAsync();
-                return ApiResult<List<PreguntaConsulta>>.Ok(preguntas);
+                // Incluimos el Proceso Electoral para saber a qué consulta pertenece cada pregunta
+                var preguntas = await _context.PreguntasConsultas
+                    .Include(p => p.ProcesosElectorales)
+                    .ToListAsync();
+                return Ok(preguntas);
             }
             catch (Exception ex)
             {
-                return ApiResult<List<PreguntaConsulta>>.Fail(ex.Message);
+                Console.WriteLine($"Error al obtener preguntas de consulta: {ex.Message}");
+                return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
 
+        // GET: api/PreguntasConsultas/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ApiResult<PreguntaConsulta>>> GetPreguntaConsulta(int id)
+        public async Task<ActionResult<PreguntaConsulta>> GetPreguntaConsulta(int id)
         {
             try
             {
                 var pregunta = await _context.PreguntasConsultas
                     .Include(p => p.ProcesosElectorales)
-                    .Include(p => p.OpcionesConsulta)
+                    .Include(p => p.OpcionesConsulta) 
                     .Include(p => p.VotosRecibidos)
                     .FirstOrDefaultAsync(p => p.Id == id);
 
                 if (pregunta == null)
                 {
-                    return ApiResult<PreguntaConsulta>.Fail("Pregunta de consulta no encontrada.");
+                    return NotFound($"No se encontró la pregunta de consulta con ID {id}.");
                 }
 
-                return ApiResult<PreguntaConsulta>.Ok(pregunta);
+                return Ok(pregunta);
             }
             catch (Exception ex)
             {
-                return ApiResult<PreguntaConsulta>.Fail(ex.Message);
+                Console.WriteLine($"Error en GetPreguntaConsulta: {ex.Message}");
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
             }
         }
 
+        // PUT: api/PreguntasConsultas/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResult<PreguntaConsulta>>> PutPreguntaConsulta(int id, PreguntaConsulta pregunta)
+        public async Task<IActionResult> PutPreguntaConsulta(int id, PreguntaConsulta pregunta)
         {
             if (id != pregunta.Id)
             {
-                return ApiResult<PreguntaConsulta>.Fail("ID de Pregunta de consulta no coincide.");
+                return BadRequest("El ID de la URL no coincide con el ID de la pregunta.");
             }
 
             _context.Entry(pregunta).State = EntityState.Modified;
@@ -70,56 +78,65 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                return NoContent(); 
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (DbUpdateConcurrencyException)
             {
                 if (!PreguntaConsultaExists(id))
                 {
-                    return ApiResult<PreguntaConsulta>.Fail("Pregunta de consulta no encontrada.");
+                    return NotFound("La pregunta de consulta no existe.");
                 }
                 else
                 {
-                    return ApiResult<PreguntaConsulta>.Fail(ex.Message);
+                    throw;
                 }
             }
-
-            return ApiResult<PreguntaConsulta>.Ok(null);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al actualizar la pregunta: {ex.Message}");
+                return StatusCode(500, $"Error al actualizar: {ex.Message}");
+            }
         }
 
+        // POST: api/PreguntasConsultas
         [HttpPost]
-        public async Task<ActionResult<ApiResult<PreguntaConsulta>>> PostPreguntaConsulta(PreguntaConsulta pregunta)
+        public async Task<ActionResult<PreguntaConsulta>> PostPreguntaConsulta(PreguntaConsulta pregunta)
         {
             try
             {
                 _context.PreguntasConsultas.Add(pregunta);
                 await _context.SaveChangesAsync();
-                return ApiResult<PreguntaConsulta>.Ok(pregunta);
+
+                return CreatedAtAction(nameof(GetPreguntaConsulta), new { id = pregunta.Id }, pregunta);
             }
             catch (Exception ex)
             {
-                return ApiResult<PreguntaConsulta>.Fail(ex.Message);
+                Console.WriteLine($"Error al crear la pregunta de consulta: {ex.Message}");
+                return StatusCode(500, $"Error al guardar: {ex.Message}");
             }
         }
 
+        // DELETE: api/PreguntasConsultas/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ApiResult<PreguntaConsulta>>> DeletePreguntaConsulta(int id)
+        public async Task<ActionResult<PreguntaConsulta>> DeletePreguntaConsulta(int id)
         {
             try
             {
                 var pregunta = await _context.PreguntasConsultas.FindAsync(id);
                 if (pregunta == null)
                 {
-                    return ApiResult<PreguntaConsulta>.Fail("Pregunta de consulta no encontrada.");
+                    return NotFound("Pregunta de consulta no encontrada.");
                 }
 
                 _context.PreguntasConsultas.Remove(pregunta);
                 await _context.SaveChangesAsync();
 
-                return ApiResult<PreguntaConsulta>.Ok(pregunta);
+                return Ok(pregunta);
             }
             catch (Exception ex)
             {
-                return ApiResult<PreguntaConsulta>.Fail(ex.Message);
+                Console.WriteLine($"Error al eliminar la pregunta: {ex.Message}");
+                return StatusCode(500, $"Error al eliminar: {ex.Message}");
             }
         }
 

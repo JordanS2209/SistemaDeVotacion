@@ -15,6 +15,13 @@ namespace SistemaVotacion.MVC
             Crud<TipoIdentificacion>.EndPoint = "https://localhost:7202/api/TiposIdentificaciones";
             Crud<Genero>.EndPoint = "https://localhost:7202/api/Generos";
             Crud<Lista>.EndPoint = "https://localhost:7202/api/Boletas/activas";
+            Crud<Dignidad>.EndPoint = "https://localhost:7202/api/Dignidades";
+            Crud<Provincia>.EndPoint = "https://localhost:7202/api/Provincias";
+            Crud<Ciudad>.EndPoint = "https://localhost:7202/api/Ciudades";
+            Crud<Parroquia>.EndPoint = "https://localhost:7202/api/Parroquias";
+
+
+
 
 
             var builder = WebApplication.CreateBuilder(args);

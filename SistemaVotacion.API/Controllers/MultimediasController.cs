@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemaVotacion.Modelos;
@@ -19,22 +20,28 @@ namespace SistemaVotacion.API.Controllers
             _context = context;
         }
 
+        // GET: api/Multimedias
         [HttpGet]
-        public async Task<ActionResult<ApiResult<List<Multimedia>>>> GetMultimedias()
+        public async Task<ActionResult<List<Multimedia>>> GetMultimedias()
         {
             try
             {
-                var multimedias = await _context.Multimedias.ToListAsync();
-                return ApiResult<List<Multimedia>>.Ok(multimedias);
+                var multimedias = await _context.Multimedias
+                    .Include(m => m.Candidato)
+                    .Include(m => m.Lista)
+                    .ToListAsync();
+                return Ok(multimedias);
             }
             catch (Exception ex)
             {
-                return ApiResult<List<Multimedia>>.Fail(ex.Message);
+                Console.WriteLine($"Error al obtener recursos multimedia: {ex.Message}");
+                return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
 
+        // GET: api/Multimedias/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ApiResult<Multimedia>>> GetMultimedia(int id)
+        public async Task<ActionResult<Multimedia>> GetMultimedia(int id)
         {
             try
             {
@@ -45,23 +52,25 @@ namespace SistemaVotacion.API.Controllers
 
                 if (multimedia == null)
                 {
-                    return ApiResult<Multimedia>.Fail("Multimedia no encontrada.");
+                    return NotFound($"No se encontró el recurso multimedia con ID {id}.");
                 }
 
-                return ApiResult<Multimedia>.Ok(multimedia);
+                return Ok(multimedia);
             }
             catch (Exception ex)
             {
-                return ApiResult<Multimedia>.Fail(ex.Message);
+                Console.WriteLine($"Error en GetMultimedia: {ex.Message}");
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
             }
         }
 
+        // PUT: api/Multimedias/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResult<Multimedia>>> PutMultimedia(int id, Multimedia multimedia)
+        public async Task<IActionResult> PutMultimedia(int id, Multimedia multimedia)
         {
             if (id != multimedia.Id)
             {
-                return ApiResult<Multimedia>.Fail("ID de Multimedia no coincide.");
+                return BadRequest("El ID de la URL no coincide con el ID del recurso.");
             }
 
             _context.Entry(multimedia).State = EntityState.Modified;
@@ -69,56 +78,65 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                return NoContent(); 
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (DbUpdateConcurrencyException)
             {
                 if (!MultimediaExists(id))
                 {
-                    return ApiResult<Multimedia>.Fail("Multimedia no encontrada.");
+                    return NotFound("El recurso multimedia no existe.");
                 }
                 else
                 {
-                    return ApiResult<Multimedia>.Fail(ex.Message);
+                    throw;
                 }
             }
-
-            return ApiResult<Multimedia>.Ok(null);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al actualizar multimedia: {ex.Message}");
+                return StatusCode(500, $"Error al actualizar: {ex.Message}");
+            }
         }
 
+        // POST: api/Multimedias
         [HttpPost]
-        public async Task<ActionResult<ApiResult<Multimedia>>> PostMultimedia(Multimedia multimedia)
+        public async Task<ActionResult<Multimedia>> PostMultimedia(Multimedia multimedia)
         {
             try
             {
                 _context.Multimedias.Add(multimedia);
                 await _context.SaveChangesAsync();
-                return ApiResult<Multimedia>.Ok(multimedia);
+
+                return CreatedAtAction(nameof(GetMultimedia), new { id = multimedia.Id }, multimedia);
             }
             catch (Exception ex)
             {
-                return ApiResult<Multimedia>.Fail(ex.Message);
+                Console.WriteLine($"Error al crear multimedia: {ex.Message}");
+                return StatusCode(500, $"Error al guardar el recurso: {ex.Message}");
             }
         }
 
+        // DELETE: api/Multimedias/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ApiResult<Multimedia>>> DeleteMultimedia(int id)
+        public async Task<ActionResult<Multimedia>> DeleteMultimedia(int id)
         {
             try
             {
                 var multimedia = await _context.Multimedias.FindAsync(id);
                 if (multimedia == null)
                 {
-                    return ApiResult<Multimedia>.Fail("Multimedia no encontrada.");
+                    return NotFound("Recurso multimedia no encontrado.");
                 }
 
                 _context.Multimedias.Remove(multimedia);
                 await _context.SaveChangesAsync();
 
-                return ApiResult<Multimedia>.Ok(multimedia);
+                return Ok(multimedia); 
             }
             catch (Exception ex)
             {
-                return ApiResult<Multimedia>.Fail(ex.Message);
+                Console.WriteLine($"Error al eliminar multimedia: {ex.Message}");
+                return StatusCode(500, $"Error al eliminar: {ex.Message}");
             }
         }
 

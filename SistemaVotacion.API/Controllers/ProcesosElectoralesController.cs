@@ -19,22 +19,28 @@ namespace SistemaVotacion.API.Controllers
             _context = context;
         }
 
+        // GET: api/ProcesosElectorales
         [HttpGet]
-        public async Task<ActionResult<ApiResult<List<ProcesoElectoral>>>> GetProcesosElectorales()
+        public async Task<ActionResult<List<ProcesoElectoral>>> GetProcesosElectorales()
         {
             try
             {
-                var procesos = await _context.ProcesosElectorales.ToListAsync();
-                return ApiResult<List<ProcesoElectoral>>.Ok(procesos);
+                // Incluimos el tipo de proceso para el listado administrativo
+                var procesos = await _context.ProcesosElectorales
+                    .Include(p => p.TipoProceso)
+                    .ToListAsync();
+                return Ok(procesos);
             }
             catch (Exception ex)
             {
-                return ApiResult<List<ProcesoElectoral>>.Fail(ex.Message);
+                Console.WriteLine($"Error al obtener procesos electorales: {ex.Message}");
+                return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
 
+        // GET: api/ProcesosElectorales/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ApiResult<ProcesoElectoral>>> GetProcesoElectoral(int id)
+        public async Task<ActionResult<ProcesoElectoral>> GetProcesoElectoral(int id)
         {
             try
             {
@@ -51,23 +57,25 @@ namespace SistemaVotacion.API.Controllers
 
                 if (proceso == null)
                 {
-                    return ApiResult<ProcesoElectoral>.Fail("Proceso electoral no encontrado.");
+                    return NotFound($"No se encontró el proceso electoral con ID {id}.");
                 }
 
-                return ApiResult<ProcesoElectoral>.Ok(proceso);
+                return Ok(proceso);
             }
             catch (Exception ex)
             {
-                return ApiResult<ProcesoElectoral>.Fail(ex.Message);
+                Console.WriteLine($"Error en GetProcesoElectoral: {ex.Message}");
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
             }
         }
 
+        // PUT: api/ProcesosElectorales/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResult<ProcesoElectoral>>> PutProcesoElectoral(int id, ProcesoElectoral proceso)
+        public async Task<IActionResult> PutProcesoElectoral(int id, ProcesoElectoral proceso)
         {
             if (id != proceso.Id)
             {
-                return ApiResult<ProcesoElectoral>.Fail("ID de Proceso electoral no coincide.");
+                return BadRequest("El ID de la URL no coincide con el ID del proceso electoral.");
             }
 
             _context.Entry(proceso).State = EntityState.Modified;
@@ -75,56 +83,65 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                return NoContent(); 
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (DbUpdateConcurrencyException)
             {
                 if (!ProcesoElectoralExists(id))
                 {
-                    return ApiResult<ProcesoElectoral>.Fail("Proceso electoral no encontrado.");
+                    return NotFound("El proceso electoral no existe.");
                 }
                 else
                 {
-                    return ApiResult<ProcesoElectoral>.Fail(ex.Message);
+                    throw;
                 }
             }
-
-            return ApiResult<ProcesoElectoral>.Ok(null);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al actualizar proceso electoral: {ex.Message}");
+                return StatusCode(500, $"Error al actualizar: {ex.Message}");
+            }
         }
 
+        // POST: api/ProcesosElectorales
         [HttpPost]
-        public async Task<ActionResult<ApiResult<ProcesoElectoral>>> PostProcesoElectoral(ProcesoElectoral proceso)
+        public async Task<ActionResult<ProcesoElectoral>> PostProcesoElectoral(ProcesoElectoral proceso)
         {
             try
             {
                 _context.ProcesosElectorales.Add(proceso);
                 await _context.SaveChangesAsync();
-                return ApiResult<ProcesoElectoral>.Ok(proceso);
+
+                return CreatedAtAction(nameof(GetProcesoElectoral), new { id = proceso.Id }, proceso);
             }
             catch (Exception ex)
             {
-                return ApiResult<ProcesoElectoral>.Fail(ex.Message);
+                Console.WriteLine($"Error al crear proceso electoral: {ex.Message}");
+                return StatusCode(500, $"Error al guardar el proceso electoral: {ex.Message}");
             }
         }
 
+        // DELETE: api/ProcesosElectorales/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ApiResult<ProcesoElectoral>>> DeleteProcesoElectoral(int id)
+        public async Task<ActionResult<ProcesoElectoral>> DeleteProcesoElectoral(int id)
         {
             try
             {
                 var proceso = await _context.ProcesosElectorales.FindAsync(id);
                 if (proceso == null)
                 {
-                    return ApiResult<ProcesoElectoral>.Fail("Proceso electoral no encontrado.");
+                    return NotFound("Proceso electoral no encontrado.");
                 }
 
                 _context.ProcesosElectorales.Remove(proceso);
                 await _context.SaveChangesAsync();
 
-                return ApiResult<ProcesoElectoral>.Ok(proceso);
+                return Ok(proceso);
             }
             catch (Exception ex)
             {
-                return ApiResult<ProcesoElectoral>.Fail(ex.Message);
+                Console.WriteLine($"Error al eliminar proceso electoral: {ex.Message}");
+                return StatusCode(500, $"Error al eliminar: {ex.Message}");
             }
         }
 

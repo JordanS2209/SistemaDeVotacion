@@ -19,22 +19,28 @@ namespace SistemaVotacion.API.Controllers
             _context = context;
         }
 
+        // GET: api/RecintosElectorales
         [HttpGet]
-        public async Task<ActionResult<ApiResult<List<RecintoElectoral>>>> GetRecintosElectorales()
+        public async Task<ActionResult<List<RecintoElectoral>>> GetRecintosElectorales()
         {
             try
             {
-                var recintos = await _context.RecintosElectorales.ToListAsync();
-                return ApiResult<List<RecintoElectoral>>.Ok(recintos);
+                
+                var recintos = await _context.RecintosElectorales
+                    .Include(r => r.Parroquia)
+                    .ToListAsync();
+                return Ok(recintos);
             }
             catch (Exception ex)
             {
-                return ApiResult<List<RecintoElectoral>>.Fail(ex.Message);
+                Console.WriteLine($"Error al obtener recintos electorales: {ex.Message}");
+                return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
 
+        // GET: api/RecintosElectorales/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ApiResult<RecintoElectoral>>> GetRecintoElectoral(int id)
+        public async Task<ActionResult<RecintoElectoral>> GetRecintoElectoral(int id)
         {
             try
             {
@@ -45,23 +51,25 @@ namespace SistemaVotacion.API.Controllers
 
                 if (recinto == null)
                 {
-                    return ApiResult<RecintoElectoral>.Fail("Recinto electoral no encontrado.");
+                    return NotFound($"No se encontró el recinto electoral con ID {id}.");
                 }
 
-                return ApiResult<RecintoElectoral>.Ok(recinto);
+                return Ok(recinto);
             }
             catch (Exception ex)
             {
-                return ApiResult<RecintoElectoral>.Fail(ex.Message);
+                Console.WriteLine($"Error en GetRecintoElectoral: {ex.Message}");
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
             }
         }
 
+        // PUT: api/RecintosElectorales/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResult<RecintoElectoral>>> PutRecintoElectoral(int id, RecintoElectoral recinto)
+        public async Task<IActionResult> PutRecintoElectoral(int id, RecintoElectoral recinto)
         {
             if (id != recinto.Id)
             {
-                return ApiResult<RecintoElectoral>.Fail("ID de Recinto electoral no coincide.");
+                return BadRequest("El ID de la URL no coincide con el ID del recinto.");
             }
 
             _context.Entry(recinto).State = EntityState.Modified;
@@ -69,56 +77,65 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                return NoContent();
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (DbUpdateConcurrencyException)
             {
                 if (!RecintoElectoralExists(id))
                 {
-                    return ApiResult<RecintoElectoral>.Fail("Recinto electoral no encontrado.");
+                    return NotFound("El recinto electoral no existe.");
                 }
                 else
                 {
-                    return ApiResult<RecintoElectoral>.Fail(ex.Message);
+                    throw;
                 }
             }
-
-            return ApiResult<RecintoElectoral>.Ok(null);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al actualizar recinto: {ex.Message}");
+                return StatusCode(500, $"Error al actualizar: {ex.Message}");
+            }
         }
 
+        // POST: api/RecintosElectorales
         [HttpPost]
-        public async Task<ActionResult<ApiResult<RecintoElectoral>>> PostRecintoElectoral(RecintoElectoral recinto)
+        public async Task<ActionResult<RecintoElectoral>> PostRecintoElectoral(RecintoElectoral recinto)
         {
             try
             {
                 _context.RecintosElectorales.Add(recinto);
                 await _context.SaveChangesAsync();
-                return ApiResult<RecintoElectoral>.Ok(recinto);
+
+                return CreatedAtAction(nameof(GetRecintoElectoral), new { id = recinto.Id }, recinto);
             }
             catch (Exception ex)
             {
-                return ApiResult<RecintoElectoral>.Fail(ex.Message);
+                Console.WriteLine($"Error al crear recinto electoral: {ex.Message}");
+                return StatusCode(500, $"Error al guardar el recinto: {ex.Message}");
             }
         }
 
+        // DELETE: api/RecintosElectorales/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ApiResult<RecintoElectoral>>> DeleteRecintoElectoral(int id)
+        public async Task<ActionResult<RecintoElectoral>> DeleteRecintoElectoral(int id)
         {
             try
             {
                 var recinto = await _context.RecintosElectorales.FindAsync(id);
                 if (recinto == null)
                 {
-                    return ApiResult<RecintoElectoral>.Fail("Recinto electoral no encontrado.");
+                    return NotFound("Recinto electoral no encontrado.");
                 }
 
                 _context.RecintosElectorales.Remove(recinto);
                 await _context.SaveChangesAsync();
 
-                return ApiResult<RecintoElectoral>.Ok(recinto);
+                return Ok(recinto); 
             }
             catch (Exception ex)
             {
-                return ApiResult<RecintoElectoral>.Fail(ex.Message);
+                Console.WriteLine($"Error al eliminar recinto: {ex.Message}");
+                return StatusCode(500, $"Error al eliminar: {ex.Message}");
             }
         }
 

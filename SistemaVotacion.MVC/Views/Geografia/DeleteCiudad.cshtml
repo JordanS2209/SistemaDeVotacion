@@ -1,0 +1,42 @@
+﻿@model SistemaVotacion.Modelos.Ciudad
+
+@{
+    ViewData["Title"] = "Eliminar Ciudad";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card border-danger shadow">
+                <div class="card-header bg-danger text-white text-center">
+                    <h4 class="mb-0">¿Eliminar esta Ciudad?</h4>
+                </div>
+                <div class="card-body text-center">
+                    <p class="lead">Estás a punto de borrar:</p>
+                    <h3 class="text-dark fw-bold">@Model.NombreCiudad</h3>
+
+                    <p class="text-muted">Provincia: @(Model.Provincia?.NombreProvincia ?? "No asignada")</p>
+
+                    <div class="alert alert-warning mt-3">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Atención:</strong> Si eliminas esta ciudad, podrías perder la relación con las **parroquias** asociadas.
+                    </div>
+
+                    <form asp-action="DeleteCiudad" method="post">
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger">Confirmar Eliminación</button>
+                            <a asp-action="ListCiudades" class="btn btn-light">Cancelar</a>
+                        </div>
+                    </form>
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger mt-3 small">@ViewBag.Error</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

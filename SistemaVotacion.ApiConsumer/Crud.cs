@@ -13,7 +13,7 @@ namespace SistemaVotacion.ApiConsumer
         {
             var client = new HttpClient();
 
-            
+
             return client;
         }
 
@@ -47,7 +47,7 @@ namespace SistemaVotacion.ApiConsumer
                 }
                 catch (HttpRequestException ex)
                 {
-                    // Error típico cuando el puerto no está escuchando
+
                     throw new Exception($"No se pudo conectar con la API ({EndPoint}). Detalle: {ex.Message}", ex);
                 }
             }
@@ -101,6 +101,7 @@ namespace SistemaVotacion.ApiConsumer
             {
                 var response = client.PutAsync(
                         $"{EndPoint}/{id}",
+
                         new StringContent(
                             JsonConvert.SerializeObject(item),
                             Encoding.UTF8,
@@ -134,5 +135,6 @@ namespace SistemaVotacion.ApiConsumer
                 }
             }
         }
+
     }
 }

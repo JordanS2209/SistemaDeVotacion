@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "Ingresar código de votación";
+}
+
+<h2>Ingresar código de votación</h2>
+
+<form asp-controller="Acceso" asp-action="IngresarCodigo" method="post">
+    <div>
+        <label>Código de 6 dígitos</label>
+        <input type="text" name="codigo" maxlength="6" />
+    </div>
+
+    <button type="submit">Continuar</button>
+</form>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemaVotacion.Modelos;
@@ -19,22 +20,25 @@ namespace SistemaVotacion.API.Controllers
             _context = context;
         }
 
+        // GET: api/TipoVotos
         [HttpGet]
-        public async Task<ActionResult<ApiResult<List<TipoVoto>>>> GetTipoVotos()
+        public async Task<ActionResult<List<TipoVoto>>> GetTipoVotos()
         {
             try
             {
                 var tipos = await _context.TipoVotos.ToListAsync();
-                return ApiResult<List<TipoVoto>>.Ok(tipos);
+                return Ok(tipos);
             }
             catch (Exception ex)
             {
-                return ApiResult<List<TipoVoto>>.Fail(ex.Message);
+                Console.WriteLine($"Error al obtener tipos de votos: {ex.Message}");
+                return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
 
+        // GET: api/TipoVotos/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ApiResult<TipoVoto>>> GetTipoVoto(int id)
+        public async Task<ActionResult<TipoVoto>> GetTipoVoto(int id)
         {
             try
             {
@@ -44,23 +48,25 @@ namespace SistemaVotacion.API.Controllers
 
                 if (tipo == null)
                 {
-                    return ApiResult<TipoVoto>.Fail("Tipo de voto no encontrado.");
+                    return NotFound($"No se encontró el tipo de voto con ID {id}.");
                 }
 
-                return ApiResult<TipoVoto>.Ok(tipo);
+                return Ok(tipo);
             }
             catch (Exception ex)
             {
-                return ApiResult<TipoVoto>.Fail(ex.Message);
+                Console.WriteLine($"Error en GetTipoVoto: {ex.Message}");
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
             }
         }
 
+        // PUT: api/TipoVotos/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResult<TipoVoto>>> PutTipoVoto(int id, TipoVoto tipo)
+        public async Task<IActionResult> PutTipoVoto(int id, TipoVoto tipo)
         {
             if (id != tipo.Id)
             {
-                return ApiResult<TipoVoto>.Fail("ID de Tipo de voto no coincide.");
+                return BadRequest("El ID de la URL no coincide con el ID del tipo de voto.");
             }
 
             _context.Entry(tipo).State = EntityState.Modified;
@@ -68,56 +74,65 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                return NoContent(); 
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (DbUpdateConcurrencyException)
             {
                 if (!TipoVotoExists(id))
                 {
-                    return ApiResult<TipoVoto>.Fail("Tipo de voto no encontrado.");
+                    return NotFound("El tipo de voto no existe.");
                 }
                 else
                 {
-                    return ApiResult<TipoVoto>.Fail(ex.Message);
+                    throw;
                 }
             }
-
-            return ApiResult<TipoVoto>.Ok(null);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al actualizar tipo de voto: {ex.Message}");
+                return StatusCode(500, $"Error al actualizar: {ex.Message}");
+            }
         }
 
+        // POST: api/TipoVotos
         [HttpPost]
-        public async Task<ActionResult<ApiResult<TipoVoto>>> PostTipoVoto(TipoVoto tipo)
+        public async Task<ActionResult<TipoVoto>> PostTipoVoto(TipoVoto tipo)
         {
             try
             {
                 _context.TipoVotos.Add(tipo);
                 await _context.SaveChangesAsync();
-                return ApiResult<TipoVoto>.Ok(tipo);
+
+                return CreatedAtAction(nameof(GetTipoVoto), new { id = tipo.Id }, tipo);
             }
             catch (Exception ex)
             {
-                return ApiResult<TipoVoto>.Fail(ex.Message);
+                Console.WriteLine($"Error al crear tipo de voto: {ex.Message}");
+                return StatusCode(500, $"Error al guardar el tipo de voto: {ex.Message}");
             }
         }
 
+        // DELETE: api/TipoVotos/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ApiResult<TipoVoto>>> DeleteTipoVoto(int id)
+        public async Task<ActionResult<TipoVoto>> DeleteTipoVoto(int id)
         {
             try
             {
                 var tipo = await _context.TipoVotos.FindAsync(id);
                 if (tipo == null)
                 {
-                    return ApiResult<TipoVoto>.Fail("Tipo de voto no encontrado.");
+                    return NotFound("Tipo de voto no encontrado.");
                 }
 
                 _context.TipoVotos.Remove(tipo);
                 await _context.SaveChangesAsync();
 
-                return ApiResult<TipoVoto>.Ok(tipo);
+                return Ok(tipo); 
             }
             catch (Exception ex)
             {
-                return ApiResult<TipoVoto>.Fail(ex.Message);
+                Console.WriteLine($"Error al eliminar tipo de voto: {ex.Message}");
+                return StatusCode(500, $"Error al eliminar: {ex.Message}");
             }
         }
 

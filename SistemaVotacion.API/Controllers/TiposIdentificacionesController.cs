@@ -73,7 +73,7 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-                return NoContent(); // Éxito sin contenido de retorno
+                return NoContent(); 
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -101,7 +101,6 @@ namespace SistemaVotacion.API.Controllers
                 _context.TiposIdentificaciones.Add(tipo);
                 await _context.SaveChangesAsync();
 
-                // Retorna 201 Created y la ubicación del nuevo recurso
                 return CreatedAtAction(nameof(GetTipoIdentificacion), new { id = tipo.Id }, tipo);
             }
             catch (Exception ex)

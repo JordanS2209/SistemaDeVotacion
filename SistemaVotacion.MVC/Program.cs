@@ -27,7 +27,7 @@ namespace SistemaVotacion.MVC
             builder.Services.AddAuthentication("Cookies") //cokies
                             .AddCookie("Cookies", options =>
                             {
-                                options.LoginPath = "/Account/Index"; // Ruta de inicio de sesión
+                                options.LoginPath = "/Account/Index"; // Ruta de inicio de sesiÃ³n
                             });
             builder.Services.AddHttpContextAccessor();
 

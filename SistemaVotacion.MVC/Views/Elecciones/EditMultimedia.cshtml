@@ -1,0 +1,57 @@
+﻿@model SistemaVotacion.Modelos.Multimedia
+
+@{
+    ViewData["Title"] = "Editar Multimedia";
+}
+
+<h1>Editar Multimedia</h1>
+
+<h4>Multimedia</h4>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="EditMultimedia" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            @* Id oculto, necesario para enviar al controlador *@
+            <input type="hidden" asp-for="Id" />
+
+            <div class="form-group">
+                <label asp-for="Descripcion" class="control-label"></label>
+                <input asp-for="Descripcion" class="form-control" />
+                <span asp-validation-for="Descripcion" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="IdCandidato" class="control-label"></label>
+                <input asp-for="IdCandidato" class="form-control" />
+                <span asp-validation-for="IdCandidato" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="IdLista" class="control-label"></label>
+                <input asp-for="IdLista" class="form-control" />
+                <span asp-validation-for="IdLista" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3">
+                <input type="submit" value="Guardar" class="btn btn-primary" />
+                <a asp-action="ListMultimedia" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-6">
+        @* Mostrar la imagen actual *@
+        @if (!string.IsNullOrEmpty(Model.UrlFoto))
+        {
+            <h5>Imagen actual</h5>
+            <img src="@Model.UrlFoto" alt="Vista previa" style="max-width:300px; max-height:300px;" />
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

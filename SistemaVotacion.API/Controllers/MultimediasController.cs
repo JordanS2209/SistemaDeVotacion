@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemaVotacion.Modelos;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SistemaVotacion.API.Controllers
 {
@@ -14,10 +15,11 @@ namespace SistemaVotacion.API.Controllers
     public class MultimediasController : ControllerBase
     {
         private readonly SistemaVotacionAPIContext _context;
-
-        public MultimediasController(SistemaVotacionAPIContext context)
-        {
-            _context = context;
+        private readonly BlobServiceClient _blobServiceClient;
+        public MultimediasController(SistemaVotacionAPIContext context, BlobServiceClient blobServiceClient) 
+        { 
+            _context = context; 
+            _blobServiceClient = blobServiceClient; 
         }
 
         // GET: api/Multimedias
@@ -99,22 +101,45 @@ namespace SistemaVotacion.API.Controllers
         }
 
         // POST: api/Multimedias
-        [HttpPost]
-        public async Task<ActionResult<Multimedia>> PostMultimedia(Multimedia multimedia)
+        [HttpPost("upload")]
+        public async Task<ActionResult<Multimedia>> Upload(IFormFile file, int idCandidato, int idLista, string descripcion)
         {
-            try
-            {
-                _context.Multimedias.Add(multimedia);
-                await _context.SaveChangesAsync();
+            if (file == null || file.Length == 0)
+                return BadRequest("Archivo no válido.");
 
-                return CreatedAtAction(nameof(GetMultimedia), new { id = multimedia.Id }, multimedia);
-            }
-            catch (Exception ex)
+            // Nombre único para el archivo
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+
+            // Contenedor en Azure Blob
+            var container = _blobServiceClient.GetBlobContainerClient("multimedia");
+            await container.CreateIfNotExistsAsync();
+
+            var blobClient = container.GetBlobClient(fileName);
+
+            // Subir archivo
+            using (var stream = file.OpenReadStream())
             {
-                Console.WriteLine($"Error al crear multimedia: {ex.Message}");
-                return StatusCode(500, $"Error al guardar el recurso: {ex.Message}");
+                await blobClient.UploadAsync(stream, overwrite: true);
             }
+
+            // URL pública del archivo
+            var urlFoto = blobClient.Uri.ToString();
+
+            var multimedia = new Multimedia
+            {
+                UrlFoto = urlFoto,
+                Descripcion = descripcion,
+                IdCandidato = idCandidato,
+                IdLista = idLista
+            };
+
+            _context.Multimedias.Add(multimedia);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetMultimedia), new { id = multimedia.Id }, multimedia);
         }
+
+
 
         // DELETE: api/Multimedias/5
         [HttpDelete("{id}")]

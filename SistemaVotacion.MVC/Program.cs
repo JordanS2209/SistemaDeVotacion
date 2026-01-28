@@ -14,15 +14,18 @@ namespace SistemaVotacion.MVC
             Crud<Rol>.EndPoint = "https://localhost:7202/api/Roles";
             Crud<TipoIdentificacion>.EndPoint = "https://localhost:7202/api/TiposIdentificaciones";
             Crud<Genero>.EndPoint = "https://localhost:7202/api/Generos";
-            Crud<Lista>.EndPoint = "https://localhost:7202/api/Boletas/activas";
+            //Crud<Lista>.EndPoint = "https://localhost:7202/api/Boletas/activas";
             Crud<Dignidad>.EndPoint = "https://localhost:7202/api/Dignidades";
             Crud<Provincia>.EndPoint = "https://localhost:7202/api/Provincias";
             Crud<Ciudad>.EndPoint = "https://localhost:7202/api/Ciudades";
             Crud<Parroquia>.EndPoint = "https://localhost:7202/api/Parroquias";
-
-
-
-
+            Crud<Multimedia>.EndPoint = "https://localhost:7202/api/Multimedias";
+            Crud<TipoProceso>.EndPoint = "https://localhost:7202/api/TipoProcesos";
+            Crud<Candidato>.EndPoint = "https://localhost:7202/api/Candidatos";
+            Crud<OpcionConsulta>.EndPoint = "https://localhost:7202/api/OpcionesConsultas";
+            Crud<PreguntaConsulta>.EndPoint = "https://localhost:7202/api/PreguntasConsultas";
+            Crud<ProcesoElectoral>.EndPoint = "https://localhost:7202/api/ProcesosElectorales";
+            Crud<Lista>.EndPoint = "https://localhost:7202/api/Listas";
 
             var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +33,10 @@ namespace SistemaVotacion.MVC
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddHttpClient<IMultimediaService, MultimediaService>(client => 
+            { 
+                client.BaseAddress = new Uri("https://localhost:7202/api/Multimedias/"); 
+            });
 
             builder.Services.AddAuthentication("Cookies") //cokies
                             .AddCookie("Cookies", options =>

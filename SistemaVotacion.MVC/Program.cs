@@ -15,14 +15,7 @@ namespace SistemaVotacion.MVC
             Crud<TipoIdentificacion>.EndPoint = "https://localhost:7202/api/TiposIdentificaciones";
             Crud<Genero>.EndPoint = "https://localhost:7202/api/Generos";
             Crud<Lista>.EndPoint = "https://localhost:7202/api/Boletas/activas";
-            Crud<Dignidad>.EndPoint = "https://localhost:7202/api/Dignidades";
-            Crud<Provincia>.EndPoint = "https://localhost:7202/api/Provincias";
-            Crud<Ciudad>.EndPoint = "https://localhost:7202/api/Ciudades";
-            Crud<Parroquia>.EndPoint = "https://localhost:7202/api/Parroquias";
-
-
-
-
+            Crud<Padron>.EndPoint = "https://localhost:7202/api/Padrones";
 
             var builder = WebApplication.CreateBuilder(args);
 
@@ -34,9 +27,7 @@ namespace SistemaVotacion.MVC
             builder.Services.AddAuthentication("Cookies") //cokies
                             .AddCookie("Cookies", options =>
                             {
-                                options.LoginPath = "/Account/Index"; // Ruta de inicio de sesión
-
-
+                                options.LoginPath = "/Account/Index"; // Ruta de inicio de sesiÃ³n
                             });
             builder.Services.AddHttpContextAccessor();
 

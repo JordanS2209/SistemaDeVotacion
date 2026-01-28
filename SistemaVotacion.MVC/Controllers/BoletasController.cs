@@ -1,31 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SistemaVotacion.ApiConsumer;
-using SistemaVotacion.Modelos;
 
 namespace SistemaVotacion.MVC.Controllers
 {
     public class BoletasController : Controller
     {
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index(string codigo)
         {
-            try
+           
+            if (string.IsNullOrWhiteSpace(codigo))
             {
-                var listas = Crud<Lista>.GetAll();
-
-                if (listas == null || !listas.Any())
-                {
-                    return View("ProcesoNoDisponible");
-                }
-
-                return View(listas);
+                TempData["Error"] = "Debe ingresar un código de votación.";
+                return RedirectToAction("IngresarCodigo", "Acceso");
             }
-            catch (Exception ex)
-            {
-                // Aquí puedes loguear el error si quieres
-                ViewBag.Error = ex.Message;
-                return View("ProcesoNoDisponible");
-            }
+
+            
+            ViewBag.Codigo = codigo;
+            return View(); 
         }
     }
 }

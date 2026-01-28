@@ -11,7 +11,10 @@ namespace SistemaVotacion.ApiConsumer
 
         private static HttpClient CreateClient()
         {
-            var client = new HttpClient();
+            var client = new HttpClient
+            {
+                BaseAddress = new Uri("http://localhost:5067/")
+            };
 
 
             return client;

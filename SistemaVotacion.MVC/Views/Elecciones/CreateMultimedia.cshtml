@@ -1,0 +1,57 @@
+﻿@model SistemaVotacion.Modelos.Multimedia
+
+@{
+    ViewData["Title"] = "Crear Multimedia";
+}
+
+<h1>Crear Multimedia</h1>
+<h4>Subir archivo multimedia</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <!-- IMPORTANTE: enctype="multipart/form-data" -->
+        <form asp-action="CreateMultimedia" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- Campo para archivo -->
+            <div class="form-group">
+                <label for="file" class="control-label">Archivo</label>
+                <input type="file" name="file" class="form-control" required />
+            </div>
+
+            <!-- Campo descripción -->
+            <div class="form-group">
+                <label asp-for="Descripcion" class="control-label"></label>
+                <input asp-for="Descripcion" class="form-control" />
+                <span asp-validation-for="Descripcion" class="text-danger"></span>
+            </div>
+
+            <!-- Campo IdCandidato -->
+            <div class="form-group">
+                <label asp-for="IdCandidato" class="control-label"></label>
+                <input asp-for="IdCandidato" class="form-control" />
+                <span asp-validation-for="IdCandidato" class="text-danger"></span>
+            </div>
+
+            <!-- Campo IdLista -->
+            <div class="form-group">
+                <label asp-for="IdLista" class="control-label"></label>
+                <input asp-for="IdLista" class="form-control" />
+                <span asp-validation-for="IdLista" class="text-danger"></span>
+            </div>
+
+            <!-- Botones -->
+            <div class="form-group mt-3">
+                <input type="submit" value="Subir" class="btn btn-primary" />
+                <a asp-action="ListMultimedia" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

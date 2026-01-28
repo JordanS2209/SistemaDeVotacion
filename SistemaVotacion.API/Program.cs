@@ -1,3 +1,4 @@
+using Azure.Storage.Blobs;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -16,6 +17,11 @@ namespace SistemaVotacion.API
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddDbContext<SistemaVotacionAPIContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("SistemaVotacionAPIContext") ?? throw new InvalidOperationException("Connection string 'SistemaVotacionAPIContext' not found.")));
+            //Azure Blob Service storage
+            builder.Services.AddSingleton(x => 
+            { var config = x.GetRequiredService<IConfiguration>(); 
+                var connectionString = config.GetConnectionString("AzureStorage"); 
+                return new BlobServiceClient(connectionString); });
 
             // Add services to the container.
 

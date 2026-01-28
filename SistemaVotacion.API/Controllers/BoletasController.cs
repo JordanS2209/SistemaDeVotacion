@@ -40,7 +40,7 @@ namespace SistemaVotacion.API.Controllers
             return Ok(procesoActivo.ListasParticipantes);
         }
 
-        // NUEVO: Obtener boleta validando código de acceso (urna)
+      
         [HttpGet("por-codigo/{codigo}")]
         public async Task<IActionResult> ObtenerBoletaPorCodigo(string codigo)
         {
@@ -75,12 +75,15 @@ namespace SistemaVotacion.API.Controllers
                 return NotFound("No se encontró el proceso electoral para el código dado.");
             }
 
-            // Opcional: no invalidamos aún el código hasta que efectivamente vote
-            return Ok(new
+            
+            var resultado = new
             {
-                PadronId = padron.Id, // para usarlo al registrar el voto
-                Listas = proceso.ListasParticipantes
-            });
+                padronId = padron.Id,
+                fechaFinVotacion = proceso.FechaFin, 
+                listas = proceso.ListasParticipantes 
+            };
+
+            return Ok(resultado);
         }
     }
 }

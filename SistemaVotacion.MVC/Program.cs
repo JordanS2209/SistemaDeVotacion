@@ -15,7 +15,7 @@ namespace SistemaVotacion.MVC
             Crud<TipoIdentificacion>.EndPoint = "https://localhost:7202/api/TiposIdentificaciones";
             Crud<Genero>.EndPoint = "https://localhost:7202/api/Generos";
             Crud<Lista>.EndPoint = "https://localhost:7202/api/Boletas/activas";
-
+            Crud<Padron>.EndPoint = "https://localhost:7202/api/Padrones";
 
             var builder = WebApplication.CreateBuilder(args);
 
@@ -28,8 +28,6 @@ namespace SistemaVotacion.MVC
                             .AddCookie("Cookies", options =>
                             {
                                 options.LoginPath = "/Account/Index"; // Ruta de inicio de sesión
-
-
                             });
             builder.Services.AddHttpContextAccessor();
 

@@ -1,7 +1,10 @@
-﻿@model List<SistemaVotacion.Modelos.Lista>
+﻿@using System.Linq
+@model List<SistemaVotacion.Modelos.Lista>
 
 @{
-    Layout = null;
+    ViewData["Title"] = "Boleta";
+    Layout = null; 
+    var fechaFin = ViewBag.FechaFinVotacion as string;
 }
 
 <!DOCTYPE html>
@@ -10,9 +13,18 @@
     <meta charset="UTF-8" />
     <title>Boleta Electoral</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <link rel="stylesheet" href="~/css/Boleta.css" />
 </head>
 <body>
+
+    <h1>Boleta Electoral</h1>
+    <p>Código validado: @ViewBag.Codigo</p>
+
+    <div class="contador-elecciones">
+        <span class="titulo">Tiempo restante</span>
+        <span id="tiempo-restante">--:--:--</span>
+    </div>
 
     <form method="post">
         <div class="boleta-container">
@@ -24,24 +36,24 @@
 
             <div class="boleta-opciones">
 
-                @if (Model != null && Model.Any())
+                @if (Model != null && Model.Count > 0)
                 {
                     foreach (var lista in Model)
                     {
                         var presidente = lista.Candidatos?
-                        .FirstOrDefault(c => c.Dignidad.NombreDignidad == "Presidente");
+                            .FirstOrDefault(c => c.Dignidad?.NombreDignidad == "Presidente");
 
                         var vicepresidente = lista.Candidatos?
-                        .FirstOrDefault(c => c.Dignidad.NombreDignidad == "Vicepresidente");
+                            .FirstOrDefault(c => c.Dignidad?.NombreDignidad == "Vicepresidente");
 
                         var logoLista = lista.RecursosMultimedia?
-                        .FirstOrDefault()?.UrlFoto ?? "img/default-lista.png";
+                            .FirstOrDefault()?.UrlFoto ?? "img/default-lista.png";
 
                         var fotoPresidente = presidente?.GaleriaMultimedia?
-                        .FirstOrDefault()?.UrlFoto ?? "img/default-persona.png";
+                            .FirstOrDefault()?.UrlFoto ?? "img/default-persona.png";
 
                         var fotoVicepresidente = vicepresidente?.GaleriaMultimedia?
-                        .FirstOrDefault()?.UrlFoto ?? "img/default-persona.png";
+                            .FirstOrDefault()?.UrlFoto ?? "img/default-persona.png";
 
                         <label class="opcion-card">
                             <input type="radio" name="IdLista" value="@lista.Id" required />
@@ -71,6 +83,10 @@
                             </div>
                         </label>
                     }
+                }
+                else
+                {
+                    <p>No hay boletas disponibles para mostrar.</p>
                 }
             </div>
 

@@ -22,13 +22,13 @@ namespace SistemaVotacion.API.Controllers
 
             var procesoActivo = _context.ProcesosElectorales
                 .Include(p => p.ListasParticipantes)
-                .ThenInclude(l => l.Candidatos)
-                .ThenInclude(c => c.Dignidad)
+                    .ThenInclude(l => l.Candidatos)
+                        .ThenInclude(c => c.Dignidad)
                 .Include(p => p.ListasParticipantes)
-                .ThenInclude(l => l.Candidatos)
-                .ThenInclude(c => c.GaleriaMultimedia)
+                    .ThenInclude(l => l.Candidatos)
+                        .ThenInclude(c => c.GaleriaMultimedia)
                 .Include(p => p.ListasParticipantes)
-                .ThenInclude(l => l.RecursosMultimedia)
+                    .ThenInclude(l => l.RecursosMultimedia)
                 .FirstOrDefault(p =>
                     ahora >= p.FechaInicio &&
                     ahora <= p.FechaFin
@@ -39,5 +39,52 @@ namespace SistemaVotacion.API.Controllers
 
             return Ok(procesoActivo.ListasParticipantes);
         }
+
+      
+        [HttpGet("por-codigo/{codigo}")]
+        public async Task<IActionResult> ObtenerBoletaPorCodigo(string codigo)
+        {
+            var ahora = DateTime.Now;
+
+            var padron = await _context.Padrones
+                .Include(p => p.Proceso)
+                .FirstOrDefaultAsync(p =>
+                    p.CodigoAcceso == codigo &&
+                    !p.HaVotado &&
+                    ahora >= p.Proceso.FechaInicio &&
+                    ahora <= p.Proceso.FechaFin);
+
+            if (padron == null)
+            {
+                return BadRequest("Código inválido o ya utilizado.");
+            }
+
+            var proceso = await _context.ProcesosElectorales
+                .Include(p => p.ListasParticipantes)
+                    .ThenInclude(l => l.Candidatos)
+                        .ThenInclude(c => c.Dignidad)
+                .Include(p => p.ListasParticipantes)
+                    .ThenInclude(l => l.Candidatos)
+                        .ThenInclude(c => c.GaleriaMultimedia)
+                .Include(p => p.ListasParticipantes)
+                    .ThenInclude(l => l.RecursosMultimedia)
+                .FirstOrDefaultAsync(p => p.Id == padron.IdProceso);
+
+            if (proceso == null)
+            {
+                return NotFound("No se encontró el proceso electoral para el código dado.");
+            }
+
+            
+            var resultado = new
+            {
+                padronId = padron.Id,
+                fechaFinVotacion = proceso.FechaFin, 
+                listas = proceso.ListasParticipantes 
+            };
+
+            return Ok(resultado);
+        }
     }
 }
+

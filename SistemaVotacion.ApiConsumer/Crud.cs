@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using SistemaVotacion.Modelos;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text;
 
 namespace SistemaVotacion.ApiConsumer
@@ -97,6 +98,35 @@ namespace SistemaVotacion.ApiConsumer
                 }
             }
         }
+        public static T CreateItem(T item)
+        {
+            if (string.IsNullOrWhiteSpace(EndPoint))
+                throw new InvalidOperationException($"El EndPoint de Crud<{typeof(T).Name}> no está configurado.");
+
+            using (var client = new HttpClient())
+            {
+                var settings = new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                };
+
+                var json = JsonConvert.SerializeObject(item, settings);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = client.PostAsync(EndPoint, content).Result;
+                var responseBody = response.Content.ReadAsStringAsync().Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return JsonConvert.DeserializeObject<T>(responseBody);
+                }
+                else
+                {
+                    throw new Exception($"Error HTTP {(int)response.StatusCode}: {responseBody}");
+                }
+            }
+        }
 
         public static bool Update(int id, T item)
         {
@@ -138,6 +168,23 @@ namespace SistemaVotacion.ApiConsumer
                 }
             }
         }
+        public static List<T> GetCustom(string url)
+        {
+            using (var client = new HttpClient())
+            {
+                var response = client.GetAsync(url).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = response.Content.ReadAsStringAsync().Result;
+                    return JsonConvert.DeserializeObject<List<T>>(json);
+                }
+                else
+                {
+                    throw new Exception($"Error: {response.StatusCode}");
+                }
+            }
+        }
+
 
     }
 }

@@ -57,6 +57,17 @@ namespace SistemaVotacion.API.Controllers
                 return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
+        // GET: api/Dignidades/simple
+        [HttpGet("simple")]
+        public async Task<ActionResult<IEnumerable<object>>> GetDignidadesSimple()
+        {
+            var dignidades = await _context.Dignidades
+                .Select(d => new { d.Id, d.NombreDignidad })
+                .ToListAsync();
+
+            return Ok(dignidades);
+        }
+
 
         // PUT: api/Dignidades/5
         [HttpPut("{id}")]

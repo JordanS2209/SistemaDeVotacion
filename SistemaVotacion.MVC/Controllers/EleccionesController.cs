@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.WebUtilities;
 using SistemaVotacion.ApiConsumer;
 using SistemaVotacion.Modelos;
 using SistemaVotacion.Servicios.Interfaces;
@@ -8,10 +9,10 @@ namespace SistemaVotacion.MVC.Controllers
 {
     public class EleccionesController : Controller
     {
-        private readonly IMultimediaService _multimediaService; 
-        public EleccionesController(IMultimediaService multimediaService) 
-        { 
-            _multimediaService = multimediaService; 
+        private readonly IMultimediaService _multimediaService;
+        public EleccionesController(IMultimediaService multimediaService)
+        {
+            _multimediaService = multimediaService;
         }
         public IActionResult Index()
         {
@@ -22,23 +23,25 @@ namespace SistemaVotacion.MVC.Controllers
         //index
         public IActionResult ListTipoProcesos()
         {
-            try {
+            try
+            {
                 var tipoProcesosData = Crud<TipoProceso>.GetAll();
                 return View(tipoProcesosData);
-
             }
             catch (Exception ex)
             {
                 ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View(new List<object>());
+                return View(new List<TipoProceso>());
             }
-          
         }
         public IActionResult DetailsTipoProcesos(int id)
         {
             try
             {
                 var tipoProcesoData = Crud<TipoProceso>.GetById(id);
+                if (tipoProcesoData == null)
+                    return NotFound();
+
                 return View(tipoProcesoData);
             }
             catch (Exception ex)
@@ -51,7 +54,6 @@ namespace SistemaVotacion.MVC.Controllers
         {
             return View();
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult CreateTipoProcesos(TipoProceso nuevoTipoProceso)
@@ -65,24 +67,25 @@ namespace SistemaVotacion.MVC.Controllers
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("", "Error: " + ex.Message);
-
+                    ModelState.AddModelError("", "Error al crear: " + ex.Message);
                 }
             }
             return View(nuevoTipoProceso);
-
         }
         public IActionResult EditTipoProceso(int id)
         {
             try
             {
                 var tipoProcesoData = Crud<TipoProceso>.GetById(id);
+                if (tipoProcesoData == null)
+                    return NotFound();
+
                 return View(tipoProcesoData);
             }
             catch (Exception ex)
             {
                 ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View(id);
+                return View();
             }
         }
 
@@ -90,16 +93,19 @@ namespace SistemaVotacion.MVC.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult EditTipoProceso(int id, TipoProceso tipoProcesoData)
         {
-            try
+            if (ModelState.IsValid)
             {
-               Crud<TipoProceso>.Update(id, tipoProcesoData);
-                return RedirectToAction(nameof(ListTipoProcesos));
+                try
+                {
+                    Crud<TipoProceso>.Update(id, tipoProcesoData);
+                    return RedirectToAction(nameof(ListTipoProcesos));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error al actualizar: " + ex.Message);
+                }
             }
-            catch(Exception ex)
-            {
-                ModelState.AddModelError("", "Error: " + ex.Message);
-                return View(tipoProcesoData);
-            }
+            return View(tipoProcesoData);
         }
 
         public IActionResult DeleteTipoProceso(int id)
@@ -116,34 +122,107 @@ namespace SistemaVotacion.MVC.Controllers
                 Crud<TipoProceso>.Delete(id);
                 return RedirectToAction(nameof(ListTipoProcesos));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                ModelState.AddModelError("", "Error: " + ex.Message);
+                ModelState.AddModelError("", "Error al eliminar: " + ex.Message);
                 return View(tipoProcesoData);
             }
         }
-        // CADIDATOS - CRUD
+
+        //// CADIDATOS - CRUD
+        //// Helper para obtener las listas
+        //private List<SelectListItem> GetListas()
+        //{
+        //    Crud<Lista>.EndPoint = "https://localhost:7202/api/Listas/simple";
+        //    var listas = Crud<Lista>.GetAll();
+        //    return listas.Select(l => new SelectListItem
+        //    {
+        //        Value = l.Id.ToString(),
+        //        Text = l.NombreLista
+        //    }).ToList();
+        //}
+
+        //// Helper para obtener las dignidades
+        //private List<SelectListItem> GetDignidades()
+        //{
+        //    Crud<Dignidad>.EndPoint = "https://localhost:7202/api/Dignidades/simple";
+
+        //    var dignidades = Crud<Dignidad>.GetAll();
+        //    return dignidades.Select(d => new SelectListItem
+        //    {
+        //        Value = d.Id.ToString(),
+        //        Text = d.NombreDignidad
+        //    }).ToList();
+        //}
+
         public IActionResult ListCandidato()
         {
             try
             {
-                var caditdatoData = Crud<Candidato>.GetAll();
-                return View(caditdatoData);
+                // Ya no necesitas configurar el EndPoint aquí
+                var candidatoData = Crud<Candidato>.GetAll();
 
+                // Poblar los dropdowns
+                //ViewBag.Listas = Crud<Lista>.GetAll();
+                //ViewBag.Dignidades = Crud<Dignidad>.GetAll();
+
+                return View(candidatoData);
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View(new List<object>());
+                TempData["error"] = "Error al conectar con la API: " + ex.Message;
+                //ViewBag.Listas = Crud<Lista>.GetAll();
+                //ViewBag.Dignidades = Crud<Dignidad>.GetAll();
+                return View(new List<Candidato>());
             }
+        }
 
+
+        public IActionResult FiltrarCandidatos(string nombre, int? lista, int? dignidad)
+        {
+            try
+            {
+
+                var queryParams = new Dictionary<string, string>();
+
+                if (!string.IsNullOrEmpty(nombre))
+                    queryParams.Add("nombre", nombre);
+
+                if (lista.HasValue)
+                    queryParams.Add("lista", lista.Value.ToString());
+
+                if (dignidad.HasValue)
+                    queryParams.Add("dignidad", dignidad.Value.ToString());
+
+                // Generar la URL final con los parámetros
+                string url = QueryHelpers.AddQueryString($"{Crud<Candidato>.EndPoint}/filtrar", queryParams);
+
+                // Llamar al endpoint de filtrado
+                var candidatos = Crud<Candidato>.GetCustom(url);
+
+                // Poblar los dropdowns para que se mantengan en la vista
+                ViewBag.Listas = Crud<Lista>.GetAll();
+                ViewBag.Dignidades = Crud<Dignidad>.GetAll();
+
+                return View("ListCandidato", candidatos);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = "Error al filtrar candidatos: " + ex.Message;
+                ViewBag.Listas = Crud<Lista>.GetAll();
+                ViewBag.Dignidades = Crud<Dignidad>.GetAll();
+                return View("ListCandidato", new List<Candidato>());
+            }
         }
         public IActionResult DetailsCandidato(int id)
         {
             try
             {
-                var caditdatoData = Crud<Candidato>.GetById(id);
-                return View(caditdatoData);
+                var candidatoData = Crud<Candidato>.GetById(id);
+                if (candidatoData == null)
+                    return NotFound();
+
+                return View(candidatoData);
             }
             catch (Exception ex)
             {
@@ -151,8 +230,11 @@ namespace SistemaVotacion.MVC.Controllers
                 return View();
             }
         }
+
         public IActionResult CreateCandidato()
         {
+            ViewBag.Listas = Crud<Lista>.GetAll();
+            ViewBag.Dignidades = Crud<Dignidad>.GetAll();
             return View();
         }
 
@@ -160,33 +242,42 @@ namespace SistemaVotacion.MVC.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult CreateCandidato(Candidato nuevoCandidato)
         {
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    Crud<Candidato>.Create(nuevoCandidato);
+                    var candidatoCreado = Crud<Candidato>.Create(nuevoCandidato);
                     return RedirectToAction(nameof(ListCandidato));
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("", "Error: " + ex.Message);
-
+                    ModelState.AddModelError("", "Error al crear candidato: " + ex.Message);
                 }
             }
-            return View(nuevoCandidato);
 
+            ViewBag.Listas = Crud<Lista>.GetAll();
+            ViewBag.Dignidades = Crud<Dignidad>.GetAll();
+            return View(nuevoCandidato);
         }
+
+
         public IActionResult EditCandidato(int id)
         {
             try
             {
-                var caditdatoData = Crud<Candidato>.GetById(id);
-                return View(caditdatoData);
+                var candidatoData = Crud<Candidato>.GetById(id);
+                if (candidatoData == null)
+                    return NotFound();
+
+                ViewBag.Listas = Crud<Lista>.GetAll();
+                ViewBag.Dignidades = Crud<Dignidad>.GetAll();
+                return View(candidatoData);
             }
             catch (Exception ex)
             {
                 ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View(id);
+                return View();
             }
         }
 
@@ -194,23 +285,39 @@ namespace SistemaVotacion.MVC.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult EditCandidato(int id, Candidato candidatoData)
         {
-            try
+            if (id != candidatoData.Id)
             {
-                Crud<Candidato>.Update(id, candidatoData);
-                return RedirectToAction(nameof(ListCandidato));
+                return BadRequest("El ID de la URL no coincide con el ID del candidato.");
             }
-            catch (Exception ex)
+
+            if (ModelState.IsValid)
             {
-                ModelState.AddModelError("", "Error: " + ex.Message);
-                return View(candidatoData);
+                try
+                {
+                    Crud<Candidato>.Update(id, candidatoData);
+                    return RedirectToAction(nameof(ListCandidato));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error al actualizar: " + ex.Message);
+                }
             }
+
+            ViewBag.Listas = Crud<Lista>.GetAll();
+            ViewBag.Dignidades = Crud<Dignidad>.GetAll();
+            return View(candidatoData);
         }
+
 
         public IActionResult DeleteCandidato(int id)
         {
             var candidatoData = Crud<Candidato>.GetById(id);
+            if (candidatoData == null)
+                return NotFound();
+
             return View(candidatoData);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteCandidato(int id, Candidato candidatoData)
@@ -222,26 +329,50 @@ namespace SistemaVotacion.MVC.Controllers
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "Error: " + ex.Message);
+                ModelState.AddModelError("", "Error al eliminar: " + ex.Message);
                 return View(candidatoData);
             }
         }
+
         //OPCION CONSULTA - CRUD
+        // LISTAR
+
+        // Helper para opciones Sí/No
+        private List<SelectListItem> GetOpcionesConsulta()
+        {
+            return new List<SelectListItem>
+        {
+            new SelectListItem { Value = "Sí", Text = "Sí" },
+            new SelectListItem { Value = "No", Text = "No" }
+        };
+        }
+
+        // Helper para preguntas
+        private List<SelectListItem> GetPreguntasConsulta()
+        {
+            return Crud<PreguntaConsulta>.GetAll()
+                .Select(p => new SelectListItem
+                {
+                    Value = p.Id.ToString(),
+                    Text = p.TextoPregunta
+                })
+                .ToList();
+        }
         public IActionResult ListOpcionConsulta()
         {
             try
             {
                 var opcionConsultaData = Crud<OpcionConsulta>.GetAll();
                 return View(opcionConsultaData);
-
             }
             catch (Exception ex)
             {
                 ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View(new List<object>());
+                return View(new List<OpcionConsulta>());
             }
-
         }
+
+        // DETALLES
         public IActionResult DetailsOpcionConsulta(int id)
         {
             try
@@ -255,66 +386,88 @@ namespace SistemaVotacion.MVC.Controllers
                 return View();
             }
         }
+
+        
+
+        // CREAR (GET)
         public IActionResult CreateOpcionConsulta()
         {
+            ViewBag.Valores = GetOpcionesConsulta();
+            ViewBag.Preguntas = GetPreguntasConsulta();
             return View();
         }
 
+        // CREAR (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateOpcionConsulta(OpcionConsulta nuevoOpcionConsulta)
+        public IActionResult CreateOpcionConsulta(OpcionConsulta nuevaOpcion)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    Crud<OpcionConsulta>.Create(nuevoOpcionConsulta);
+                    Crud<OpcionConsulta>.Create(nuevaOpcion);
                     return RedirectToAction(nameof(ListOpcionConsulta));
                 }
                 catch (Exception ex)
                 {
                     ModelState.AddModelError("", "Error: " + ex.Message);
-
                 }
             }
-            return View(nuevoOpcionConsulta);
 
+            ViewBag.Valores = GetOpcionesConsulta();
+            ViewBag.Preguntas = GetPreguntasConsulta();
+            return View(nuevaOpcion);
         }
+
+        // EDITAR (GET)
         public IActionResult EditOpcionConsulta(int id)
         {
             try
             {
                 var opcionConsultaData = Crud<OpcionConsulta>.GetById(id);
+                ViewBag.Valores = GetOpcionesConsulta();
+                ViewBag.Preguntas = GetPreguntasConsulta();
                 return View(opcionConsultaData);
             }
             catch (Exception ex)
             {
                 ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View(id);
+                return View();
             }
         }
 
+        // EDITAR (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult EditOpcionConsulta(int id, OpcionConsulta opcionConsultaData)
         {
-            try
+            if (ModelState.IsValid)
             {
-                Crud<OpcionConsulta>.Update(id, opcionConsultaData);
-                return RedirectToAction(nameof(ListOpcionConsulta));
+                try
+                {
+                    Crud<OpcionConsulta>.Update(id, opcionConsultaData);
+                    return RedirectToAction(nameof(ListOpcionConsulta));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error: " + ex.Message);
+                }
             }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", "Error: " + ex.Message);
-                return View(opcionConsultaData);
-            }
+
+            ViewBag.Valores = GetOpcionesConsulta();
+            ViewBag.Preguntas = GetPreguntasConsulta();
+            return View(opcionConsultaData);
         }
 
+        // ELIMINAR (GET)
         public IActionResult DeleteOpcionConsulta(int id)
         {
             var opcionConsultaData = Crud<OpcionConsulta>.GetById(id);
             return View(opcionConsultaData);
         }
+
+        // ELIMINAR (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteOpcionConsulta(int id, OpcionConsulta opcionConsultaData)
@@ -330,6 +483,8 @@ namespace SistemaVotacion.MVC.Controllers
                 return View(opcionConsultaData);
             }
         }
+
+
         //PREGUNTA CONSULTA - CRUD
         public IActionResult ListPreguntaConsulta()
         {
@@ -662,7 +817,7 @@ namespace SistemaVotacion.MVC.Controllers
         {
             try
             {
-                var multimediaData = await _multimediaService.GetByIdAsync(id); 
+                var multimediaData = await _multimediaService.GetByIdAsync(id);
                 return View(multimediaData);
             }
             catch (Exception ex)
@@ -680,16 +835,17 @@ namespace SistemaVotacion.MVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateMultimedia(IFormFile file, int idCandidato, int idLista, string? descripcion)
         {
-            if (file != null) 
-            { 
-                try 
-                { 
-                    await _multimediaService.UploadAsync(file, idCandidato, idLista, descripcion); 
-                    return RedirectToAction(nameof(ListMultimedia)); 
-                } catch (Exception ex) 
-                { 
-                    ModelState.AddModelError("", "Error: " + ex.Message); 
-                } 
+            if (file != null)
+            {
+                try
+                {
+                    await _multimediaService.UploadAsync(file, idCandidato, idLista, descripcion);
+                    return RedirectToAction(nameof(ListMultimedia));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error: " + ex.Message);
+                }
             }
             return View();
 
@@ -698,7 +854,7 @@ namespace SistemaVotacion.MVC.Controllers
         {
             try
             {
-                var multimediaData = await _multimediaService.GetByIdAsync(id); 
+                var multimediaData = await _multimediaService.GetByIdAsync(id);
                 return View(multimediaData);
             }
             catch (Exception ex)
@@ -714,7 +870,7 @@ namespace SistemaVotacion.MVC.Controllers
         {
             try
             {
-                await _multimediaService.UpdateAsync(id, multimediaData); 
+                await _multimediaService.UpdateAsync(id, multimediaData);
                 return RedirectToAction(nameof(ListMultimedia));
             }
             catch (Exception ex)
@@ -735,7 +891,7 @@ namespace SistemaVotacion.MVC.Controllers
         {
             try
             {
-                await _multimediaService.DeleteAsync(id); 
+                await _multimediaService.DeleteAsync(id);
                 return RedirectToAction(nameof(ListMultimedia));
             }
             catch (Exception ex)

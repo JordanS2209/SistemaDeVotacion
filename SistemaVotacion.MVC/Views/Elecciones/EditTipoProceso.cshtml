@@ -1,0 +1,43 @@
+﻿@model SistemaVotacion.Modelos.TipoProceso
+
+@{
+    ViewData["Title"] = "Editar Tipo de Proceso";
+}
+
+<h1>Editar Tipo de Proceso</h1>
+
+<h4>TipoProceso</h4>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="EditTipoProceso" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- Id oculto, no editable -->
+            <input type="hidden" asp-for="Id" />
+
+            <div class="form-group">
+                <label asp-for="NombreTipoProceso" class="control-label"></label>
+                <input asp-for="NombreTipoProceso" class="form-control" />
+                <span asp-validation-for="NombreTipoProceso" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Descripcion" class="control-label"></label>
+                <textarea asp-for="Descripcion" class="form-control"></textarea>
+                <span asp-validation-for="Descripcion" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3">
+                <input type="submit" value="Guardar cambios" class="btn btn-primary" />
+                <a asp-action="ListTipoProcesos" class="btn btn-secondary">Volver a la lista</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

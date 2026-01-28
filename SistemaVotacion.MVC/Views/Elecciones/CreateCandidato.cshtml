@@ -1,0 +1,44 @@
+﻿@model SistemaVotacion.Modelos.Candidato
+
+@{
+    ViewData["Title"] = "Crear Candidato";
+}
+
+<h1>Crear Candidato</h1>
+
+<h4>Candidato</h4>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="CreateCandidato" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="NombreCandidato" class="control-label"></label>
+                <input asp-for="NombreCandidato" class="form-control" />
+                <span asp-validation-for="NombreCandidato" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="IdLista" class="control-label">Lista</label>
+                <select asp-for="IdLista" class="form-control" asp-items="ViewBag.Listas"></select>
+                <span asp-validation-for="IdLista" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="IdDignidad" class="control-label">Dignidad</label>
+                <select asp-for="IdDignidad" class="form-control" asp-items="ViewBag.Dignidades"></select>
+                <span asp-validation-for="IdDignidad" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-3">
+                <input type="submit" value="Crear" class="btn btn-primary" />
+                <a asp-action="ListCandidato" class="btn btn-secondary">Volver a la lista</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

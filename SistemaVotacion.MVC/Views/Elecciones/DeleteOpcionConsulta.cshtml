@@ -1,0 +1,42 @@
+﻿@model SistemaVotacion.Modelos.OpcionConsulta
+
+@{
+    ViewData["Title"] = "Eliminar Opción de Consulta";
+}
+
+<h1>Eliminar Opción de Consulta</h1>
+
+<h3>¿Estás seguro de que deseas eliminar esta opción?</h3>
+<div>
+    <h4>OpciónConsulta</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.TextoOpcion)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TextoOpcion)
+        </dd>
+
+        <dt class="col-sm-2">
+            Pregunta
+        </dt>
+        <dd class="col-sm-10">
+            @(Model.Pregunta != null ? Model.Pregunta.TextoPregunta : "Pregunta no disponible")
+        </dd>
+    </dl>
+
+    <form asp-action="DeleteOpcionConsulta" method="post">
+        <!-- Campo oculto para enviar el Id -->
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Eliminar" class="btn btn-danger" /> |
+        <a asp-action="ListOpcionConsulta" class="btn btn-secondary">Volver al listado</a>
+    </form>
+</div>

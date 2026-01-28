@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemaVotacion.Modelos;
@@ -26,12 +25,11 @@ namespace SistemaVotacion.API.Controllers
         {
             try
             {
-                // Incluimos Lista y Dignidad para que el MVC muestre los nombres directamente
-                var candidatos = await _context.Candidatos
-                    .Include(c => c.Lista)
-                    .Include(c => c.Dignidad)
+                var data = await _context.Candidatos
+                    //.Include(c => c.Lista)
+                    //.Include(c => c.Dignidad)
                     .ToListAsync();
-                return Ok(candidatos);
+                return Ok(data);
             }
             catch (Exception ex)
             {
@@ -56,7 +54,7 @@ namespace SistemaVotacion.API.Controllers
                 {
                     return NotFound($"No se encontró el candidato con ID {id}.");
                 }
-
+                   
                 return Ok(candidato);
             }
             catch (Exception ex)
@@ -66,9 +64,37 @@ namespace SistemaVotacion.API.Controllers
             }
         }
 
+       
+        // GET: api/Candidatos/filtrar?nombre=Ana&lista=2&dignidad=3
+        [HttpGet("filtrar")]
+        public async Task<ActionResult<IEnumerable<Candidato>>> Filtrar(
+            string? nombre, int? lista, int? dignidad, DateTime? desde, DateTime? hasta)
+        {
+            var query = _context.Candidatos
+                .Include(c => c.Lista)
+                .Include(c => c.Dignidad)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(nombre))
+                query = query.Where(c => c.NombreCandidato.Contains(nombre));
+
+            if (lista.HasValue)
+                query = query.Where(c => c.IdLista == lista.Value);
+
+            if (dignidad.HasValue)
+                query = query.Where(c => c.IdDignidad == dignidad.Value);
+
+            var candidatos = await query.OrderBy(c => c.NombreCandidato).ToListAsync();
+
+            if (!candidatos.Any())
+                return NotFound("No se encontraron candidatos con los filtros aplicados.");
+
+            return Ok(candidatos);
+        }
+
         // PUT: api/Candidatos/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCandidato(int id, Candidato candidato)
+        public async Task<ActionResult<Candidato>> PutCandidato(int id, Candidato candidato)
         {
             if (id != candidato.Id)
             {
@@ -80,6 +106,13 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+
+                //var candidatoConRelaciones = await _context.Candidatos
+                //    .Include(c => c.Lista)
+                //    .Include(c => c.Dignidad)
+                //    .FirstOrDefaultAsync(c => c.Id == id);
+
+                //return Ok(candidatoConRelaciones);
                 return NoContent(); 
             }
             catch (DbUpdateConcurrencyException)
@@ -113,10 +146,15 @@ namespace SistemaVotacion.API.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error al crear candidato: {ex.Message}");
                 return StatusCode(500, $"Error al guardar el candidato: {ex.Message}");
             }
         }
+
+
+
+
+
+
 
         // DELETE: api/Candidatos/5
         [HttpDelete("{id}")]
@@ -125,6 +163,10 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 var candidato = await _context.Candidatos.FindAsync(id);
+                //    .Include(c => c.Lista)
+                //    .Include(c => c.Dignidad)
+                //    .FirstOrDefaultAsync(c => c.Id == id);
+
                 if (candidato == null)
                 {
                     return NotFound("Candidato no encontrado.");

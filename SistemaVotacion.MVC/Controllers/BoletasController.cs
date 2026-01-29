@@ -10,7 +10,7 @@ namespace SistemaVotacion.MVC.Controllers
            
             if (string.IsNullOrWhiteSpace(codigo))
             {
-                TempData["Error"] = "Debe ingresar un código de votación.";
+                TempData["Error"] = "Debe ingresar un código válido.";
                 return RedirectToAction("IngresarCodigo", "Acceso");
             }
 

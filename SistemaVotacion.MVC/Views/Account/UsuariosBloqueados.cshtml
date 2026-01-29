@@ -1,0 +1,77 @@
+﻿@model List<SistemaVotacion.Modelos.Usuario>
+@{
+    ViewData["Title"] = "Gestión de Bloqueos";
+}
+
+<style>
+    body {
+        background-color: #1b263b;
+        color: white;
+    }
+
+    .admin-card {
+        background-color: #f0f7ff;
+        color: #1b263b;
+        border: none;
+    }
+
+    .table-custom {
+        background-color: white;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+</style>
+<br /><br /><br />
+<div class="container mt-5">
+    <div class="card admin-card shadow-lg rounded-4 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold m-0"><i class="bi bi-shield-lock-fill"></i> Usuarios Bloqueados</h2>
+            <span class="badge bg-danger rounded-pill px-3">@Model.Count() Cuentas</span>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="alert alert-success text-center border-0 shadow-sm">
+                <i class="bi bi-check-circle-fill"></i> No hay usuarios bloqueados en este momento.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive table-custom shadow-sm">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Identificación</th>
+                            <th>Nombre Completo</th>
+                            <th>Correo Electrónico</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var u in Model)
+                        {
+                            <tr>
+                                <td class="fw-bold">@u.NumeroIdentificacion</td>
+                                <td>@u.Nombres @u.Apellidos</td>
+                                <td>@u.Email</td>
+                                <td class="text-center">
+                                    <form asp-action="Desbloquear" asp-route-id="@u.Id" method="post">
+                                        <button type="submit" class="btn btn-outline-success btn-sm fw-bold shadow-sm">
+                                            <i class="bi bi-unlock-fill"></i> Desbloquear
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        <div class="mt-4">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-secondary shadow-sm">
+                <i class="bi bi-arrow-left"></i> Volver al Inicio
+            </a>
+        </div>
+    </div>
+</div>

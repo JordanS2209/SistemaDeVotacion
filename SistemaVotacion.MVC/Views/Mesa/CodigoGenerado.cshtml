@@ -1,0 +1,17 @@
+﻿@{
+    ViewBag.Title = "Código generado";
+}
+
+<h2>Código de acceso generado</h2>
+
+@if (ViewBag.Codigo != null)
+{
+    <p>El código de acceso es:</p>
+    <h1>@ViewBag.Codigo</h1>
+}
+else
+{
+    <p>No se pudo generar el código de acceso.</p>
+}
+
+<a asp-controller="Mesa" asp-action="Index" class="btn btn-primary mt-3">Volver</a>

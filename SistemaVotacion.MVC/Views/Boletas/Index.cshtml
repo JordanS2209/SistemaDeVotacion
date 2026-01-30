@@ -1,10 +1,17 @@
 ﻿@using System.Linq
+@using SistemaVotacion.Modelos
 @model List<SistemaVotacion.Modelos.Lista>
 
 @{
     ViewData["Title"] = "Boleta";
-    Layout = null; 
+    Layout = null;
     var fechaFin = ViewBag.FechaFinVotacion as string;
+
+    // Función helper para comparar dignidades sin problemas de mayúsculas ni espacios
+    string NormalizarDignidad(string? nombre) =>
+        string.IsNullOrWhiteSpace(nombre)
+            ? string.Empty
+            : nombre.Trim().ToLowerInvariant();
 }
 
 <!DOCTYPE html>
@@ -20,13 +27,19 @@
 
     <h1>Boleta Electoral</h1>
     <p>Código validado: @ViewBag.Codigo</p>
+    <p>Debug FechaFin: @fechaFin</p>
 
     <div class="contador-elecciones">
         <span class="titulo">Tiempo restante</span>
         <span id="tiempo-restante">--:--:--</span>
     </div>
 
-    <form method="post">
+    <form asp-controller="Boletas"
+          asp-action="Index"
+          method="post">
+
+        <input type="hidden" name="codigo" value="@ViewBag.Codigo" />
+
         <div class="boleta-container">
 
             <div class="boleta-header">
@@ -41,22 +54,25 @@
                     foreach (var lista in Model)
                     {
                         var presidente = lista.Candidatos?
-                            .FirstOrDefault(c => c.Dignidad?.NombreDignidad == "Presidente");
+                        .FirstOrDefault(c => NormalizarDignidad(c.Dignidad?.NombreDignidad) == "presidente");
 
                         var vicepresidente = lista.Candidatos?
-                            .FirstOrDefault(c => c.Dignidad?.NombreDignidad == "Vicepresidente");
+                        .FirstOrDefault(c => NormalizarDignidad(c.Dignidad?.NombreDignidad) == "vicepresidente");
 
                         var logoLista = lista.RecursosMultimedia?
-                            .FirstOrDefault()?.UrlFoto ?? "img/default-lista.png";
+                        .FirstOrDefault()?.UrlFoto ?? "img/default-lista.png";
 
                         var fotoPresidente = presidente?.GaleriaMultimedia?
-                            .FirstOrDefault()?.UrlFoto ?? "img/default-persona.png";
+                        .FirstOrDefault()?.UrlFoto ?? "img/default-persona.png";
 
                         var fotoVicepresidente = vicepresidente?.GaleriaMultimedia?
-                            .FirstOrDefault()?.UrlFoto ?? "img/default-persona.png";
+                        .FirstOrDefault()?.UrlFoto ?? "img/default-persona.png";
 
                         <label class="opcion-card">
-                            <input type="radio" name="IdLista" value="@lista.Id" required />
+                            <input type="radio"
+                                   name="idLista"
+                                   value="@lista.Id"
+                                   required />
 
                             <div class="opcion-content">
                                 <div class="partido">
@@ -91,16 +107,20 @@
             </div>
 
             <div class="acciones">
-                <button type="submit" class="btn-votar">VOTAR</button>
+                <button type="submit" class="btn-votar">
+                    VOTAR
+                </button>
             </div>
 
         </div>
     </form>
 
+
     <div class="contador-elecciones">
         <span class="titulo">Tiempo restante</span>
         <span id="tiempo-restante">00:15:00</span>
     </div>
+
 
 </body>
 </html>

@@ -64,7 +64,7 @@ namespace SistemaVotacion.API.Controllers
             }
         }
 
-        
+
         [HttpGet("estado-votante-identificacion/{numeroIdentificacion}")]
         public async Task<IActionResult> ObtenerEstadoPorIdentificacion(string numeroIdentificacion)
         {
@@ -228,7 +228,7 @@ namespace SistemaVotacion.API.Controllers
                 return BadRequest("El proceso electoral no está activo.");
             }
 
-           
+
             if (string.IsNullOrWhiteSpace(padron.CodigoAcceso))
             {
                 padron.CodigoAcceso = new Random().Next(100000, 999999).ToString();
@@ -319,7 +319,7 @@ namespace SistemaVotacion.API.Controllers
             }
         }
 
-        
+
         [HttpGet("validar-codigo/{codigoAcceso}")]
         public async Task<IActionResult> ValidarCodigoAcceso(string codigoAcceso)
         {
@@ -348,8 +348,10 @@ namespace SistemaVotacion.API.Controllers
 
             return Ok(new
             {
-                PadronId = padron.Id
+                PadronId = padron.Id,
+                IdProceso = padron.IdProceso
             });
+
         }
 
         private bool PadronExists(int id)

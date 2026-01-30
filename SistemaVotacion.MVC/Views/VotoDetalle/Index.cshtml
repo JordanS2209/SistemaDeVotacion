@@ -1,0 +1,51 @@
+﻿@{
+    ViewData["Title"] = "Resultados de la votación";
+}
+
+<div class="text-center">
+    <h2>Resultados en tiempo real</h2>
+    <div id="resultados-votacion" class="mt-5"></div>
+</div>
+
+@section Scripts {
+    <script>
+        async function cargarResultados() {
+            const contenedor = document.getElementById('resultados-votacion');
+            contenedor.innerHTML = '<p>Cargando resultados...</p>';
+            try {
+                const resp = await fetch('https://localhost:7202/api/Resultados/por-lista');
+                if (!resp.ok) throw new Error('No se pudo obtener resultados');
+                const datos = await resp.json();
+                if (!Array.isArray(datos) || datos.length === 0) {
+                    contenedor.innerHTML = '<p>No hay resultados disponibles.</p>';
+                    return;
+                }
+                // Calcular el máximo de votos para la barra
+                const maxVotos = Math.max(...datos.map(x => x.totalVotos));
+                // Mostrar líder
+                let html = `<h3 style="color:green;">¡Líder actual: ${datos[0].nombreLista} (Lista ${datos[0].numeroLista}) con ${datos[0].totalVotos} votos!</h3>`;
+                html += `<div style="max-width:500px;margin:auto;">`;
+                datos.forEach((l, idx) => {
+                    const porcentaje = maxVotos > 0 ? Math.round((l.totalVotos / maxVotos) * 100) : 0;
+                    html += `
+                        <div style="text-align:left;margin-bottom:10px;">
+                            <strong>${l.nombreLista} (Lista ${l.numeroLista})</strong>
+                            <div style="background:#e9ecef;border-radius:5px;overflow:hidden;">
+                                <div style="width:${porcentaje}%;background:${idx === 0 ? '#28a745' : '#007bff'};color:white;padding:5px 10px;transition:width 0.5s;">
+                                    ${l.totalVotos} votos (${porcentaje}%)
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+                contenedor.innerHTML = html;
+            } catch (e) {
+                contenedor.innerHTML = '<p>Error al cargar resultados.</p>';
+            }
+        }
+        // Cargar al inicio y cada 5 segundos
+        cargarResultados();
+        setInterval(cargarResultados, 5000);
+    </script>
+}

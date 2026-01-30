@@ -20,14 +20,20 @@ namespace SistemaVotacion.API.Controllers
         }
 
         // GET: api/Listas
+        // Devuelve las listas para la boleta, con candidatos, dignidades y recursos multimedia
         [HttpGet]
         public async Task<ActionResult<List<Lista>>> GetListas()
         {
             try
             {
                 var listas = await _context.Listas
-                    .Include(l => l.Procesos)
+                    .Include(l => l.Candidatos)
+                        .ThenInclude(c => c.Dignidad)
+                    .Include(l => l.Candidatos)
+                        .ThenInclude(c => c.GaleriaMultimedia)
+                    .Include(l => l.RecursosMultimedia)
                     .ToListAsync();
+
                 return Ok(listas);
             }
             catch (Exception ex)
@@ -46,6 +52,9 @@ namespace SistemaVotacion.API.Controllers
                 var lista = await _context.Listas
                     .Include(l => l.Procesos)
                     .Include(l => l.Candidatos)
+                        .ThenInclude(c => c.Dignidad)
+                    .Include(l => l.Candidatos)
+                        .ThenInclude(c => c.GaleriaMultimedia)
                     .Include(l => l.RecursosMultimedia)
                     .Include(l => l.VotosRecibidos)
                     .FirstOrDefaultAsync(l => l.Id == id);
@@ -78,7 +87,7 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-                return NoContent(); 
+                return NoContent();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -139,6 +148,22 @@ namespace SistemaVotacion.API.Controllers
                 return StatusCode(500, $"Error al eliminar: {ex.Message}");
             }
         }
+        // GET: api/Listas/por-proceso/1
+        [HttpGet("por-proceso/{idProceso}")]
+        public async Task<IActionResult> GetListasPorProceso(int idProceso)
+        {
+
+            var listas = await _context.Listas
+                .Include(l => l.Candidatos)
+                .ThenInclude(c => c.Dignidad)
+                .Include(l => l.Candidatos)
+                .ThenInclude(c => c.GaleriaMultimedia)
+                .Include(l => l.RecursosMultimedia)
+                .ToListAsync();
+
+            return Ok(listas);
+        }
+
 
         private bool ListaExists(int id)
         {

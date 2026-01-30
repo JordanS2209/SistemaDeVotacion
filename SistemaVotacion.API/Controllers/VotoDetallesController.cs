@@ -26,7 +26,7 @@ namespace SistemaVotacion.API.Controllers
         {
             try
             {
-                // Incluimos información básica para el listado general
+
                 var votos = await _context.VotoDetalles
                     .Include(v => v.TipoVoto)
                     .Include(v => v.Junta)
@@ -138,13 +138,36 @@ namespace SistemaVotacion.API.Controllers
                 _context.VotoDetalles.Remove(voto);
                 await _context.SaveChangesAsync();
 
-                return Ok(voto); 
+                return Ok(voto);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error al eliminar detalle de voto: {ex.Message}");
                 return StatusCode(500, $"Error al eliminar: {ex.Message}");
             }
+        }
+        [HttpPost("registrar-voto")]
+        public async Task<IActionResult> RegistrarVoto([FromBody] VotoDetalle voto)
+        {
+
+            var padron = await _context.Padrones
+                .FirstOrDefaultAsync(p =>
+                    p.IdProceso == voto.IdProceso &&
+                    !p.HaVotado
+                );
+
+            if (padron == null)
+                return BadRequest("El votante ya sufragó o no es válido.");
+
+
+            _context.VotoDetalles.Add(voto);
+
+
+            padron.HaVotado = true;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { mensaje = "Voto registrado correctamente" });
         }
 
         private bool VotoDetalleExists(int id)

@@ -1,4 +1,4 @@
-﻿@{
+﻿@* @{
     ViewBag.Title = "Mesa - Buscar votante";
 
     int? padronId = ViewBag.PadronId as int?;
@@ -23,17 +23,18 @@
         @ViewBag.Error
     </div>
 }
-
-@if (mostrarVentanaCodigo && padronId.HasValue && !string.IsNullOrWhiteSpace(codigoAcceso))
+@if (ViewBag.YaVoto == true)
 {
-    <div class="mt-4 d-flex justify-content-center">
-        <div class="card" style="max-width: 320px;">
-            <div class="card-header bg-secondary text-white">
-                Código generado
-            </div>
-            <div class="card-body text-center">
-                <p>Se ha generado el siguiente código para el votante:</p>
-                <h2>@codigoAcceso</h2>
+    <div class="alert alert-warning mt-3">
+        <strong>⚠️ Usuario ya votó</strong><br />
+        Este ciudadano ya ejerció su derecho al voto y no puede votar nuevamente.
+    </div>
+}
+
+        <form asp-controller="Mesa" asp-action="BuscarVotante" method="post" class="mesa-form-hero">
+            <input type="text" class="mesa-input" id="numeroIdentificacion" name="numeroIdentificacion" placeholder="Cédula" required />
+            <button type="submit" class="mesa-btn">BUSCAR</button>
+        </form>
 
                 <form asp-controller="Mesa" asp-action="Habilitar" method="post" class="mt-3">
                     <input type="hidden" name="padronId" value="@padronId.Value" />
@@ -42,4 +43,46 @@
             </div>
         </div>
     </div>
+}
+ *@
+
+
+@{
+    ViewBag.Title = "Mesa - Buscar votante";
+
+    int? padronId = ViewBag.PadronId as int?;
+    string codigoAcceso = ViewBag.CodigoAcceso as string;
+    bool mostrarVentanaCodigo = ViewBag.MostrarVentanaCodigo ?? false;
+}
+
+<h2>Mesa - Buscar votante</h2>
+
+<form asp-controller="Mesa" asp-action="BuscarVotante" method="post" class="mesa-form-hero">
+    <div class="form-group">
+        <label for="numeroIdentificacion">Cédula</label>
+        <input type="text" class="form-control mesa-input" id="numeroIdentificacion" name="numeroIdentificacion" placeholder="Cédula" required />
+    </div>
+    <button type="submit" class="btn btn-primary mt-2 mesa-btn">Buscar</button>
+</form>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger mt-3">
+        @ViewBag.Error
+    </div>
+}
+@if (ViewBag.YaVoto == true)
+{
+    <div class="alert alert-warning mt-3">
+        <strong>⚠️ Usuario ya votó</strong><br />
+        Este ciudadano ya ejerció su derecho al voto y no puede votar nuevamente.
+    </div>
+}
+
+@if (padronId.HasValue)
+{
+    <form asp-controller="Mesa" asp-action="Habilitar" method="post" class="mt-3">
+        <input type="hidden" name="padronId" value="@padronId.Value" />
+        <button type="submit" class="btn btn-success">Habilitar</button>
+    </form>
 }

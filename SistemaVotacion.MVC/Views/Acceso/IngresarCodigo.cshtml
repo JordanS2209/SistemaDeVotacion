@@ -1,22 +1,28 @@
 ﻿@{
     ViewData["Title"] = "Ingresar código de votación";
-    var error = ViewBag.Error as string ?? TempData["Error"] as string;
 }
 
-<h2>Ingresar código de votación</h2>
+<link rel="stylesheet" href="~/css/IngresarCodigo.css" />
 
-<form asp-controller="Acceso" asp-action="IngresarCodigo" method="post">
-    <div class="form-group">
-        <label for="codigo">Código de 6 dígitos</label>
-        <input type="text" id="codigo" name="codigo" maxlength="6" class="form-control" />
+<div class="codigo-container">
+    <div class="codigo-card">
+        <h2>Ingresar código de votación</h2>
+
+        @if (TempData["Mensaje"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["Mensaje"]
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">
+                @TempData["Error"]
+            </div>
+        }
+        <form asp-controller="Acceso" asp-action="IngresarCodigo" method="post" class="codigo-form-hero">
+            <input type="text" id="codigo" name="codigo" maxlength="6" class="codigo-input" placeholder="Código de 6 dígitos" autocomplete="off" required />
+            <button type="submit" class="codigo-btn">CONTINUAR</button>
+        </form>
     </div>
-
-    <button type="submit" class="btn btn-primary mt-2">Continuar</button>
-</form>
-
-@if (!string.IsNullOrEmpty(error))
-{
-    <div class="alert alert-danger mt-3">
-        @error
-    </div>
-}
+</div>

@@ -1,42 +1,78 @@
 ﻿@{
     ViewData["Title"] = "Iniciar Sesión";
 }
+<br /><br /><br />
+<style>
+    body {
+        background-color: #1b263b; 
+        color: white;
+    }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-4">
-            <div class="card shadow p-4">
-                <h2 class="text-center mb-4">Sistema de Votación</h2>
-                <p class="text-center text-muted small">Ingrese sus credenciales para acceder</p>
+    
+    .login-card {
+        background-color: #f0f7ff; 
+        color: #1b263b; 
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
 
-                <form asp-action="Login" asp-controller="Account" method="post">
 
-                    <div class="form-group mb-3">
-                        <label for="email" class="form-label">Correo Electrónico</label>
-                        <input type="email" class="form-control" name="email" id="email"
-                               required placeholder="nombre@correo.com">
-                    </div>
+    .form-control:focus {
+        border-color: #4cc9f0;
+        box-shadow: 0 0 0 0.25rem rgba(76, 201, 240, 0.25);
+    }
 
-                    <div class="form-group mb-3">
-                        <label for="password" class="form-label">Contraseña</label>
-                        <input type="password" class="form-control" name="password" id="password"
-                               required placeholder="********">
-                    </div>
+    .btn-login {
+        background-color: #4361ee;
+        border: none;
+        transition: all 0.3s ease;
+    }
 
-                    <button type="submit" class="btn btn-primary w-100 py-2">Ingresar al Sistema</button>
+        .btn-login:hover {
+            background-color: #3f37c9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+        }
+</style>
 
-                    @if (ViewBag.ErrorMessage != null)
-                    {
-                        <div class="alert alert-danger mt-3 text-center py-2" style="font-size: 0.9em;">
-                            <i class="bi bi-exclamation-triangle-fill"></i> @ViewBag.ErrorMessage
-                        </div>
-                    }
-                </form>
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="col-md-4">
+        <div class="card login-card shadow-lg p-4 rounded-5 border-0">
+            <div class="text-center mb-4">
+                
+                <h2 class="fw-bold mt-2">Sistema de Votación</h2>
+                <p class="text-muted small">Ingrese sus datos para continuar</p>
+            </div>
 
-                <div class="mt-4 text-center border-top pt-3">
-                    <span class="text-muted">¿No tienes cuenta?</span> <br />
-                    <a asp-action="Register" asp-controller="Account" class="text-decoration-none">Regístrate aquí</a>
+            <form asp-action="Login" asp-controller="Account" method="post">
+                <div class="form-group mb-3">
+                    <label class="form-label small fw-bold">Correo Electrónico</label>
+                    <input type="email" class="form-control form-control-lg rounded-3"
+                           name="email" required placeholder="nombre@correo.com">
                 </div>
+
+                <div class="form-group mb-4">
+                    <label class="form-label small fw-bold">Contraseña</label>
+                    <input type="password" class="form-control form-control-lg rounded-3"
+                           name="password" required placeholder="********">
+                </div>
+
+                <button type="submit" class="btn btn-login btn-lg w-100 text-white fw-bold rounded-3">
+                    Ingresar al Sistema
+                </button>
+
+                @if (ViewBag.ErrorMessage != null)
+                {
+                    <div class="alert alert-danger mt-3 text-center py-2 border-0 small">
+                        <i class="bi bi-exclamation-circle"></i> @ViewBag.ErrorMessage
+                    </div>
+                }
+            </form>
+
+            <div class="mt-4 text-center border-top pt-3">
+                <p class="text-muted small mb-1">¿Aún no tienes cuenta?</p>
+                <a asp-action="Register" asp-controller="Account" class="text-primary fw-bold text-decoration-none">
+                    Regístrate aquí <i class="bi bi-arrow-right"></i>
+                </a>
             </div>
         </div>
     </div>

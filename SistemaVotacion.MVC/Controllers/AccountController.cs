@@ -25,14 +25,56 @@ namespace SistemaVotacion.MVC.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(string email, string password)
         {
-            if (await _authService.Login(email, password))
+            // 1. Buscamos al usuario en la base de datos a través de la API
+            var usuarios = Crud<Usuario>.GetAll();
+            var usuario = usuarios.FirstOrDefault(u => u.Email.ToLower() == email.Trim().ToLower());
+
+            // Si el usuario no existe, mensaje estándar por seguridad
+            if (usuario == null)
             {
-                // Redirigir al Dashboard principal
-                return RedirectToAction("Index", "Home");
+                ViewBag.ErrorMessage = "Credenciales incorrectas.";
+                return View("Index");
             }
 
-            ViewBag.ErrorMessage = "Email o contraseña incorrectos.";
-            return View("Index");
+            // Opción A: Usar el operador ?? para dar un valor por defecto
+            if (usuario.CuentaBloqueada == true)
+            {
+                ViewBag.ErrorMessage = "Cuenta bloqueada. Contacte al administrador.";
+                return View("Index");
+            }
+
+            // 3. Intentamos la autenticación con el servicio
+            bool loginExitoso = await _authService.Login(email, password);
+
+            if (loginExitoso)
+            {
+                // Si entra con éxito, reseteamos los intentos a 0
+                usuario.IntentosFallidos = 0;
+                Crud<Usuario>.Update(usuario.Id, usuario); // Asegúrate que el campo sea IdUsuario o el que uses
+
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                // 4. Lógica de incremento de intentos fallidos
+                usuario.IntentosFallidos++;
+
+                if (usuario.IntentosFallidos >= 3)
+                {
+                    usuario.CuentaBloqueada = true;
+                    ViewBag.ErrorMessage = "Cuenta bloqueada.";
+                }
+                else
+                {
+                    int restantes = 3 - usuario.IntentosFallidos;
+                    ViewBag.ErrorMessage = $"Credenciales mal puestas. {restantes} intentos restantes.";
+                }
+
+                // 5. Guardamos el nuevo estado (intentos o bloqueo) mediante el Crud
+                Crud<Usuario>.Update(usuario.Id, usuario);
+
+                return View("Index");
+            }
         }
 
         [HttpGet]
@@ -100,6 +142,39 @@ namespace SistemaVotacion.MVC.Controllers
             // Elimina la cookie de autenticación
             await HttpContext.SignOutAsync("Cookies");
             return RedirectToAction("Index", "Account");
+        }
+
+        // GET: Account/UsuariosBloqueados
+        public IActionResult UsuariosBloqueados()
+        {
+            // Obtenemos todos los usuarios desde la API
+            var todosLosUsuarios = Crud<Usuario>.GetAll();
+
+            // Filtramos solo los que tienen la cuenta bloqueada
+            // Usamos '?? false' para manejar el tipo bool? correctamente
+            var bloqueados = todosLosUsuarios.Where(u => u.CuentaBloqueada ?? false).ToList();
+
+            return View(bloqueados);
+        }
+
+        // POST: Account/Desbloquear/5
+        [HttpPost]
+        public IActionResult Desbloquear(int id)
+        {
+            // 1. Buscamos al usuario por su ID
+            var usuario = Crud<Usuario>.GetById(id);
+
+            if (usuario != null)
+            {
+                // 2. Reseteamos los valores de seguridad
+                usuario.CuentaBloqueada = false;
+                usuario.IntentosFallidos = 0;
+
+                // 3. Actualizamos el registro en la base de datos a través del CRUD
+                Crud<Usuario>.Update(id, usuario);
+            }
+
+            return RedirectToAction("UsuariosBloqueados");
         }
     }
 }

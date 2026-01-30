@@ -4,6 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - SistemaVotacion.MVC</title>
+
+    @* Estilos Base *@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -12,20 +14,23 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow fixed-top mb-3">
             <div class="container-fluid">
+                @* Logo / Nombre del Sistema *@
                 <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
                     <i class="bi bi-check2-square text-primary"></i> Sistema Votación
                 </a>
+
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    @* LADO IZQUIERDO: Navegación y Menús de Admin *@
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link text-light fw-bold" asp-controller="Home" asp-action="Index">Inicio</a>
                         </li>
 
-                        @* 1. Filtro para Super Administrador *@
+                        @* Acciones para SUPER ADMINISTRADOR *@
                         @if (User.Identity.IsAuthenticated && User.IsInRole("SUPER ADMINISTRADOR"))
                         {
                             <li class="nav-item">
@@ -42,7 +47,7 @@
                             </li>
                         }
 
-                        @* 2. Filtro para otros roles (Asegúrate de poner el nombre del rol aquí) *@
+                        @* Acciones para ADMINISTRADOR *@
                         @if (User.Identity.IsAuthenticated && User.IsInRole("ADMINISTRADOR"))
                         {
                             <li class="nav-item">
@@ -54,17 +59,49 @@
                                 <a class="nav-link text-light" asp-controller="Geografia" asp-action="Index">Gestionar Zona Geografica</a>
                             </li>
                         }
- @* <-- AQUÍ FALTABA ESTA LLAVE *@
+                    </ul>
+
+                    @* LADO DERECHO: Login o Perfil de Usuario (Soluciona el ícono faltante) *@
+                    <ul class="navbar-nav ms-auto">
+                        @if (!User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-light fw-bold btn btn-outline-primary px-3 shadow-sm"
+                                   asp-controller="Account" asp-action="Index">
+                                    <i class="bi bi-box-arrow-in-right"></i> Login
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-white bg-primary rounded-3 px-3 shadow-sm"
+                                   href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-person-circle"></i> @User.Identity.Name
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow">
+                                    <li><h6 class="dropdown-header">Sesión Activa</h6></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" asp-controller="Account" asp-action="Logout">
+                                            <i class="bi bi-power"></i> Cerrar Sesión
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
 
+    @* Contenedor Principal *@
     <main role="main" class="pb-3" style="margin-top: 80px;">
         @RenderBody()
     </main>
 
+    @* Scripts *@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

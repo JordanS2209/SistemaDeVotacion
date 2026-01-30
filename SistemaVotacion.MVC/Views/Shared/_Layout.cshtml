@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-
 </head>
 <body>
     <header>
@@ -23,55 +22,46 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-light fw-bold " asp-controller="Home" asp-action="Index">Inicio</a>
+                            <a class="nav-link text-light fw-bold" asp-controller="Home" asp-action="Index">Inicio</a>
                         </li>
 
-                        @* FILTRO POR ROL: Solo los Administradores ven la gestión de procesos *@
+                        @* 1. Filtro para Super Administrador *@
                         @if (User.Identity.IsAuthenticated && User.IsInRole("SUPER ADMINISTRADOR"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-light fw-bold" asp-controller="Account" asp-action="Register">
-                                     Registrar Usuarios
-                                </a>
+                                <a class="nav-link text-light fw-bold" asp-controller="Account" asp-action="Register">Registrar Usuarios</a>
                             </li>
-
                             <li class="nav-item">
-                                <a class="nav-link text-light fw-bold" asp-controller="Account" asp-action="UsuariosBloqueados">
-                                     Gestión de Bloqueos
-                                </a>
+                                <a class="nav-link text-light fw-bold" asp-controller="Account" asp-action="UsuariosBloqueados">Gestión de Bloqueos</a>
                             </li>
-
                             <li class="nav-item">
-                                <a class="nav-link text-light fw-bold" asp-controller="Creation" asp-action="ListRoles">
-                                     Gestión de Roles
-                                </a>
+                                <a class="nav-link text-light fw-bold" asp-controller="Creation" asp-action="ListRoles">Gestión de Roles</a>
                             </li>
-
                             <li class="nav-item">
-                                <a class="nav-link text-light fw-bold" asp-controller="Geografia" asp-action="Index">
-                                     Gestión Geografica
-                                </a>
+                                <a class="nav-link text-light fw-bold" asp-controller="Geografia" asp-action="Index">Gestión Geografica</a>
                             </li>
                         }
 
-                        @if (User.Identity.IsAuthenticated && User.IsInRole(""))
+                        @* 2. Filtro para otros roles (Asegúrate de poner el nombre del rol aquí) *@
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("ADMINISTRADOR"))
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-warning fw-bold" asp-controller="Account" asp-action="Register">
                                     <i class="bi bi-shield-lock"></i> Registrar Usuarios
                                 </a>
                             </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Geografia" asp-action="Index">Gestionar Zona Geografica</a>
-                        </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-light" asp-controller="Geografia" asp-action="Index">Gestionar Zona Geografica</a>
+                            </li>
+                        }
+ @* <-- AQUÍ FALTABA ESTA LLAVE *@
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
 
-    <main role="main" class="pb-3">
+    <main role="main" class="pb-3" style="margin-top: 80px;">
         @RenderBody()
     </main>
 

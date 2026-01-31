@@ -1,25 +1,121 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Inicio - Sistema de Votación";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<style>
+    body {
+        background-color: #1b263b; 
+        color: white; 
+    }
 
-    <a asp-controller="Boletas"
-       asp-action="Index"
-       class="btn btn-success mt-4">
-        Iniciar Votación
-    </a>
-    <a asp-controller="Acceso"
-       asp-action="IngresarCodigo"
-       class="btn btn-success mt-10">
-        Ingresar codigo 
-    </a>
-    <a asp-controller="Mesa"
-       asp-action="Index"
-       class="btn btn-success mt-10">
-        Ingresar codigo
-    </a>
-  
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+</style>
+<br />
+<br />
+<br />
+<br />
+
+<div class="container text-center mt-4">
+    <h1 class="display-4 fw-bold text-white">Bienvenido al Sistema de Votación</h1>
+    <p class="fs-5 text-light opacity-75">Plataforma oficial para procesos electorales</p>
 </div>
+
+<br />
+<br />
+
+<div class="container-fluid px-0 my-4">
+    <div class="row g-0">
+        <div class="col-12">
+            <img src="~/img/Banner.jpg"
+                 class="img-fluid w-100"
+                 alt="Banner Principal"
+                 style="max-height: 500px; max-width:2600px; object-fit: cover;">
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div id="carouselExample" class="carousel slide shadow-lg" data-bs-ride="carousel">
+        <div class="carousel-inner rounded">
+
+            <div class="carousel-item active">
+                <img src="~/img/CuentaBloqueada1.jpg" class="d-block w-100" alt="Soporte Técnico">
+
+                <div class="carousel-caption d-none d-md-block bg-primary bg-opacity-75 rounded p-4"
+                     style="top: 30px; bottom: auto; display: inline-block; width: fit-content; left: 50%; transform: translateX(-50%);">
+
+                    <h2 class="m-0 text-white fw-bold fs-1">¿Cuenta Bloqueada?</h2>
+                    <p class="m-0 text-white fs-4 mt-2 mb-3">Contáctanos directamente por WhatsApp.</p>
+
+                    <a href="https://w.app/cr8lfr"
+                       target="_blank"
+                       class="btn btn-success btn-lg fw-bold rounded-pill shadow">
+                        <i class="bi bi-whatsapp"></i> Chatear ahora
+                    </a>
+                </div>
+            </div>
+
+            <div class="carousel-item">
+                <a asp-controller="Home" asp-action="Privacy">
+                    <img src="~/img/Banner1.jpg" class="d-block w-100" alt="Proceso Electoral">
+                </a>
+                <div class="carousel-caption d-none d-md-block bg-primary bg-opacity-75 rounded p-4"
+                     style="top: 30px; bottom: auto; display: inline-block; width: fit-content; left: 50%; transform: translateX(-50%);">
+                    <h2 class="m-0 text-white fw-bold fs-1">Proceso Electoral 2026</h2>
+                    <p class="m-0 text-white fs-4 mt-2">Haz clic para más detalles.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </div>
+</div>
+
+<footer class="mt-5 py-5 border-top border-secondary border-opacity-25" style="background-color: #0d1b2a; color: #a0aec0;">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-4 text-center text-md-start mb-4 mb-md-0">
+                <h5 class="text-white fw-bold mb-1">Sistema de Votación</h5>
+                <p class="small mb-0">© 2026 - Proceso Electoral Oficial</p>
+                <p class="x-small opacity-50">Desarrollado para la transparencia ciudadana.</p>
+            </div>
+
+            <div class="col-md-4 text-center mb-4 mb-md-0">
+                <ul class="list-inline mb-0">
+                    <li class="list-inline-item">
+                        <a asp-controller="Home" asp-action="Index" class="text-decoration-none text-light opacity-75 small">Inicio</a>
+                    </li>
+                    <li class="list-inline-item mx-2 text-secondary">|</li>
+                    <li class="list-inline-item">
+                        <a asp-controller="Home" asp-action="Privacy" class="text-decoration-none text-light opacity-75 small">Privacidad</a>
+                    </li>
+                    <li class="list-inline-item mx-2 text-secondary">|</li>
+                    <li class="list-inline-item">
+                        <a href="#" class="text-decoration-none text-light opacity-75 small">Ayuda</a>
+                    </li>
+                </ul>
+            </div>
+
+           
+        </div>
+
+        <hr class="my-4 border-secondary border-opacity-25">
+
+        <div class="text-center">
+            <small class="opacity-50">
+                Este sistema cumple con  estándares de seguridad electoral vigentes.
+            </small>
+        </div>
+    </div>
+</footer>

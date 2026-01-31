@@ -2,40 +2,70 @@
 @{
     ViewData["Title"] = "Registro de Usuario";
 }
+<br /><br /><br />
+<style>
+    body {
+        background-color: #1b263b; /* Azul medio oscuro */
+        color: white;
+    }
+
+    /* Tarjeta en azul gélido para legibilidad */
+    .register-card {
+        background-color: #f0f7ff;
+        color: #1b263b;
+        border: none;
+    }
+
+    /* Estilo para los títulos de sección dentro de la tarjeta */
+    .section-title {
+        color: #4361ee;
+        font-weight: bold;
+        border-bottom: 2px solid #e0e9f0;
+        padding-bottom: 5px;
+    }
+
+    .form-label {
+        color: #1b263b;
+    }
+
+    .text-muted {
+        color: #6c757d !important;
+    }
+</style>
 
 <div class="container mt-4 mb-5">
     <div class="row justify-content-center">
         <div class="col-md-10 col-lg-8">
-            <div class="card shadow-lg border-0">
-                <div class="card-header bg-primary text-white text-center py-3">
-                    <h3 class="mb-0">Crear Nueva Cuenta de Usuario</h3>
+            <div class="card register-card shadow-lg rounded-5 overflow-hidden">
+                <div class="card-header bg-primary text-white text-center py-3 border-0">
+                    <h3 class="mb-0 fw-bold">Crear Nueva Cuenta de Usuario</h3>
                 </div>
-                <div class="card-body p-4">
 
+                <div class="card-body p-4 p-md-5">
                     <form asp-action="Register" asp-controller="Account" method="post">
 
                         <div class="row">
                             <div class="col-md-6 border-end">
-                                <h5 class="text-secondary mb-3"><i class="bi bi-person-fill"></i> Datos Personales</h5>
+                                <h5 class="section-title mb-3"><i class="bi bi-person-fill"></i> Datos Personales</h5>
 
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Nombres</label>
-                                    <input type="text" class="form-control" name="nombre" required placeholder="Ej: Juan Alberto">
+                                    <input type="text" class="form-control rounded-3" name="nombre" required placeholder="Ej: Juan Alberto">
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Apellidos</label>
-                                    <input type="text" class="form-control" name="apellido" required placeholder="Ej: Pérez Castro">
+                                    <input type="text" class="form-control rounded-3" name="apellido" required placeholder="Ej: Pérez Castro">
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Fecha de Nacimiento</label>
-                                    <input type="date" class="form-control" name="fechaNac" required>
+                                    <input type="date" class="form-control rounded-3" name="fechaNac" required>
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Género</label>
-                                    <select class="form-select" name="idGenero" required>
+                                    <select class="form-select rounded-3" name="idGenero" required>
                                         <option value="">-- Seleccione Género --</option>
                                         @if (ViewBag.Generos != null)
                                         {
@@ -48,12 +78,12 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-6 ps-md-4">
-                                <h5 class="text-secondary mb-3"><i class="bi bi-card-checklist"></i> Identificación</h5>
+                            <div class="col-md-6 ps-md-4 mt-4 mt-md-0">
+                                <h5 class="section-title mb-3"><i class="bi bi-card-checklist"></i> Identificación</h5>
 
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Tipo de Documento</label>
-                                    <select class="form-select" name="idTipoIdent" required>
+                                    <select class="form-select rounded-3" name="idTipoIdent" required>
                                         <option value="">-- Seleccione Tipo --</option>
                                         @if (ViewBag.TiposIdentificacion != null)
                                         {
@@ -66,19 +96,19 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label fw-bold">Número de Identificación (Cédula)</label>
-                                    <input type="text" class="form-control" name="cedula" required placeholder="0000000000">
+                                    <label class="form-label fw-bold">Número de Identificación</label>
+                                    <input type="text" class="form-control rounded-3" name="cedula" required placeholder="0000000000">
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Código Dactilar</label>
-                                    <input type="text" class="form-control" name="codigoDactilar" required placeholder="Ej: V1234V1234">
+                                    <input type="text" class="form-control rounded-3" name="codigoDactilar" required placeholder="Ej: V1234V1234">
                                     <small class="text-muted">Ubicado al reverso de su cédula.</small>
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Rol en el Sistema</label>
-                                    <select class="form-select" name="idRol" required>
+                                    <select class="form-select rounded-3" name="idRol" required>
                                         <option value="">-- Seleccione Rol --</option>
                                         @if (ViewBag.Roles != null)
                                         {
@@ -92,31 +122,34 @@
                             </div>
                         </div>
 
-                        <hr class="my-4">
+                        <hr class="my-4" style="border-color: #d0dbe5;">
 
-                        <h5 class="text-secondary mb-3"><i class="bi bi-lock-fill"></i> Seguridad de la Cuenta</h5>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Correo Electrónico</label>
-                            <input type="email" class="form-control" name="email" required placeholder="usuario@ejemplo.com">
-                        </div>
+                        <h5 class="section-title mb-3"><i class="bi bi-lock-fill"></i> Seguridad de la Cuenta</h5>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Contraseña</label>
-                                <input type="password" class="form-control" name="password" required placeholder="Mínimo 8 caracteres">
+                                <label class="form-label fw-bold">Correo Electrónico</label>
+                                <input type="email" class="form-control rounded-3" name="email" required placeholder="usuario@ejemplo.com">
                             </div>
-                            
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Contraseña</label>
+                                <input type="password" class="form-control rounded-3" name="password" required placeholder="Mínimo 8 caracteres">
+                            </div>
                         </div>
 
                         <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg">Crear Cuenta Ahora</button>
-                            <a asp-action="Index" asp-controller="Account" class="btn btn-outline-secondary">Cancelar y volver al Login</a>
+                            <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-bold shadow-sm">
+                                Crear Cuenta Ahora
+                            </button>
+                            <a asp-action="Index" asp-controller="Account" class="btn btn-outline-secondary rounded-3">
+                                Cancelar y volver al Login
+                            </a>
                         </div>
 
                         @if (ViewBag.ErrorMessage != null)
                         {
-                            <div class="alert alert-danger mt-3 text-center animate__animated animate__shakeX">
+                            <div class="alert alert-danger mt-3 text-center border-0 shadow-sm">
                                 <i class="bi bi-exclamation-octagon-fill"></i> @ViewBag.ErrorMessage
                             </div>
                         }

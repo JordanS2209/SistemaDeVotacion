@@ -1,0 +1,32 @@
+﻿@{
+    Layout = null;
+    ViewData["Title"] = "Voto realizado";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>Voto realizado</title>
+    <link rel="stylesheet" href="~/css/Boleta.css" />
+</head>
+<body>
+
+    <div class="boleta-container">
+        <div class="boleta-header">
+            <h1>✅ Voto realizado con éxito</h1>
+            <p>Su voto ha sido registrado correctamente.</p>
+            <p>Gracias por participar.</p>
+        </div>
+
+        <div class="acciones">
+            <a asp-controller="Acceso"
+               asp-action="IngresarCodigo"
+               class="btn btn-success">
+                Regresar
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

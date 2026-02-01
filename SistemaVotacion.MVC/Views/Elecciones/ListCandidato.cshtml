@@ -1,0 +1,65 @@
+﻿@model IEnumerable<SistemaVotacion.Modelos.Candidato>
+
+@{
+    ViewData["Title"] = "Lista de Candidatos";
+}
+
+<h1>Lista de Candidatos</h1>
+
+<p>
+    <a asp-action="CreateCandidato" class="btn btn-primary">Crear nuevo candidato</a>
+</p>
+
+<!-- Formulario de búsqueda -->
+<form asp-action="FiltrarCandidatos" method="get" class="mb-3">
+    <div class="row">
+        <div class="col-md-4">
+            <label for="nombre">Nombre</label>
+            <input type="text" name="nombre" class="form-control" placeholder="Buscar por nombre..." />
+        </div>
+        <div class="col-md-3">
+            <label for="lista">Lista</label>
+            <select name="lista" class="form-control" asp-items="ViewBag.Listas">
+                <option value="">-- Todas --</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="dignidad">Dignidad</label>
+            <select name="dignidad" class="form-control" asp-items="ViewBag.Dignidades">
+                <option value="">-- Todas --</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">Buscar</button>
+        </div>
+    </div>
+</form>
+
+<!-- Tabla de resultados -->
+<table class="table table-striped table-hover mt-3">
+    <thead class="table-dark">
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Id)</th>
+            <th>@Html.DisplayNameFor(model => model.NombreCandidato)</th>
+            <th>Lista</th>
+            <th>Dignidad</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.NombreCandidato</td>
+                <td>@(item.Lista != null ? item.Lista.NombreLista : $"IdLista={item.IdLista}")</td>
+                <td>@(item.Dignidad != null ? item.Dignidad.NombreDignidad : $"IdDignidad={item.IdDignidad}")</td>
+                <td>
+                    <a asp-action="EditCandidato" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Editar</a>
+                    <a asp-action="DetailsCandidato" asp-route-id="@item.Id" class="btn btn-info btn-sm">Detalles</a>
+                    <a asp-action="DeleteCandidato" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,49 @@
+﻿@model IEnumerable<SistemaVotacion.Modelos.OpcionConsulta>
+
+@{
+    ViewData["Title"] = "Listado de Opciones de Consulta";
+}
+
+<h1>Opciones de Consulta</h1>
+
+<p>
+    <a asp-action="CreateOpcionConsulta" class="btn btn-success">Crear Nueva</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TextoOpcion)
+            </th>
+            <th>
+                Pregunta
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TextoOpcion)
+                </td>
+                <td>
+                    @(item.Pregunta != null ? item.Pregunta.TextoPregunta : "Pregunta no disponible")
+                </td>
+                <td>
+                    <a asp-action="EditOpcionConsulta" asp-route-id="@item.Id" class="btn btn-primary btn-sm">Editar</a> |
+                    <a asp-action="DetailsOpcionConsulta" asp-route-id="@item.Id" class="btn btn-info btn-sm">Detalles</a> |
+                    <a asp-action="DeleteOpcionConsulta" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

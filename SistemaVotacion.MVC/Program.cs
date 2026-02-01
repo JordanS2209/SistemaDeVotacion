@@ -14,8 +14,6 @@ namespace SistemaVotacion.MVC
             Crud<Rol>.EndPoint = "https://localhost:7202/api/Roles";
             Crud<TipoIdentificacion>.EndPoint = "https://localhost:7202/api/TiposIdentificaciones";
             Crud<Genero>.EndPoint = "https://localhost:7202/api/Generos";
-
-            //Crud<Lista>.EndPoint = "https://localhost:7202/api/Boletas/activas";
             Crud<Dignidad>.EndPoint = "https://localhost:7202/api/Dignidades";
             Crud<Provincia>.EndPoint = "https://localhost:7202/api/Provincias";
             Crud<Ciudad>.EndPoint = "https://localhost:7202/api/Ciudades";
@@ -26,7 +24,6 @@ namespace SistemaVotacion.MVC
             Crud<OpcionConsulta>.EndPoint = "https://localhost:7202/api/OpcionesConsultas";
             Crud<PreguntaConsulta>.EndPoint = "https://localhost:7202/api/PreguntasConsultas";
             Crud<ProcesoElectoral>.EndPoint = "https://localhost:7202/api/ProcesosElectorales";
-            Crud<Lista>.EndPoint = "https://localhost:7202/api/Listas";
             Crud<Lista>.EndPoint = "https://localhost:7202/api/Boletas/activas";
             Crud<Padron>.EndPoint = "https://localhost:7202/api/Padrones";
 

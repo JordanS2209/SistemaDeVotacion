@@ -1,0 +1,52 @@
+﻿@model SistemaVotacion.Modelos.Candidato
+
+@{
+    ViewData["Title"] = "Eliminar Candidato";
+}
+
+<h1>Eliminar Candidato</h1>
+
+<h3>¿Estás seguro que deseas eliminar este registro?</h3>
+<div>
+    <h4>Candidato</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.NombreCandidato)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.NombreCandidato)
+        </dd>
+
+        <dt class="col-sm-2">
+            Lista
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Lista.NombreLista)
+        </dd>
+
+        <dt class="col-sm-2">
+            Dignidad
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Dignidad.NombreDignidad)
+        </dd>
+    </dl>
+
+    <form asp-action="DeleteCandidato" method="post">
+        <!-- Campo oculto para enviar el Id -->
+        <input type="hidden" asp-for="Id" />
+
+        <div class="form-group mt-3">
+            <input type="submit" value="Eliminar" class="btn btn-danger" />
+            <a asp-action="ListCandidato" class="btn btn-secondary">Volver a la lista</a>
+        </div>
+    </form>
+</div>

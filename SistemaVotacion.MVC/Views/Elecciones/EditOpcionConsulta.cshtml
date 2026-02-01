@@ -1,0 +1,46 @@
+﻿@model SistemaVotacion.Modelos.OpcionConsulta
+
+@{
+    ViewData["Title"] = "Editar Opción de Consulta";
+}
+
+<h1>Editar Opción de Consulta</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="EditOpcionConsulta" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- Id oculto -->
+            <input type="hidden" asp-for="Id" />
+
+            <!-- TextoOpcion: Sí / No -->
+            <div class="form-group">
+                <label asp-for="TextoOpcion" class="control-label"></label>
+                <select asp-for="TextoOpcion" class="form-control" asp-items="ViewBag.Valores"></select>
+                <span asp-validation-for="TextoOpcion" class="text-danger"></span>
+            </div>
+
+            <!-- Pregunta asociada -->
+            <div class="form-group">
+                <label asp-for="IdPregunta" class="control-label"></label>
+                <select asp-for="IdPregunta" class="form-control"
+                        asp-items="@(new SelectList(ViewBag.Preguntas, "Value", "Text", Model.IdPregunta))">
+                </select>
+                <span asp-validation-for="IdPregunta" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3">
+                <input type="submit" value="Guardar" class="btn btn-primary" />
+                <a asp-action="ListOpcionConsulta" class="btn btn-secondary">Volver al listado</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -21,7 +21,7 @@ namespace SistemaVotacion.Modelos
         [Required, ForeignKey("ProcesoElectoral")]
         public int IdProceso { get; set; }
 
-         public  ProcesoElectoral? Procesos { get; set; }
+        public  ProcesoElectoral? Procesos { get; set; }
 
         public  List<Candidato>? Candidatos { get; set; } 
 

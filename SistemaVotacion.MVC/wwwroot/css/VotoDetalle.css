@@ -1,0 +1,115 @@
+﻿body {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.titulo-principal {
+    text-align: center;
+    margin: 30px 0;
+}
+
+/* =======================
+   GRÁFICAS
+   ======================= */
+.contenedor-principal {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.card-grafica {
+    background: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    width: 340px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.leyenda-listas {
+    margin-top: 10px;
+}
+
+.fila-lista {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.color-lista {
+    width: 14px;
+    height: 14px;
+    margin-right: 8px;
+}
+
+.nombre-lista {
+    flex: 1;
+}
+
+.votos-lista {
+    font-weight: bold;
+}
+
+/* =======================
+   PANEL PROVINCIAS
+   ======================= */
+.panel-provincias {
+    margin: 50px auto;
+    padding: 30px;
+    max-width: 1200px;
+    background: #f0f3f7;
+    border-radius: 16px;
+}
+
+.mapa-layout {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+}
+
+.columna-provincias {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-prov {
+    background: #455a64;
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+    .btn-prov:hover {
+        background: #1e88e5;
+    }
+
+.mapa-centro img {
+    width: 600px; /* 👈 más grande */
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+}
+
+
+.resultado-provincia {
+    margin-top: 25px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.nota {
+    font-size: 12px;
+    color: #666;
+}
+
+.btn-prov.activo {
+    background: #1e88e5;
+}
+
+#totalesProvincia p {
+    margin: 4px 0;
+    font-size: 14px;
+}

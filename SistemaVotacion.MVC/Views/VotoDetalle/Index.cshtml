@@ -1,51 +1,225 @@
 ﻿@{
-    ViewData["Title"] = "Resultados de la votación";
+    ViewData["Title"] = "Resultados Electorales";
 }
 
-<div class="text-center">
-    <h2>Resultados en tiempo real</h2>
-    <div id="resultados-votacion" class="mt-5"></div>
+<link rel="stylesheet" href="~/css/VotoDetalle.css" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<h2 class="titulo-principal">Resultados Electorales</h2>
+
+<!-- =======================
+     GRÁFICAS PRINCIPALES
+     ======================= -->
+<div class="contenedor-principal">
+
+    <div class="card-grafica">
+        <h3 class="titulo-grafica">Resultados por Listas</h3>
+        <canvas id="graficaListas"></canvas>
+        <div id="leyendaListas" class="leyenda-listas"></div>
+    </div>
+
+    <div class="card-grafica">
+        <h3 class="titulo-grafica">Distribución de Tipos de Voto</h3>
+        <canvas id="graficaTipos"></canvas>
+
+    </div>
+
 </div>
 
-@section Scripts {
-    <script>
-        async function cargarResultados() {
-            const contenedor = document.getElementById('resultados-votacion');
-            contenedor.innerHTML = '<p>Cargando resultados...</p>';
-            try {
-                const resp = await fetch('https://localhost:7202/api/Resultados/por-lista');
-                if (!resp.ok) throw new Error('No se pudo obtener resultados');
-                const datos = await resp.json();
-                if (!Array.isArray(datos) || datos.length === 0) {
-                    contenedor.innerHTML = '<p>No hay resultados disponibles.</p>';
-                    return;
-                }
-                // Calcular el máximo de votos para la barra
-                const maxVotos = Math.max(...datos.map(x => x.totalVotos));
-                // Mostrar líder
-                let html = `<h3 style="color:green;">¡Líder actual: ${datos[0].nombreLista} (Lista ${datos[0].numeroLista}) con ${datos[0].totalVotos} votos!</h3>`;
-                html += `<div style="max-width:500px;margin:auto;">`;
-                datos.forEach((l, idx) => {
-                    const porcentaje = maxVotos > 0 ? Math.round((l.totalVotos / maxVotos) * 100) : 0;
-                    html += `
-                        <div style="text-align:left;margin-bottom:10px;">
-                            <strong>${l.nombreLista} (Lista ${l.numeroLista})</strong>
-                            <div style="background:#e9ecef;border-radius:5px;overflow:hidden;">
-                                <div style="width:${porcentaje}%;background:${idx === 0 ? '#28a745' : '#007bff'};color:white;padding:5px 10px;transition:width 0.5s;">
-                                    ${l.totalVotos} votos (${porcentaje}%)
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-                html += `</div>`;
-                contenedor.innerHTML = html;
-            } catch (e) {
-                contenedor.innerHTML = '<p>Error al cargar resultados.</p>';
-            }
+<!-- =======================
+     PANEL MAPA + PROVINCIAS
+     ======================= -->
+<div class="panel-provincias">
+
+    <h2 class="titulo-panel">Resultados por Provincia</h2>
+
+    <div class="mapa-layout">
+
+        <div id="provincias-izq" class="columna-provincias"></div>
+
+        <div class="mapa-centro">
+            <img src="~/img/MapaDelEcuador.jpg" alt="Mapa del Ecuador">
+        </div>
+
+        <div id="provincias-der" class="columna-provincias"></div>
+
+    </div>
+
+    <div class="resultado-provincia">
+        <h3>Provincia seleccionada</h3>
+        <h3 id="tituloProvincia">Provincia seleccionada</h3>
+
+        <canvas id="graficaProvincia"
+                style="max-width:280px;margin:15px auto;display:block;"></canvas>
+        <div id="totalesProvincia" style="margin-top:15px;"></div>
+
+    </div>
+
+
+</div>
+
+<!-- =======================
+     SCRIPTS
+     ======================= -->
+<script>
+    /* ===============================
+       DATOS RESULTADOS
+       =============================== */
+    const dataApi = @Html.Raw(ViewBag.Data ?? "{}");
+
+    /* -------- GRAFICA LISTAS -------- */
+    const listas = dataApi.listas || [];
+    const colores = ['#3366cc', '#dc3912', '#ff9900', '#109618', '#990099'];
+
+    new Chart(document.getElementById('graficaListas'), {
+        type: 'pie',
+        data: {
+            labels: listas.map(x => x.lista),
+            datasets: [{
+                data: listas.map(x => x.votos),
+                backgroundColor: colores
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } }
         }
-        // Cargar al inicio y cada 5 segundos
-        cargarResultados();
-        setInterval(cargarResultados, 5000);
-    </script>
-}
+    });
+
+    const leyenda = document.getElementById("leyendaListas");
+    leyenda.innerHTML = "";
+
+    listas.forEach((item, index) => {
+        leyenda.innerHTML += `
+            <div class="fila-lista">
+                <span class="color-lista" style="background:${colores[index % colores.length]}"></span>
+                <span class="nombre-lista">${item.lista}</span>
+                <span class="votos-lista">${item.votos} votos</span>
+            </div>`;
+    });
+
+    /* -------- GRAFICA VALIDOS / BLANCOS -------- */
+    const resumen = dataApi.resumen || {};
+    const validos = resumen.validos ?? 0;
+    const blancos = resumen.blancos ?? 0;
+    const total = validos + blancos || 1;
+
+    new Chart(document.getElementById('graficaTipos'), {
+        type: 'doughnut',
+        data: {
+            labels: [
+                `Válidos (${((validos / total) * 100).toFixed(1)}%)`,
+                `Blancos (${((blancos / total) * 100).toFixed(1)}%)`
+            ],
+            datasets: [{
+                data: [validos, blancos],
+                backgroundColor: ['#4f7f8c', '#caa14a'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            cutout: '65%',
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+
+    /* ===============================
+       PROVINCIAS DESDE LA BASE
+       =============================== */
+    let provincias = [];
+
+    try {
+        provincias = JSON.parse('@Html.Raw(ViewBag.Provincias ?? "[]")');
+    } catch {
+        provincias = [];
+    }
+
+    const izq = document.getElementById("provincias-izq");
+    const der = document.getElementById("provincias-der");
+
+    provincias.forEach((p, index) => {
+        const btn = document.createElement("button");
+           btn.className = "btn-prov";
+    btn.textContent = p.nombreProvincia ?? p.nombre ?? "Provincia";
+
+    btn.onclick = () => {
+        document.querySelectorAll('.btn-prov')
+            .forEach(b => b.classList.remove('activo'));
+
+        btn.classList.add('activo');
+
+        cargarResultadosProvincia(p.idProvincia, btn.textContent);
+    };
+
+    (index < provincias.length / 2 ? izq : der).appendChild(btn);
+
+    });
+</script>
+<script>
+    let chartProvincia = null;
+        async function cargarResultadosProvincia(idProvincia, nombreProvincia) {
+
+        document.getElementById("tituloProvincia").innerText =
+            "Resultados en " + nombreProvincia;
+
+        const response = await fetch(
+            `https://localhost:7202/api/Resultados/por-provincia/${idProvincia}`
+        );
+
+        const data = await response.json();
+
+        // ===============================
+        // NORMALIZAR LISTAS (INCLUIR CEROS)
+        // ===============================
+        const listasBase = dataApi.listas.map(l => l.lista);
+
+        const mapa = {};
+        data.forEach(x => mapa[x.lista] = x.votos);
+
+        const labels = [];
+        const valores = [];
+
+        listasBase.forEach(l => {
+            labels.push(l);
+            valores.push(mapa[l] ?? 0);
+        });
+
+        // ===============================
+        // GRAFICA
+        // ===============================
+        const colores = ['#3366cc', '#dc3912', '#ff9900', '#109618', '#990099'];
+        const ctx = document.getElementById('graficaProvincia');
+
+        if (chartProvincia) chartProvincia.destroy();
+
+        chartProvincia = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: valores,
+                    backgroundColor: colores
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        // ===============================
+        // TOTALES DEBAJO DE LA GRAFICA
+        // ===============================
+        const total = valores.reduce((a, b) => a + b, 0);
+
+        let html = `<p><b>Total votos:</b> ${total}</p>`;
+
+        labels.forEach((l, i) => {
+            html += `<p>${l}: ${valores[i]}</p>`;
+        });
+
+        document.getElementById("totalesProvincia").innerHTML = html;
+    }
+
+
+</script>

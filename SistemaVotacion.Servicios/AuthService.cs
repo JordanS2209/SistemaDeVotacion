@@ -87,6 +87,10 @@ namespace SistemaVotacion.Servicios
                 };
 
                 Crud<Usuario>.Create(nuevoUsuario);
+
+                //SERVICIO CORREO
+                var emailService = new EmailService();
+                await emailService.EnviarCorreoRegistro(email, nombre);
                 return true;
             }
             catch (Exception ex)

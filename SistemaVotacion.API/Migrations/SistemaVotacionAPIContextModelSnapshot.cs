@@ -202,12 +202,9 @@ namespace SistemaVotacion.API.Migrations
                     b.Property<int>("NumeroLista")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("ProcesosId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("ProcesosId");
+                    b.HasIndex("IdProceso");
 
                     b.ToTable("Listas");
                 });
@@ -255,16 +252,13 @@ namespace SistemaVotacion.API.Migrations
                     b.Property<int>("IdPregunta")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("PreguntaId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("TextoOpcion")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PreguntaId");
+                    b.HasIndex("IdPregunta");
 
                     b.ToTable("OpcionConsultas");
                 });
@@ -794,11 +788,13 @@ namespace SistemaVotacion.API.Migrations
 
             modelBuilder.Entity("SistemaVotacion.Modelos.Lista", b =>
                 {
-                    b.HasOne("SistemaVotacion.Modelos.ProcesoElectoral", "Procesos")
+                    b.HasOne("SistemaVotacion.Modelos.ProcesoElectoral", "Proceso")
                         .WithMany("ListasParticipantes")
-                        .HasForeignKey("ProcesosId");
+                        .HasForeignKey("IdProceso")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Procesos");
+                    b.Navigation("Proceso");
                 });
 
             modelBuilder.Entity("SistemaVotacion.Modelos.Multimedia", b =>
@@ -824,7 +820,9 @@ namespace SistemaVotacion.API.Migrations
                 {
                     b.HasOne("SistemaVotacion.Modelos.PreguntaConsulta", "Pregunta")
                         .WithMany("OpcionesConsulta")
-                        .HasForeignKey("PreguntaId");
+                        .HasForeignKey("IdPregunta")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Pregunta");
                 });

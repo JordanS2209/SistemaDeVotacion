@@ -35,5 +35,7 @@
 
 <div>
     @Html.ActionLink("Editar", "EditOpcionConsulta", new { id = Model.Id }) |
-    <a asp-action="ListOpcionConsulta">Volver al listado</a>
+    <a asp-action="EditOpcionConsulta" asp-route-id="@Model.Id" class="btn btn-warning">Editar</a>
+    <a asp-action="ListOpcionConsulta" class="btn btn-secondary">Volver</a>
+
 </div>

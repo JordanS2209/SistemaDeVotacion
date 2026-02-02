@@ -1,4 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemaVotacion.Modelos;
 
@@ -42,17 +47,10 @@ namespace SistemaVotacion.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Lista>> GetLista(int id)
         {
-            var lista = await _context.Listas
-                .Include(l => l.Procesos)
-                .Include(l => l.Candidatos)
-                .Include(l => l.RecursosMultimedia)
-                .Include(l => l.VotosRecibidos)
-                .FirstOrDefaultAsync(l => l.Id == id);
-
             try
             {
                 var lista = await _context.Listas
-                    .Include(l => l.Procesos)
+                    //.Include(l => l.Procesos)
                     .Include(l => l.Candidatos)
                         .ThenInclude(c => c.Dignidad)
                     .Include(l => l.Candidatos)
@@ -61,11 +59,16 @@ namespace SistemaVotacion.API.Controllers
                     .Include(l => l.VotosRecibidos)
                     .FirstOrDefaultAsync(l => l.Id == id);
 
+                if (lista == null)
+                    return NotFound($"No se encontró la lista con ID {id}.");
 
-            if (lista == null)
-                return NotFound($"No se encontró la lista con ID {id}.");
-
-            return Ok(lista);
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener la lista: {ex.Message}");
+                return StatusCode(500, $"Error interno: {ex.Message}");
+            }
         }
         // GET: api/Listas/simple
         [HttpGet("simple")]

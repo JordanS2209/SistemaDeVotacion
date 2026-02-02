@@ -14,19 +14,17 @@ namespace SistemaVotacion.Modelos
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        public string NombreLista { get; set; } 
-
+        public string NombreLista { get; set; }
         public int NumeroLista { get; set; }
 
-        [Required, ForeignKey("ProcesoElectoral")]
+        [Required]
         public int IdProceso { get; set; }
 
-        public  ProcesoElectoral? Procesos { get; set; }
+        [ForeignKey(nameof(IdProceso))]
+        public ProcesoElectoral? Proceso { get; set; }
 
-        public  List<Candidato>? Candidatos { get; set; } 
-
-        public  List<Multimedia>? RecursosMultimedia { get; set; }
-
-        public  List<VotoDetalle>? VotosRecibidos { get; set; }
+        public List<Candidato>? Candidatos { get; set; }
+        public List<Multimedia>? RecursosMultimedia { get; set; }
+        public List<VotoDetalle>? VotosRecibidos { get; set; }
     }
 }

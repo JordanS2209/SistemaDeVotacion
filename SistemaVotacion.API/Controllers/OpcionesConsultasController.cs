@@ -26,7 +26,6 @@ namespace SistemaVotacion.API.Controllers
         {
             try
             {
-                // Incluimos la Pregunta para saber a qué consulta pertenece cada opción
                 var opciones = await _context.OpcionConsultas
                     .Include(o => o.Pregunta)
                     .ToListAsync();

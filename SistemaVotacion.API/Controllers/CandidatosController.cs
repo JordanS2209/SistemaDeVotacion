@@ -26,9 +26,11 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 var data = await _context.Candidatos
-                    //.Include(c => c.Lista)
-                    //.Include(c => c.Dignidad)
-                    .ToListAsync();
+                .Include(c => c.Lista)
+                .Include(c => c.Dignidad)
+                .Include(c => c.GaleriaMultimedia)
+                .ToListAsync();
+
                 return Ok(data);
             }
             catch (Exception ex)
@@ -64,11 +66,9 @@ namespace SistemaVotacion.API.Controllers
             }
         }
 
-       
-        // GET: api/Candidatos/filtrar?nombre=Ana&lista=2&dignidad=3
         [HttpGet("filtrar")]
         public async Task<ActionResult<IEnumerable<Candidato>>> Filtrar(
-            string? nombre, int? lista, int? dignidad, DateTime? desde, DateTime? hasta)
+             string? nombre, int? lista, int? dignidad)
         {
             var query = _context.Candidatos
                 .Include(c => c.Lista)
@@ -84,13 +84,13 @@ namespace SistemaVotacion.API.Controllers
             if (dignidad.HasValue)
                 query = query.Where(c => c.IdDignidad == dignidad.Value);
 
-            var candidatos = await query.OrderBy(c => c.NombreCandidato).ToListAsync();
-
-            if (!candidatos.Any())
-                return NotFound("No se encontraron candidatos con los filtros aplicados.");
+            var candidatos = await query
+                .OrderBy(c => c.NombreCandidato)
+                .ToListAsync();
 
             return Ok(candidatos);
         }
+
 
         // PUT: api/Candidatos/5
         [HttpPut("{id}")]
@@ -101,19 +101,20 @@ namespace SistemaVotacion.API.Controllers
                 return BadRequest("El ID de la URL no coincide con el ID del candidato.");
             }
 
-            _context.Entry(candidato).State = EntityState.Modified;
-
             try
             {
+                var existente = await _context.Candidatos.FindAsync(id);
+                if (existente == null)
+                    return NotFound();
+
+                existente.NombreCandidato = candidato.NombreCandidato;
+                existente.IdLista = candidato.IdLista;
+                existente.IdDignidad = candidato.IdDignidad;
+
                 await _context.SaveChangesAsync();
+                return NoContent();
 
-                //var candidatoConRelaciones = await _context.Candidatos
-                //    .Include(c => c.Lista)
-                //    .Include(c => c.Dignidad)
-                //    .FirstOrDefaultAsync(c => c.Id == id);
 
-                //return Ok(candidatoConRelaciones);
-                return NoContent(); 
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -152,30 +153,24 @@ namespace SistemaVotacion.API.Controllers
 
 
 
-
-
-
-
         // DELETE: api/Candidatos/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<Candidato>> DeleteCandidato(int id)
         {
             try
             {
-                var candidato = await _context.Candidatos.FindAsync(id);
-                //    .Include(c => c.Lista)
-                //    .Include(c => c.Dignidad)
-                //    .FirstOrDefaultAsync(c => c.Id == id);
+                var candidato = await _context.Candidatos
+                    .Include(c => c.GaleriaMultimedia)
+                    .FirstOrDefaultAsync(c => c.Id == id);
 
                 if (candidato == null)
-                {
-                    return NotFound("Candidato no encontrado.");
-                }
+                    return NotFound();
 
                 _context.Candidatos.Remove(candidato);
                 await _context.SaveChangesAsync();
 
                 return Ok(candidato);
+
             }
             catch (Exception ex)
             {

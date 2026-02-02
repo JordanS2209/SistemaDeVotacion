@@ -129,91 +129,84 @@ namespace SistemaVotacion.MVC.Controllers
             }
         }
 
-        //// CADIDATOS - CRUD
-        //// Helper para obtener las listas
-        //private List<SelectListItem> GetListas()
-        //{
-        //    Crud<Lista>.EndPoint = "https://localhost:7202/api/Listas/simple";
-        //    var listas = Crud<Lista>.GetAll();
-        //    return listas.Select(l => new SelectListItem
-        //    {
-        //        Value = l.Id.ToString(),
-        //        Text = l.NombreLista
-        //    }).ToList();
-        //}
+        // CADIDATOS - CRUD
+        // Helper para obtener las listas
+        private List<SelectListItem> GetListas()
+        {
+            Crud<Lista>.EndPoint = "https://localhost:7202/api/Listas";
+            var listas = Crud<Lista>.GetAll();
+            return listas.Select(l => new SelectListItem
+            {
+                Value = l.Id.ToString(),
+                Text = l.NombreLista
+            }).ToList();
+        }
 
-        //// Helper para obtener las dignidades
-        //private List<SelectListItem> GetDignidades()
-        //{
-        //    Crud<Dignidad>.EndPoint = "https://localhost:7202/api/Dignidades/simple";
+        // Helper para obtener las dignidades
+        private List<SelectListItem> GetDignidades()
+        {
+            Crud<Dignidad>.EndPoint = "https://localhost:7202/api/Dignidades";
+            var dignidades = Crud<Dignidad>.GetAll();
 
-        //    var dignidades = Crud<Dignidad>.GetAll();
-        //    return dignidades.Select(d => new SelectListItem
-        //    {
-        //        Value = d.Id.ToString(),
-        //        Text = d.NombreDignidad
-        //    }).ToList();
-        //}
+            return dignidades.Select(d => new SelectListItem
+            {
+                Value = d.Id.ToString(),
+                Text = d.NombreDignidad
+            }).ToList();
+        }
+
 
         public IActionResult ListCandidato()
         {
             try
             {
-                // Ya no necesitas configurar el EndPoint aquí
                 var candidatoData = Crud<Candidato>.GetAll();
-
-                // Poblar los dropdowns
-                //ViewBag.Listas = Crud<Lista>.GetAll();
-                //ViewBag.Dignidades = Crud<Dignidad>.GetAll();
 
                 return View(candidatoData);
             }
             catch (Exception ex)
             {
                 TempData["error"] = "Error al conectar con la API: " + ex.Message;
-                //ViewBag.Listas = Crud<Lista>.GetAll();
-                //ViewBag.Dignidades = Crud<Dignidad>.GetAll();
                 return View(new List<Candidato>());
             }
         }
 
 
-        public IActionResult FiltrarCandidatos(string nombre, int? lista, int? dignidad)
-        {
-            try
-            {
+        //public IActionResult FiltrarCandidatos(string nombre, int? lista, int? dignidad)
+        //{
+        //    try
+        //    {
 
-                var queryParams = new Dictionary<string, string>();
+        //        var queryParams = new Dictionary<string, string>();
 
-                if (!string.IsNullOrEmpty(nombre))
-                    queryParams.Add("nombre", nombre);
+        //        if (!string.IsNullOrEmpty(nombre))
+        //            queryParams.Add("nombre", nombre);
 
-                if (lista.HasValue)
-                    queryParams.Add("lista", lista.Value.ToString());
+        //        if (lista.HasValue)
+        //            queryParams.Add("lista", lista.Value.ToString());
 
-                if (dignidad.HasValue)
-                    queryParams.Add("dignidad", dignidad.Value.ToString());
+        //        if (dignidad.HasValue)
+        //            queryParams.Add("dignidad", dignidad.Value.ToString());
 
-                // Generar la URL final con los parámetros
-                string url = QueryHelpers.AddQueryString($"{Crud<Candidato>.EndPoint}/filtrar", queryParams);
+        //        // Generar la URL final con los parámetros
+        //        string url = QueryHelpers.AddQueryString($"{Crud<Candidato>.EndPoint}/filtrar", queryParams);
 
-                // Llamar al endpoint de filtrado
-                var candidatos = Crud<Candidato>.GetCustom(url);
+        //        // Llamar al endpoint de filtrado
+        //        //var candidatos = Crud<Candidato>.GetCustom(url);
 
-                // Poblar los dropdowns para que se mantengan en la vista
-                ViewBag.Listas = Crud<Lista>.GetAll();
-                ViewBag.Dignidades = Crud<Dignidad>.GetAll();
+        //        ViewBag.Listas = GetListas(); ;
+        //        ViewBag.Dignidades = GetDignidades();
 
-                return View("ListCandidato", candidatos);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Error = "Error al filtrar candidatos: " + ex.Message;
-                ViewBag.Listas = Crud<Lista>.GetAll();
-                ViewBag.Dignidades = Crud<Dignidad>.GetAll();
-                return View("ListCandidato", new List<Candidato>());
-            }
-        }
+        //        //return View("ListCandidato", candidatos);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        ViewBag.Error = "Error al filtrar candidatos: " + ex.Message;
+        //        ViewBag.Listas = GetListas(); ;
+        //        ViewBag.Dignidades = GetDignidades();
+        //        return View("ListCandidato", new List<Candidato>());
+        //    }
+        //}
         public IActionResult DetailsCandidato(int id)
         {
             try
@@ -233,8 +226,8 @@ namespace SistemaVotacion.MVC.Controllers
 
         public IActionResult CreateCandidato()
         {
-            ViewBag.Listas = Crud<Lista>.GetAll();
-            ViewBag.Dignidades = Crud<Dignidad>.GetAll();
+            ViewBag.Listas = GetListas(); ;
+            ViewBag.Dignidades = GetDignidades();
             return View();
         }
 
@@ -256,8 +249,8 @@ namespace SistemaVotacion.MVC.Controllers
                 }
             }
 
-            ViewBag.Listas = Crud<Lista>.GetAll();
-            ViewBag.Dignidades = Crud<Dignidad>.GetAll();
+            ViewBag.Listas = GetListas(); ;
+            ViewBag.Dignidades = GetDignidades();
             return View(nuevoCandidato);
         }
 
@@ -270,8 +263,8 @@ namespace SistemaVotacion.MVC.Controllers
                 if (candidatoData == null)
                     return NotFound();
 
-                ViewBag.Listas = Crud<Lista>.GetAll();
-                ViewBag.Dignidades = Crud<Dignidad>.GetAll();
+                ViewBag.Listas = GetListas(); ;
+                ViewBag.Dignidades = GetDignidades();
                 return View(candidatoData);
             }
             catch (Exception ex)
@@ -285,6 +278,7 @@ namespace SistemaVotacion.MVC.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult EditCandidato(int id, Candidato candidatoData)
         {
+
             if (id != candidatoData.Id)
             {
                 return BadRequest("El ID de la URL no coincide con el ID del candidato.");
@@ -294,6 +288,9 @@ namespace SistemaVotacion.MVC.Controllers
             {
                 try
                 {
+                    candidatoData.Lista = null;
+                    candidatoData.Dignidad = null;
+                    candidatoData.GaleriaMultimedia = null;
                     Crud<Candidato>.Update(id, candidatoData);
                     return RedirectToAction(nameof(ListCandidato));
                 }
@@ -303,8 +300,8 @@ namespace SistemaVotacion.MVC.Controllers
                 }
             }
 
-            ViewBag.Listas = Crud<Lista>.GetAll();
-            ViewBag.Dignidades = Crud<Dignidad>.GetAll();
+            ViewBag.Listas = GetListas(); ;
+            ViewBag.Dignidades = GetDignidades();
             return View(candidatoData);
         }
 

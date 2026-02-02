@@ -50,7 +50,7 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 var lista = await _context.Listas
-                    .Include(l => l.Procesos)
+                    //.Include(l => l.Procesos)
                     .Include(l => l.Candidatos)
                         .ThenInclude(c => c.Dignidad)
                     .Include(l => l.Candidatos)

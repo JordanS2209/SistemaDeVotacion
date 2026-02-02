@@ -14,14 +14,16 @@ namespace SistemaVotacion.Modelos
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
+        [Required]
         public string TextoOpcion { get; set; }
 
-
-        [Required, ForeignKey("PreguntaConsulta")]
+        [Required]
+        [ForeignKey(nameof(Pregunta))]
         public int IdPregunta { get; set; }
 
-        public  PreguntaConsulta? Pregunta { get; set; }
+        public PreguntaConsulta? Pregunta { get; set; }
 
-        public  List<VotoDetalle>? VotosRecibidos { get; set; }
+
+        public List<VotoDetalle>? VotosRecibidos { get; set; }
     }
 }

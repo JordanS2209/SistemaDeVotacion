@@ -108,5 +108,21 @@ namespace SistemaVotacion.ApiConsumer
                 }
             }
         }
+
+        public static T GetSingle(string customUrl)
+        {
+            using (var client = new HttpClient())
+            {
+                // Usamos la URL completa que le pasemos
+                var response = client.GetAsync(customUrl).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = response.Content.ReadAsStringAsync().Result;
+                    // Deserializa como un objeto único T, no como List<T>
+                    return JsonConvert.DeserializeObject<T>(json);
+                }
+                return default;
+            }
+        }
     }
 }

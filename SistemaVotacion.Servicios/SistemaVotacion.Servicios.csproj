@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MailKit" Version="4.14.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\SistemaVotacion.ApiConsumer\SistemaVotacion.ApiConsumer.csproj" />
     <ProjectReference Include="..\SistemaVotacion.API\SistemaVotacion.API.csproj" />
     <ProjectReference Include="..\SistemaVotacion.Modelos\SistemaVotacion.Modelos.csproj" />

@@ -30,6 +30,10 @@
                             <a class="nav-link text-light fw-bold" asp-controller="Home" asp-action="Index">Inicio</a>
                         </li>
 
+                        <li class="nav-item">
+                            <a class="nav-link text-light fw-bold" asp-controller="Consultas" asp-action="Index">Consulta lugar de votacion</a>
+                        </li>
+
                         @* Acciones para SUPER ADMINISTRADOR *@
                         @if (User.Identity.IsAuthenticated && User.IsInRole("SUPER ADMINISTRADOR"))
                         {

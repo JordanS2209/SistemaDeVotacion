@@ -7,11 +7,24 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace SistemaVotacion.API.Migrations
 {
     /// <inheritdoc />
-    public partial class v08Sotacion : Migration
+    public partial class v11SotacionFinal : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Dignidades",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    NombreDignidad = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Dignidades", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Generos",
                 columns: table => new
@@ -197,25 +210,6 @@ namespace SistemaVotacion.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Dignidades",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    NombreDignidad = table.Column<string>(type: "text", nullable: false),
-                    ProcesoElectoralId = table.Column<int>(type: "integer", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Dignidades", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Dignidades_ProcesosElectorales_ProcesoElectoralId",
-                        column: x => x.ProcesoElectoralId,
-                        principalTable: "ProcesosElectorales",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Listas",
                 columns: table => new
                 {
@@ -244,17 +238,17 @@ namespace SistemaVotacion.API.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     TextoPregunta = table.Column<string>(type: "text", nullable: false),
                     NumeroPregunta = table.Column<int>(type: "integer", nullable: false),
-                    IdProceso = table.Column<int>(type: "integer", nullable: false),
-                    ProcesosElectoralesId = table.Column<int>(type: "integer", nullable: true)
+                    IdProceso = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PreguntasConsultas", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PreguntasConsultas_ProcesosElectorales_ProcesosElectoralesId",
-                        column: x => x.ProcesosElectoralesId,
+                        name: "FK_PreguntasConsultas_ProcesosElectorales_IdProceso",
+                        column: x => x.IdProceso,
                         principalTable: "ProcesosElectorales",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -393,23 +387,23 @@ namespace SistemaVotacion.API.Migrations
                     VotosEnUrna = table.Column<int>(type: "integer", nullable: false),
                     HashSeguridad = table.Column<string>(type: "text", nullable: false),
                     FechaCierre = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    Observaciones = table.Column<string>(type: "text", nullable: true),
-                    ProcesosId = table.Column<int>(type: "integer", nullable: true),
-                    JuntasId = table.Column<int>(type: "integer", nullable: true)
+                    Observaciones = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ActasAuditorias", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ActasAuditorias_JuntasReceptoras_JuntasId",
-                        column: x => x.JuntasId,
+                        name: "FK_ActasAuditorias_JuntasReceptoras_IdJunta",
+                        column: x => x.IdJunta,
                         principalTable: "JuntasReceptoras",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ActasAuditorias_ProcesosElectorales_ProcesosId",
-                        column: x => x.ProcesosId,
+                        name: "FK_ActasAuditorias_ProcesosElectorales_IdProceso",
+                        column: x => x.IdProceso,
                         principalTable: "ProcesosElectorales",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -421,23 +415,23 @@ namespace SistemaVotacion.API.Migrations
                     IdUsuario = table.Column<int>(type: "integer", nullable: false),
                     IdJunta = table.Column<int>(type: "integer", nullable: false),
                     IdRol = table.Column<int>(type: "integer", nullable: false),
-                    IdProceso = table.Column<int>(type: "integer", nullable: false),
-                    JuntaId = table.Column<int>(type: "integer", nullable: true),
-                    ProcesoId = table.Column<int>(type: "integer", nullable: true)
+                    IdProceso = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_RepresentantesJuntas", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_RepresentantesJuntas_JuntasReceptoras_JuntaId",
-                        column: x => x.JuntaId,
+                        name: "FK_RepresentantesJuntas_JuntasReceptoras_IdJunta",
+                        column: x => x.IdJunta,
                         principalTable: "JuntasReceptoras",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_RepresentantesJuntas_ProcesosElectorales_ProcesoId",
-                        column: x => x.ProcesoId,
+                        name: "FK_RepresentantesJuntas_ProcesosElectorales_IdProceso",
+                        column: x => x.IdProceso,
                         principalTable: "ProcesosElectorales",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_RepresentantesJuntas_Roles_IdRol",
                         column: x => x.IdRol,
@@ -491,11 +485,7 @@ namespace SistemaVotacion.API.Migrations
                     IdLista = table.Column<int>(type: "integer", nullable: false),
                     IdDignidad = table.Column<int>(type: "integer", nullable: false),
                     IdOpcion = table.Column<int>(type: "integer", nullable: false),
-                    IdPregunta = table.Column<int>(type: "integer", nullable: false),
-                    JuntaId = table.Column<int>(type: "integer", nullable: true),
-                    ProcesoId = table.Column<int>(type: "integer", nullable: true),
-                    OpcionId = table.Column<int>(type: "integer", nullable: true),
-                    PreguntaId = table.Column<int>(type: "integer", nullable: true)
+                    IdPregunta = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -507,10 +497,11 @@ namespace SistemaVotacion.API.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_VotoDetalles_JuntasReceptoras_JuntaId",
-                        column: x => x.JuntaId,
+                        name: "FK_VotoDetalles_JuntasReceptoras_IdJunta",
+                        column: x => x.IdJunta,
                         principalTable: "JuntasReceptoras",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_VotoDetalles_Listas_IdLista",
                         column: x => x.IdLista,
@@ -518,20 +509,23 @@ namespace SistemaVotacion.API.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_VotoDetalles_OpcionConsultas_OpcionId",
-                        column: x => x.OpcionId,
+                        name: "FK_VotoDetalles_OpcionConsultas_IdOpcion",
+                        column: x => x.IdOpcion,
                         principalTable: "OpcionConsultas",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_VotoDetalles_PreguntasConsultas_PreguntaId",
-                        column: x => x.PreguntaId,
+                        name: "FK_VotoDetalles_PreguntasConsultas_IdPregunta",
+                        column: x => x.IdPregunta,
                         principalTable: "PreguntasConsultas",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_VotoDetalles_ProcesosElectorales_ProcesoId",
-                        column: x => x.ProcesoId,
+                        name: "FK_VotoDetalles_ProcesosElectorales_IdProceso",
+                        column: x => x.IdProceso,
                         principalTable: "ProcesosElectorales",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_VotoDetalles_TipoVotos_IdTipoVoto",
                         column: x => x.IdTipoVoto,
@@ -548,17 +542,17 @@ namespace SistemaVotacion.API.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     IdActa = table.Column<int>(type: "integer", nullable: false),
                     IdLista = table.Column<int>(type: "integer", nullable: false),
-                    VotosContabilizados = table.Column<int>(type: "integer", nullable: false),
-                    ActaId = table.Column<int>(type: "integer", nullable: true)
+                    VotosContabilizados = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ResultadosDetallesAuditorias", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ResultadosDetallesAuditorias_ActasAuditorias_ActaId",
-                        column: x => x.ActaId,
+                        name: "FK_ResultadosDetallesAuditorias_ActasAuditorias_IdActa",
+                        column: x => x.IdActa,
                         principalTable: "ActasAuditorias",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ResultadosDetallesAuditorias_Listas_IdLista",
                         column: x => x.IdLista,
@@ -576,17 +570,17 @@ namespace SistemaVotacion.API.Migrations
                     HaVotado = table.Column<bool>(type: "boolean", nullable: false),
                     CodigoAcceso = table.Column<string>(type: "text", nullable: true),
                     IdProceso = table.Column<int>(type: "integer", nullable: false),
-                    IdVotante = table.Column<int>(type: "integer", nullable: false),
-                    ProcesoId = table.Column<int>(type: "integer", nullable: true)
+                    IdVotante = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Padrones", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Padrones_ProcesosElectorales_ProcesoId",
-                        column: x => x.ProcesoId,
+                        name: "FK_Padrones_ProcesosElectorales_IdProceso",
+                        column: x => x.IdProceso,
                         principalTable: "ProcesosElectorales",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Padrones_Votantes_IdVotante",
                         column: x => x.IdVotante,
@@ -596,14 +590,14 @@ namespace SistemaVotacion.API.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ActasAuditorias_JuntasId",
+                name: "IX_ActasAuditorias_IdJunta",
                 table: "ActasAuditorias",
-                column: "JuntasId");
+                column: "IdJunta");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ActasAuditorias_ProcesosId",
+                name: "IX_ActasAuditorias_IdProceso",
                 table: "ActasAuditorias",
-                column: "ProcesosId");
+                column: "IdProceso");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Candidatos_IdDignidad",
@@ -619,11 +613,6 @@ namespace SistemaVotacion.API.Migrations
                 name: "IX_Ciudades_IdProvincia",
                 table: "Ciudades",
                 column: "IdProvincia");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Dignidades_ProcesoElectoralId",
-                table: "Dignidades",
-                column: "ProcesoElectoralId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_JuntasReceptoras_IdGenero",
@@ -656,14 +645,14 @@ namespace SistemaVotacion.API.Migrations
                 column: "IdPregunta");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Padrones_IdProceso",
+                table: "Padrones",
+                column: "IdProceso");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Padrones_IdVotante",
                 table: "Padrones",
                 column: "IdVotante");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Padrones_ProcesoId",
-                table: "Padrones",
-                column: "ProcesoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Parroquias_IdCiudad",
@@ -671,9 +660,9 @@ namespace SistemaVotacion.API.Migrations
                 column: "IdCiudad");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PreguntasConsultas_ProcesosElectoralesId",
+                name: "IX_PreguntasConsultas_IdProceso",
                 table: "PreguntasConsultas",
-                column: "ProcesosElectoralesId");
+                column: "IdProceso");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProcesosElectorales_IdTipoProceso",
@@ -686,6 +675,16 @@ namespace SistemaVotacion.API.Migrations
                 column: "IdParroquia");
 
             migrationBuilder.CreateIndex(
+                name: "IX_RepresentantesJuntas_IdJunta",
+                table: "RepresentantesJuntas",
+                column: "IdJunta");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RepresentantesJuntas_IdProceso",
+                table: "RepresentantesJuntas",
+                column: "IdProceso");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RepresentantesJuntas_IdRol",
                 table: "RepresentantesJuntas",
                 column: "IdRol");
@@ -696,19 +695,9 @@ namespace SistemaVotacion.API.Migrations
                 column: "IdUsuario");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RepresentantesJuntas_JuntaId",
-                table: "RepresentantesJuntas",
-                column: "JuntaId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RepresentantesJuntas_ProcesoId",
-                table: "RepresentantesJuntas",
-                column: "ProcesoId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ResultadosDetallesAuditorias_ActaId",
+                name: "IX_ResultadosDetallesAuditorias_IdActa",
                 table: "ResultadosDetallesAuditorias",
-                column: "ActaId");
+                column: "IdActa");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ResultadosDetallesAuditorias_IdLista",
@@ -746,34 +735,34 @@ namespace SistemaVotacion.API.Migrations
                 column: "IdDignidad");
 
             migrationBuilder.CreateIndex(
+                name: "IX_VotoDetalles_IdJunta",
+                table: "VotoDetalles",
+                column: "IdJunta");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_VotoDetalles_IdLista",
                 table: "VotoDetalles",
                 column: "IdLista");
 
             migrationBuilder.CreateIndex(
+                name: "IX_VotoDetalles_IdOpcion",
+                table: "VotoDetalles",
+                column: "IdOpcion");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VotoDetalles_IdPregunta",
+                table: "VotoDetalles",
+                column: "IdPregunta");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VotoDetalles_IdProceso",
+                table: "VotoDetalles",
+                column: "IdProceso");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_VotoDetalles_IdTipoVoto",
                 table: "VotoDetalles",
                 column: "IdTipoVoto");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_VotoDetalles_JuntaId",
-                table: "VotoDetalles",
-                column: "JuntaId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_VotoDetalles_OpcionId",
-                table: "VotoDetalles",
-                column: "OpcionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_VotoDetalles_PreguntaId",
-                table: "VotoDetalles",
-                column: "PreguntaId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_VotoDetalles_ProcesoId",
-                table: "VotoDetalles",
-                column: "ProcesoId");
         }
 
         /// <inheritdoc />

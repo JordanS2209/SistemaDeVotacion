@@ -19,11 +19,11 @@ namespace SistemaVotacion.Modelos
         public string? CodigoAcceso { get; set; }
 
 
-        [Required, ForeignKey("ProcesoElectoral")]
+        [Required, ForeignKey(nameof(Proceso))]
         public int IdProceso { get; set; }
 
 
-        [Required, ForeignKey("Votante")]
+        [Required, ForeignKey(nameof(Votante))]
         public int IdVotante { get; set; }
 
 

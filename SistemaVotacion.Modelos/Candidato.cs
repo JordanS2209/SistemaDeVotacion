@@ -17,10 +17,10 @@ namespace SistemaVotacion.Modelos
         public string NombreCandidato { get; set; }
 
 
-        [Required, ForeignKey("Lista")]
+        [Required, ForeignKey(nameof(Lista))]
         public int IdLista { get; set; }
 
-        [Required, ForeignKey("Dignidad")]
+        [Required, ForeignKey(nameof(Dignidad))]
         public int IdDignidad { get; set; }
 
         public  Lista? Lista { get; set; }

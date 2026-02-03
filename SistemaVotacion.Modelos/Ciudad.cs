@@ -16,7 +16,7 @@ namespace SistemaVotacion.Modelos
         
         public string NombreCiudad{ get; set; }
 
-        [Required, ForeignKey("Provincia")]
+        [Required, ForeignKey(nameof(Provincia))]
         public int IdProvincia { get; set; }
 
         public  Provincia? Provincia { get; set; }

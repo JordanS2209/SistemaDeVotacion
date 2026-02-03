@@ -1,0 +1,46 @@
+﻿@model SistemaVotacion.Modelos.Lista
+
+@{
+    ViewData["Title"] = "DetailsLista";
+}
+
+<h1>DetailsLista</h1>
+
+<div>
+    <h4>Lista</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.NombreLista)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.NombreLista)
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.NumeroLista)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.NumeroLista)
+        </dd>
+
+        <dt class="col-sm-2">
+            Proceso Electoral
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Proceso?.NombreProceso
+        </dd>
+    </dl>
+</div>
+
+<div>
+    @Html.ActionLink("Edit", "EditLista", new { id = Model.Id }) |
+    <a asp-action="ListLista">Back to List</a>
+</div>

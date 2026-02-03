@@ -25,15 +25,15 @@ namespace SistemaVotacion.API.Controllers
         {
             try
             {
-                // Incluimos el Proceso Electoral para saber a qué consulta pertenece cada pregunta
                 var preguntas = await _context.PreguntasConsultas
-                    .Include(p => p.ProcesosElectorales)
+                    .Include(p => p.ProcesosElectorales) // Para mostrar info del proceso
+                    .Include(p => p.OpcionesConsulta)    // Para incluir opciones
                     .ToListAsync();
                 return Ok(preguntas);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error al obtener preguntas de consulta: {ex.Message}");
+                Console.WriteLine($"Error al obtener preguntas: {ex.Message}");
                 return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
@@ -46,13 +46,13 @@ namespace SistemaVotacion.API.Controllers
             {
                 var pregunta = await _context.PreguntasConsultas
                     .Include(p => p.ProcesosElectorales)
-                    .Include(p => p.OpcionesConsulta) 
+                    .Include(p => p.OpcionesConsulta)
                     .Include(p => p.VotosRecibidos)
                     .FirstOrDefaultAsync(p => p.Id == id);
 
                 if (pregunta == null)
                 {
-                    return NotFound($"No se encontró la pregunta de consulta con ID {id}.");
+                    return NotFound($"No se encontró la pregunta con ID {id}.");
                 }
 
                 return Ok(pregunta);
@@ -78,13 +78,13 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-                return NoContent(); 
+                return NoContent();
             }
             catch (DbUpdateConcurrencyException)
             {
                 if (!PreguntaConsultaExists(id))
                 {
-                    return NotFound("La pregunta de consulta no existe.");
+                    return NotFound("La pregunta no existe.");
                 }
                 else
                 {
@@ -93,7 +93,7 @@ namespace SistemaVotacion.API.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error al actualizar la pregunta: {ex.Message}");
+                Console.WriteLine($"Error al actualizar pregunta: {ex.Message}");
                 return StatusCode(500, $"Error al actualizar: {ex.Message}");
             }
         }
@@ -111,8 +111,8 @@ namespace SistemaVotacion.API.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error al crear la pregunta de consulta: {ex.Message}");
-                return StatusCode(500, $"Error al guardar: {ex.Message}");
+                Console.WriteLine($"Error al crear pregunta: {ex.Message}");
+                return StatusCode(500, $"Error al guardar la pregunta: {ex.Message}");
             }
         }
 
@@ -125,7 +125,7 @@ namespace SistemaVotacion.API.Controllers
                 var pregunta = await _context.PreguntasConsultas.FindAsync(id);
                 if (pregunta == null)
                 {
-                    return NotFound("Pregunta de consulta no encontrada.");
+                    return NotFound("Pregunta no encontrada.");
                 }
 
                 _context.PreguntasConsultas.Remove(pregunta);
@@ -135,7 +135,7 @@ namespace SistemaVotacion.API.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error al eliminar la pregunta: {ex.Message}");
+                Console.WriteLine($"Error al eliminar pregunta: {ex.Message}");
                 return StatusCode(500, $"Error al eliminar: {ex.Message}");
             }
         }

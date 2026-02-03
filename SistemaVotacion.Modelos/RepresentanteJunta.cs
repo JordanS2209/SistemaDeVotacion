@@ -14,19 +14,19 @@ namespace SistemaVotacion.Modelos
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [Required, ForeignKey("Usuario")]
+        [Required, ForeignKey(nameof(Usuario))]
         public int IdUsuario { get; set; }
 
 
-        [Required, ForeignKey("JuntaReceptora")]
+        [Required, ForeignKey(nameof(Junta))]
         public int IdJunta { get; set; }
 
 
-        [Required, ForeignKey("Rol")]
+        [Required, ForeignKey(nameof(Rol))]
         public int IdRol { get; set; }
 
 
-        [Required, ForeignKey("ProcesoElectoral")]
+        [Required, ForeignKey(nameof(Proceso))]
         public int IdProceso { get; set; }
 
         public  Usuario? Usuario { get; set; }

@@ -18,8 +18,7 @@ namespace SistemaVotacion.Modelos
 
         public int NumeroPregunta { get; set; }
 
-
-        [Required, ForeignKey("ProcesoElectoral")]
+        [Required, ForeignKey(nameof(ProcesosElectorales))]
         public int IdProceso { get; set; }
 
         public  ProcesoElectoral? ProcesosElectorales { get; set; } 

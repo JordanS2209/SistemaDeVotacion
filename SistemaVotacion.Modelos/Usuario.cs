@@ -26,17 +26,17 @@ namespace SistemaVotacion.Modelos
 
         public bool? CuentaBloqueada { get; set; }
 
-        [Required, ForeignKey("Rol")]
+        [Required, ForeignKey(nameof(Rol))]
         public int IdRol { get; set; }
 
 
-        [Required, ForeignKey("TipoIdentificacion")]
+        [Required, ForeignKey(nameof(TipoIdentificacion))]
         public int IdTipoIdentificacion { get; set; }
 
         public string NumeroIdentificacion { get; set; }
 
 
-        [Required, ForeignKey("Genero")]
+        [Required, ForeignKey(nameof(Genero))]
         public int IdGenero { get; set; }
 
         public string CodigoDactilar { get; set; }

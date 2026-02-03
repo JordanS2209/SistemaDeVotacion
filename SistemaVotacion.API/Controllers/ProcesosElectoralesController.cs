@@ -48,7 +48,6 @@ namespace SistemaVotacion.API.Controllers
                     .Include(p => p.TipoProceso)
                     .Include(p => p.PadronElectoral)
                     .Include(p => p.ListasParticipantes)
-                    .Include(p => p.DignidadesAElegir)
                     .Include(p => p.PreguntasConsulta)
                     .Include(p => p.VotoDetallados)
                     .Include(p => p.RepresentantesMesas)

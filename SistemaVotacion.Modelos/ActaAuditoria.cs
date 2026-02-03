@@ -15,10 +15,10 @@ namespace SistemaVotacion.Modelos
         public int Id { get; set; }
 
 
-        [Required, ForeignKey("ProcesoElectoral")]
+        [Required, ForeignKey(nameof(Procesos))]
         public int IdProceso { get; set; }
 
-        [Required, ForeignKey("JuntaReceptora")]
+        [Required, ForeignKey(nameof(Juntas))]
         public int IdJunta { get; set; }
 
         public int TotalSufragantesPadron { get; set; }

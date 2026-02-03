@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemaVotacion.Modelos;
+using System.Text.Json;
 
 namespace SistemaVotacion.API.Controllers
 {
@@ -107,19 +108,26 @@ namespace SistemaVotacion.API.Controllers
 
         // POST: api/VotoDetalles
         [HttpPost]
-        public async Task<ActionResult<VotoDetalle>> PostVotoDetalle(VotoDetalle voto)
+        public async Task<IActionResult> PostVotoDetalle(VotoDetalle voto)
         {
             try
             {
+                if (voto.IdProceso <= 0 || voto.IdPregunta <= 0)
+                {
+                    return BadRequest("Datos de voto incompletos.");
+                }
+
+                // Si no marcó opción → voto nulo
+                voto.IdTipoVoto = voto.IdOpcion == null ? 2 : 1;
+
                 _context.VotoDetalles.Add(voto);
                 await _context.SaveChangesAsync();
 
-                return CreatedAtAction(nameof(GetVotoDetalle), new { id = voto.Id }, voto);
+                return Ok(voto);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error al crear detalle de voto: {ex.Message}");
-                return StatusCode(500, $"Error al guardar: {ex.Message}");
+                return StatusCode(500, $"Error al registrar el voto: {ex.Message}");
             }
         }
 
@@ -168,6 +176,62 @@ namespace SistemaVotacion.API.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(new { mensaje = "Voto registrado correctamente" });
+        }
+
+        [HttpPost("registrar-consulta-simple")]
+        public async Task<IActionResult> RegistrarConsultaSimple([FromBody] JsonElement body)
+        {
+            if (!body.TryGetProperty("idProceso", out var idProcesoProp) ||
+                !body.TryGetProperty("idPregunta", out var idPreguntaProp) ||
+                !body.TryGetProperty("idOpcion", out var idOpcionProp) ||
+                !body.TryGetProperty("idPadron", out var idPadronProp))
+            {
+                return BadRequest("Datos incompletos.");
+            }
+
+            var idProceso = idProcesoProp.GetInt32();
+            var idPregunta = idPreguntaProp.GetInt32();
+            var idOpcion = idOpcionProp.GetInt32();
+            var idPadron = idPadronProp.GetInt32();
+
+            var padron = await _context.Padrones
+                .Include(p => p.Votante)
+                .FirstOrDefaultAsync(p => p.Id == idPadron);
+
+            if (padron == null || padron.HaVotado)
+                return BadRequest("Padrón inválido.");
+
+            var idJunta = padron.Votante?.IdJunta ?? 0;
+            if (idJunta <= 0)
+                return BadRequest("Junta inválida.");
+
+            var idLista = await _context.Listas
+                .Where(l => l.IdProceso == idProceso)
+                .Select(l => l.Id)
+                .FirstOrDefaultAsync();
+
+            var idDignidad = await _context.Dignidades
+                .Select(d => d.Id)
+                .FirstOrDefaultAsync();
+
+            if (idLista <= 0 || idDignidad <= 0)
+                return BadRequest("Faltan Lista o Dignidad base.");
+
+            var voto = new VotoDetalle
+            {
+                IdProceso = idProceso,
+                IdPregunta = idPregunta,
+                IdOpcion = idOpcion,
+                IdJunta = idJunta,
+                IdTipoVoto = 1,
+                IdLista = idLista,
+                IdDignidad = idDignidad
+            };
+
+            _context.VotoDetalles.Add(voto);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { mensaje = "Respuesta registrada" });
         }
 
         private bool VotoDetalleExists(int id)

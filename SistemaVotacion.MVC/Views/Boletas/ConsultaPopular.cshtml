@@ -1,0 +1,42 @@
+﻿@using SistemaVotacion.Modelos
+@{
+    ViewData["Title"] = "Consulta Popular";
+
+    var preguntas = ViewBag.Preguntas as List<PreguntaConsulta> ?? new List<PreguntaConsulta>();
+    var opciones = ViewBag.Opciones as List<OpcionConsulta> ?? new List<OpcionConsulta>();
+    int idProceso = ViewBag.IdProceso;
+    int idPadron = ViewBag.IdPadron;
+}
+
+<link rel="stylesheet" href="~/css/ConsultaPopular.css" />
+
+<h2 class="titulo-principal">Consulta Popular</h2>
+
+<form method="post" asp-action="Votar">
+    <input type="hidden" name="IdProceso" value="@idProceso" />
+    <input type="hidden" name="IdPadron" value="@idPadron" />
+
+    @foreach (var pregunta in preguntas)
+    {
+        <div class="pregunta-card">
+            <h4>@pregunta.NumeroPregunta. @pregunta.TextoPregunta</h4>
+
+            <div class="opciones">
+                @foreach (var op in opciones.Where(o => o.IdPregunta == pregunta.Id))
+                {
+                    <label>
+                        <input type="radio"
+                               name="respuestas[@pregunta.Id]"
+                               value="@op.Id"
+                               required />
+                        @op.TextoOpcion
+                    </label>
+                }
+            </div>
+        </div>
+    }
+
+    <button type="submit" class="btn-votar">
+        VOTAR
+    </button>
+</form>

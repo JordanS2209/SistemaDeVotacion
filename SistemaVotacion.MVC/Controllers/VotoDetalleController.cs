@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Net.Http;
+using Newtonsoft.Json;
+using SistemaVotacion.Modelos;
+using System.Net.Http.Json;
 
 namespace SistemaVotacion.MVC.Controllers
 {
@@ -11,7 +13,7 @@ namespace SistemaVotacion.MVC.Controllers
             client.BaseAddress = new Uri("https://localhost:7202/");
 
             string data = "{}";
-            string provincias = "[]";
+            string provincias = "[]";           
 
             try
             {

@@ -144,6 +144,65 @@ namespace SistemaVotacion.API.Controllers
             }
         }
 
+
+        // GET: api/ProcesosElectorales/activo
+        [HttpGet("activo")]
+        public async Task<ActionResult<ProcesoElectoral>> GetProcesoElectoralActivo()
+        {
+            try
+            {
+                var ahora = DateTime.Now;
+
+                // 1️⃣ Obtener procesos activos por fecha
+                var procesosActivos = await _context.ProcesosElectorales
+                    .Include(p => p.TipoProceso)
+                    .Where(p =>
+                        ahora >= p.FechaInicio &&
+                        ahora <= p.FechaFin
+                    )
+                    .ToListAsync();
+
+                if (!procesosActivos.Any())
+                {
+                    return NotFound("No existe ningún proceso electoral activo.");
+                }
+
+                // 2️⃣ PRIORIDAD 1: ELECCIONES GENERALES
+                var eleccionesGenerales = procesosActivos
+                    .FirstOrDefault(p => p.IdTipoProceso == 1);
+
+                if (eleccionesGenerales != null)
+                {
+                    return Ok(eleccionesGenerales);
+                }
+
+                // 3️⃣ PRIORIDAD 2: ELECCIONES SECCIONALES
+                var eleccionesSeccionales = procesosActivos
+                    .FirstOrDefault(p => p.IdTipoProceso == 3);
+
+                if (eleccionesSeccionales != null)
+                {
+                    return Ok(eleccionesSeccionales);
+                }
+
+                // 4️⃣ PRIORIDAD 3: CONSULTA POPULAR
+                var consultaPopular = procesosActivos
+                    .FirstOrDefault(p => p.IdTipoProceso == 2);
+
+                if (consultaPopular != null)
+                {
+                    return Ok(consultaPopular);
+                }
+
+                // 5️⃣ Fallback (seguridad)
+                return Ok(procesosActivos.First());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al obtener proceso activo: {ex.Message}");
+            }
+        }
+
         private bool ProcesoElectoralExists(int id)
         {
             return _context.ProcesosElectorales.Any(e => e.Id == id);

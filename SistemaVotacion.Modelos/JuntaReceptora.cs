@@ -21,7 +21,8 @@ namespace SistemaVotacion.Modelos
         public int IdGenero { get; set; }
 
 
-        [Required, ForeignKey("RecintoElectoral")]
+        [Required]
+        [ForeignKey(nameof(Recintos))]
         public int IdRecinto { get; set; }
 
         public  Genero? Genero { get; set; }

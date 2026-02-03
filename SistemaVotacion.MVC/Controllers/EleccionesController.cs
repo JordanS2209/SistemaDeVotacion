@@ -18,6 +18,163 @@ namespace SistemaVotacion.MVC.Controllers
         {
             return View();
         }
+        // proceso electoral - crud 
+
+        private List<SelectListItem> GetTipoProceso()
+        {
+            return Crud<TipoProceso>.GetAll()
+                .Select(tp => new SelectListItem
+                {
+                    Value = tp.Id.ToString(),
+                    Text = tp.NombreTipoProceso
+                })
+                .ToList();
+        }
+
+        public IActionResult ListProcesoElectoral()
+        {
+            try
+            {
+                var procesoElectoral = Crud<ProcesoElectoral>.GetAll();
+                return View(procesoElectoral);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
+                return View(new List<ProcesoElectoral>());
+            }
+        }
+        public IActionResult DetailsProcesoElectoral(int id)
+        {
+            try
+            {
+                var procesoElectoral = Crud<ProcesoElectoral>.GetById(id);
+                if (procesoElectoral == null)
+                    return NotFound();
+
+                return View(procesoElectoral);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
+                return View();
+            }
+        }
+        public IActionResult CreateProcesoElectoral()
+        {
+            ViewBag.TipoProceso = GetTipoProceso();
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CreateProcesoElectoral(ProcesoElectoral nuevoProcesoElectoral)
+        {
+            // Validación lógica mínima
+            if (nuevoProcesoElectoral.FechaInicio >= nuevoProcesoElectoral.FechaFin)
+            {
+                ModelState.AddModelError("", "La fecha de inicio debe ser menor a la fecha de fin.");
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    Crud<ProcesoElectoral>.Create(nuevoProcesoElectoral);
+                    return RedirectToAction(nameof(ListProcesoElectoral));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error al crear: " + ex.Message);
+                }
+            }
+
+            // IMPORTANTE: volver a cargar el dropdown
+            ViewBag.TipoProceso = GetTipoProceso();
+            return View(nuevoProcesoElectoral);
+        }
+
+        public IActionResult EditProcesoElectoral(int id)
+        {
+            try
+            {
+                var procesoElectoral = Crud<ProcesoElectoral>.GetById(id);
+                if (procesoElectoral == null)
+                    return NotFound();
+
+                ViewBag.TipoProceso = GetTipoProceso();
+                return View(procesoElectoral);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
+                return View();
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditProcesoElectoral(int id, ProcesoElectoral procesoElectoral)
+        {
+            if (procesoElectoral.FechaInicio >= procesoElectoral.FechaFin)
+            {
+                ModelState.AddModelError("", "La fecha de inicio debe ser menor a la fecha de fin.");
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    Crud<ProcesoElectoral>.Update(id, procesoElectoral);
+                    return RedirectToAction(nameof(ListProcesoElectoral));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error al actualizar: " + ex.Message);
+                }
+            }
+
+            ViewBag.TipoProceso = GetTipoProceso();
+            return View(procesoElectoral);
+        }
+
+
+        public IActionResult DeleteProcesoElectoral(int id)
+        {
+            try
+            {
+                var procesoElectoral = Crud<ProcesoElectoral>.GetById(id);
+                if (procesoElectoral == null)
+                    return NotFound();
+
+                return View(procesoElectoral);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
+                return View();
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteProcesoElectoral(int id, ProcesoElectoral procesoElectoral)
+        {
+            try
+            {
+                Crud<ProcesoElectoral>.Delete(id);
+                return RedirectToAction(nameof(ListProcesoElectoral));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Error al eliminar: " + ex.Message);
+                return View(procesoElectoral);
+            }
+        }
+
+
+
+
+
 
         // TIPO DE PROCESOS - CRUD
         //index
@@ -586,110 +743,7 @@ namespace SistemaVotacion.MVC.Controllers
                 return View(preguntaConsultaData);
             }
         }
-        // PROCESO ELECTORAL - CRUD
-        public IActionResult ListProcesoElectoral()
-        {
-            try
-            {
-                var procesoElectoralData = Crud<ProcesoElectoral>.GetAll();
-                return View(procesoElectoralData);
-
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View(new List<object>());
-            }
-
-        }
-        public IActionResult DetailsProcesoElectoral(int id)
-        {
-            try
-            {
-                var procesoElectoralData = Crud<ProcesoElectoral>.GetById(id);
-                return View(procesoElectoralData);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View();
-            }
-        }
-        public IActionResult CreateProcesoElectoral()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult CreateProcesoElectoral(ProcesoElectoral nuevoProcesoElectoral)
-        {
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    Crud<ProcesoElectoral>.Create(nuevoProcesoElectoral);
-                    return RedirectToAction(nameof(ListProcesoElectoral));
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", "Error: " + ex.Message);
-
-                }
-            }
-            return View(nuevoProcesoElectoral);
-
-        }
-        public IActionResult EditProcesoElectoral(int id)
-        {
-            try
-            {
-                var procesoElectoralData = Crud<ProcesoElectoral>.GetById(id);
-                return View(procesoElectoralData);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View(id);
-            }
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult EditProcesoElectoral(int id, ProcesoElectoral procesoElectoralData)
-        {
-            try
-            {
-                Crud<ProcesoElectoral>.Update(id, procesoElectoralData);
-                return RedirectToAction(nameof(ListProcesoElectoral));
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", "Error: " + ex.Message);
-                return View(procesoElectoralData);
-            }
-        }
-
-        public IActionResult DeleteProcesoElectoral(int id)
-        {
-            var procesoElectoralData = Crud<ProcesoElectoral>.GetById(id);
-            return View(procesoElectoralData);
-        }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult DeleteProcesoElectoral(int id, ProcesoElectoral procesoElectoralData)
-        {
-            try
-            {
-                Crud<ProcesoElectoral>.Delete(id);
-                return RedirectToAction(nameof(ListProcesoElectoral));
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", "Error: " + ex.Message);
-                return View(procesoElectoralData);
-            }
-        }
+        
         // Lista-Crud
         public IActionResult ListLista()
         {

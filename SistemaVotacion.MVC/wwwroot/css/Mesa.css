@@ -1,0 +1,115 @@
+:root {
+    --primary: #6d6cff;
+    --accent: #34c5f8;
+    --bg: #0b0f2a;
+    --bg-2: #141a3a;
+    --card: rgba(20, 26, 58, 0.85);
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+    --border: rgba(109, 108, 255, 0.35);
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+    color: var(--text);
+    background:
+        radial-gradient(1200px 600px at 10% 10%, rgba(109, 108, 255, 0.25), transparent 60%),
+        radial-gradient(900px 500px at 90% 20%, rgba(52, 197, 248, 0.2), transparent 55%),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+}
+
+.mesa-container {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 32px;
+}
+
+.mesa-card {
+    width: min(640px, 94vw);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    text-align: center;
+}
+
+.mesa-card h2 {
+    margin: 0 0 20px;
+    font-size: 1.6rem;
+}
+
+.mesa-form {
+    display: grid;
+    gap: 12px;
+}
+
+.mesa-form label {
+    color: var(--muted);
+    font-size: 0.95rem;
+    text-align: left;
+}
+
+.mesa-form input {
+    width: 100%;
+    padding: 14px 18px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    font-size: 1.05rem;
+    color: var(--text);
+    background: rgba(11, 15, 42, 0.6);
+    outline: none;
+}
+
+.mesa-form input::placeholder { color: var(--muted); }
+
+.mesa-form input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(52, 197, 248, 0.2);
+}
+
+.mesa-form button,
+.mesa-btn-ok {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    color: #fff;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+}
+
+.mesa-form button:hover,
+.mesa-btn-ok:hover {
+    box-shadow: 0 12px 30px rgba(109, 108, 255, 0.35);
+}
+
+.mesa-alert {
+    margin-top: 16px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    text-align: left;
+}
+
+.mesa-error {
+    background: rgba(239, 68, 68, 0.15);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.mesa-warn {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fde68a;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.mesa-habilitar {
+    margin-top: 16px;
+    display: grid;
+}

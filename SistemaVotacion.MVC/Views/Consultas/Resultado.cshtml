@@ -1,0 +1,49 @@
+﻿@model SistemaVotacion.Modelos.Usuario
+@{
+    ViewData["Title"] = "Mi Información Electoral";
+    var infoVotante = Model.PerfilesVotante?.FirstOrDefault();
+}
+
+<div class="container mt-4">
+    <div class="card border-primary shadow">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Información del Ciudadano</h4>
+        </div>
+        <div class="card-body">
+            <h2 class="text-primary">@Model.Nombres @Model.Apellidos</h2>
+            <p class="text-muted">Cédula: @Model.NumeroIdentificacion</p>
+            <hr />
+
+            @if (infoVotante?.Junta?.Recintos != null)
+            {
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <h5 class="text-secondary border-bottom pb-2">Ubicación Geográfica</h5>
+                        <p><strong>Provincia:</strong> @infoVotante.Junta.Recintos.Parroquia.Ciudad.Provincia.NombreProvincia</p>
+                        <p><strong>Ciudad:</strong> @infoVotante.Junta.Recintos.Parroquia.Ciudad.NombreCiudad</p>
+                        <p><strong>Parroquia:</strong> @infoVotante.Junta.Recintos.Parroquia.NombreParroquia</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="text-secondary border-bottom pb-2">Datos del Voto</h5>
+                        <p><strong>Recinto:</strong> @infoVotante.Junta.Recintos.NombreRecinto</p>
+                        <p><strong>Junta No:</strong> @infoVotante.Junta.NumeroJunta (@infoVotante.Junta.Genero?.DetalleGenero)</p>
+                        <p><strong>Dirección:</strong> @infoVotante.Junta.Recintos.DireccionRecinto</p>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-3 bg-light border rounded">
+                    <strong>Referencia del Recinto:</strong> @infoVotante.Junta.Recintos.DetalleRecinto
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning">
+                    Usted no tiene una Junta Receptora asignada actualmente.
+                </div>
+            }
+        </div>
+        <div class="card-footer text-center">
+            <a href="@Url.Action("Index", "Consultas")" class="btn btn-outline-secondary">Nueva Consulta</a>
+        </div>
+    </div>
+</div>

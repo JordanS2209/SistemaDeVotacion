@@ -15,10 +15,10 @@ namespace SistemaVotacion.Modelos
         public int Id { get; set; }
 
 
-        [Required, ForeignKey("JuntaReceptora")]
+        [Required,ForeignKey(nameof(Junta))]
         public int IdJunta { get; set; }
 
-         [Required, ForeignKey("Usuario")]
+         [Required, ForeignKey(nameof(Usuario))]
         public int IdUsuario { get; set; }
         public bool Estado { get; set; } = false;
 

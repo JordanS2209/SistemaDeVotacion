@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace SistemaVotacion.API.Migrations
 {
     [DbContext(typeof(SistemaVotacionAPIContext))]
-    [Migration("20260202221003_v05Sotacion")]
-    partial class v05Sotacion
+    [Migration("20260203002156_v08Sotacion")]
+    partial class v08Sotacion
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -175,14 +175,11 @@ namespace SistemaVotacion.API.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("RecintosId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("IdGenero");
 
-                    b.HasIndex("RecintosId");
+                    b.HasIndex("IdRecinto");
 
                     b.ToTable("JuntasReceptoras");
                 });
@@ -644,14 +641,11 @@ namespace SistemaVotacion.API.Migrations
                     b.Property<int>("IdUsuario")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("JuntaId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("IdUsuario");
+                    b.HasIndex("IdJunta");
 
-                    b.HasIndex("JuntaId");
+                    b.HasIndex("IdUsuario");
 
                     b.ToTable("Votantes");
                 });
@@ -782,7 +776,9 @@ namespace SistemaVotacion.API.Migrations
 
                     b.HasOne("SistemaVotacion.Modelos.RecintoElectoral", "Recintos")
                         .WithMany("JuntasReceptoras")
-                        .HasForeignKey("RecintosId");
+                        .HasForeignKey("IdRecinto")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Genero");
 
@@ -966,15 +962,17 @@ namespace SistemaVotacion.API.Migrations
 
             modelBuilder.Entity("SistemaVotacion.Modelos.Votante", b =>
                 {
+                    b.HasOne("SistemaVotacion.Modelos.JuntaReceptora", "Junta")
+                        .WithMany("VotantesAsignados")
+                        .HasForeignKey("IdJunta")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("SistemaVotacion.Modelos.Usuario", "Usuario")
                         .WithMany("PerfilesVotante")
                         .HasForeignKey("IdUsuario")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("SistemaVotacion.Modelos.JuntaReceptora", "Junta")
-                        .WithMany("VotantesAsignados")
-                        .HasForeignKey("JuntaId");
 
                     b.Navigation("Junta");
 

@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace SistemaVotacion.API.Migrations
 {
     /// <inheritdoc />
-    public partial class v05Sotacion : Migration
+    public partial class v08Sotacion : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -334,8 +334,7 @@ namespace SistemaVotacion.API.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     NumeroJunta = table.Column<string>(type: "text", nullable: false),
                     IdGenero = table.Column<int>(type: "integer", nullable: false),
-                    IdRecinto = table.Column<int>(type: "integer", nullable: false),
-                    RecintosId = table.Column<int>(type: "integer", nullable: true)
+                    IdRecinto = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -347,10 +346,11 @@ namespace SistemaVotacion.API.Migrations
                         principalColumn: "IdGenero",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_JuntasReceptoras_RecintosElectorales_RecintosId",
-                        column: x => x.RecintosId,
+                        name: "FK_JuntasReceptoras_RecintosElectorales_IdRecinto",
+                        column: x => x.IdRecinto,
                         principalTable: "RecintosElectorales",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -460,17 +460,17 @@ namespace SistemaVotacion.API.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     IdJunta = table.Column<int>(type: "integer", nullable: false),
                     IdUsuario = table.Column<int>(type: "integer", nullable: false),
-                    Estado = table.Column<bool>(type: "boolean", nullable: false),
-                    JuntaId = table.Column<int>(type: "integer", nullable: true)
+                    Estado = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Votantes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Votantes_JuntasReceptoras_JuntaId",
-                        column: x => x.JuntaId,
+                        name: "FK_Votantes_JuntasReceptoras_IdJunta",
+                        column: x => x.IdJunta,
                         principalTable: "JuntasReceptoras",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Votantes_Usuarios_IdUsuario",
                         column: x => x.IdUsuario,
@@ -631,9 +631,9 @@ namespace SistemaVotacion.API.Migrations
                 column: "IdGenero");
 
             migrationBuilder.CreateIndex(
-                name: "IX_JuntasReceptoras_RecintosId",
+                name: "IX_JuntasReceptoras_IdRecinto",
                 table: "JuntasReceptoras",
-                column: "RecintosId");
+                column: "IdRecinto");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Listas_IdProceso",
@@ -731,14 +731,14 @@ namespace SistemaVotacion.API.Migrations
                 column: "IdTipoIdentificacion");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Votantes_IdJunta",
+                table: "Votantes",
+                column: "IdJunta");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Votantes_IdUsuario",
                 table: "Votantes",
                 column: "IdUsuario");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Votantes_JuntaId",
-                table: "Votantes",
-                column: "JuntaId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_VotoDetalles_IdDignidad",

@@ -68,28 +68,37 @@ namespace SistemaVotacion.API.Controllers
 
         [HttpGet("filtrar")]
         public async Task<ActionResult<IEnumerable<Candidato>>> Filtrar(
-             string? nombre, int? lista, int? dignidad)
+                string? nombre, int? lista, int? dignidad)
         {
-            var query = _context.Candidatos
-                .Include(c => c.Lista)
-                .Include(c => c.Dignidad)
-                .AsQueryable();
+            try
+            {
+                var query = _context.Candidatos
+                    .Include(c => c.Lista)
+                    .Include(c => c.Dignidad)
+                    .AsQueryable();
 
-            if (!string.IsNullOrEmpty(nombre))
-                query = query.Where(c => c.NombreCandidato.Contains(nombre));
+                if (!string.IsNullOrEmpty(nombre))
+                    query = query.Where(c => c.NombreCandidato.Contains(nombre));
 
-            if (lista.HasValue)
-                query = query.Where(c => c.IdLista == lista.Value);
+                if (lista.HasValue)
+                    query = query.Where(c => c.IdLista == lista.Value);
 
-            if (dignidad.HasValue)
-                query = query.Where(c => c.IdDignidad == dignidad.Value);
+                if (dignidad.HasValue)
+                    query = query.Where(c => c.IdDignidad == dignidad.Value);
 
-            var candidatos = await query
-                .OrderBy(c => c.NombreCandidato)
-                .ToListAsync();
+                var candidatos = await query
+                    .OrderBy(c => c.NombreCandidato)
+                    .ToListAsync();
 
-            return Ok(candidatos);
+                return Ok(candidatos);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al filtrar candidatos: {ex.Message}");
+                return StatusCode(500, $"Error interno al filtrar candidatos: {ex.Message}");
+            }
         }
+
 
 
         // PUT: api/Candidatos/5
@@ -97,35 +106,21 @@ namespace SistemaVotacion.API.Controllers
         public async Task<ActionResult<Candidato>> PutCandidato(int id, Candidato candidato)
         {
             if (id != candidato.Id)
-            {
                 return BadRequest("El ID de la URL no coincide con el ID del candidato.");
-            }
+
+            _context.Entry(candidato).State = EntityState.Modified;
 
             try
             {
-                var existente = await _context.Candidatos.FindAsync(id);
-                if (existente == null)
-                    return NotFound();
-
-                existente.NombreCandidato = candidato.NombreCandidato;
-                existente.IdLista = candidato.IdLista;
-                existente.IdDignidad = candidato.IdDignidad;
-
                 await _context.SaveChangesAsync();
                 return NoContent();
-
-
             }
             catch (DbUpdateConcurrencyException)
             {
                 if (!CandidatoExists(id))
-                {
                     return NotFound("El candidato no existe.");
-                }
                 else
-                {
                     throw;
-                }
             }
             catch (Exception ex)
             {
@@ -147,6 +142,7 @@ namespace SistemaVotacion.API.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Error al crear candidato: {ex.Message}");
                 return StatusCode(500, $"Error al guardar el candidato: {ex.Message}");
             }
         }
@@ -159,18 +155,14 @@ namespace SistemaVotacion.API.Controllers
         {
             try
             {
-                var candidato = await _context.Candidatos
-                    .Include(c => c.GaleriaMultimedia)
-                    .FirstOrDefaultAsync(c => c.Id == id);
-
+                var candidato = await _context.Candidatos.FindAsync(id);
                 if (candidato == null)
-                    return NotFound();
+                    return NotFound("Candidato no encontrado.");
 
                 _context.Candidatos.Remove(candidato);
                 await _context.SaveChangesAsync();
 
                 return Ok(candidato);
-
             }
             catch (Exception ex)
             {

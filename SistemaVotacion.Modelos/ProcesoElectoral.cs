@@ -22,7 +22,7 @@ namespace SistemaVotacion.Modelos
         public DateTime FechaFin { get; set; }
 
 
-        [Required, ForeignKey("TipoProceso")]
+        [Required, ForeignKey(nameof(TipoProceso))]
         public int IdTipoProceso { get; set; }
 
 
@@ -30,7 +30,6 @@ namespace SistemaVotacion.Modelos
 
         public  List<Padron>? PadronElectoral { get; set; } 
         public  List<Lista>? ListasParticipantes { get; set; }
-        public  List<Dignidad>? DignidadesAElegir { get; set; } 
         public  List<PreguntaConsulta>? PreguntasConsulta { get; set; }
         public  List<VotoDetalle>? VotoDetallados { get; set; } 
         public  List<RepresentanteJunta>? RepresentantesMesas { get; set; } 

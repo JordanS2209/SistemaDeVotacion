@@ -17,12 +17,11 @@ namespace SistemaVotacion.Modelos
         public string NumeroJunta { get; set; }
 
 
-        [Required, ForeignKey("Genero")]
+        [Required, ForeignKey(nameof(Genero))]
         public int IdGenero { get; set; }
 
 
-        [Required]
-        [ForeignKey(nameof(Recintos))]
+        [Required, ForeignKey(nameof(Recintos))]
         public int IdRecinto { get; set; }
 
         public  Genero? Genero { get; set; }

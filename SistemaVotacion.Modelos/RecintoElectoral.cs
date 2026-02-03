@@ -20,8 +20,7 @@ namespace SistemaVotacion.Modelos
         
         public string? DireccionRecinto { get; set; }
 
-
-        [Required, ForeignKey("Parroquia")]
+        [Required, ForeignKey(nameof(Parroquia))]
         public int IdParroquia { get; set; }
 
         public Parroquia? Parroquia { get; set; }

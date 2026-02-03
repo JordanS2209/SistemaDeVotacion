@@ -15,31 +15,31 @@ namespace SistemaVotacion.Modelos
         public int Id{ get; set; }
 
 
-        [Required, ForeignKey("TipoVoto")]
+        [Required, ForeignKey(nameof(TipoVoto))]
         public int IdTipoVoto { get; set; }
 
 
-        [Required, ForeignKey("JuntaReceptora")]
+        [Required, ForeignKey(nameof(Junta))]
         public int IdJunta { get; set; }
 
 
-        [Required, ForeignKey("ProcesoElectoral")]
+        [Required, ForeignKey(nameof(Proceso))]
         public int IdProceso { get; set; }
 
 
-        [Required, ForeignKey("Lista")]
+        [Required, ForeignKey(nameof(Lista))]
         public int? IdLista { get; set; }
 
 
-        [Required, ForeignKey("Dignidad")]
+        [Required, ForeignKey(nameof(Dignidad))]
         public int? IdDignidad { get; set; }
 
 
-        [Required, ForeignKey("OpcionConsulta")]
+        [Required, ForeignKey(nameof(Opcion))]
         public int? IdOpcion { get; set; }
 
 
-        [Required, ForeignKey("PreguntaConsulta")]
+        [Required, ForeignKey(nameof(Pregunta))]
         public int? IdPregunta { get; set; }
 
 

@@ -27,6 +27,7 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 var listas = await _context.Listas
+                    .Include(l => l.Proceso)
                     .Include(l => l.Candidatos)
                         .ThenInclude(c => c.Dignidad)
                     .Include(l => l.Candidatos)
@@ -50,7 +51,7 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 var lista = await _context.Listas
-                    //.Include(l => l.Procesos)
+                    .Include(l => l.Proceso)
                     .Include(l => l.Candidatos)
                         .ThenInclude(c => c.Dignidad)
                     .Include(l => l.Candidatos)
@@ -103,30 +104,49 @@ namespace SistemaVotacion.API.Controllers
                 else
                     throw;
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al actualizar lista: {ex.Message}");
+                return StatusCode(500, $"Error al actualizar: {ex.Message}");
+            }
         }
 
         // POST: api/Listas
         [HttpPost]
         public async Task<ActionResult<Lista>> PostLista(Lista lista)
         {
-            _context.Listas.Add(lista);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetLista), new { id = lista.Id }, lista);
+            try
+            {
+                _context.Listas.Add(lista);
+                await _context.SaveChangesAsync();
+                return CreatedAtAction(nameof(GetLista), new { id = lista.Id }, lista);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al crear lista: {ex.Message}");
+                return StatusCode(500, $"Error al guardar la lista: {ex.Message}");
+            }
         }
 
         // DELETE: api/Listas/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<Lista>> DeleteLista(int id)
         {
-            var lista = await _context.Listas.FindAsync(id);
-            if (lista == null)
-                return NotFound("Lista no encontrada.");
+            try
+            {
+                var lista = await _context.Listas.FindAsync(id);
+                if (lista == null)
+                    return NotFound("Lista no encontrada.");
 
-            _context.Listas.Remove(lista);
-            await _context.SaveChangesAsync();
-
-            return Ok(lista);
+                _context.Listas.Remove(lista);
+                await _context.SaveChangesAsync();
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al eliminar lista: {ex.Message}");
+                return StatusCode(500, $"Error al eliminar: {ex.Message}");
+            }
         }
         // GET: api/Listas/por-proceso/1
         [HttpGet("por-proceso/{idProceso}")]

@@ -31,8 +31,6 @@ public class SistemaVotacionAPIContext : DbContext
     public DbSet<SistemaVotacion.Modelos.Usuario> Usuarios{get;set;} = default!;
     public DbSet<SistemaVotacion.Modelos.Votante> Votantes{get;set;} = default!;
     public DbSet<SistemaVotacion.Modelos.VotoDetalle> VotoDetalles{get;set;} = default!;
-    
-
 }
-   
+
 

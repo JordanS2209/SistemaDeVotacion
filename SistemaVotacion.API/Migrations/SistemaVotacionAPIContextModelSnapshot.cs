@@ -42,14 +42,8 @@ namespace SistemaVotacion.API.Migrations
                     b.Property<int>("IdProceso")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("JuntasId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Observaciones")
                         .HasColumnType("text");
-
-                    b.Property<int?>("ProcesosId")
-                        .HasColumnType("integer");
 
                     b.Property<int>("TotalSufragantesPadron")
                         .HasColumnType("integer");
@@ -59,9 +53,9 @@ namespace SistemaVotacion.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("JuntasId");
+                    b.HasIndex("IdJunta");
 
-                    b.HasIndex("ProcesosId");
+                    b.HasIndex("IdProceso");
 
                     b.ToTable("ActasAuditorias");
                 });
@@ -127,12 +121,7 @@ namespace SistemaVotacion.API.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("ProcesoElectoralId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("ProcesoElectoralId");
 
                     b.ToTable("Dignidades");
                 });
@@ -280,14 +269,11 @@ namespace SistemaVotacion.API.Migrations
                     b.Property<int>("IdVotante")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("ProcesoId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("IdVotante");
+                    b.HasIndex("IdProceso");
 
-                    b.HasIndex("ProcesoId");
+                    b.HasIndex("IdVotante");
 
                     b.ToTable("Padrones");
                 });
@@ -328,16 +314,13 @@ namespace SistemaVotacion.API.Migrations
                     b.Property<int>("NumeroPregunta")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("ProcesosElectoralesId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("TextoPregunta")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProcesosElectoralesId");
+                    b.HasIndex("IdProceso");
 
                     b.ToTable("PreguntasConsultas");
                 });
@@ -436,21 +419,15 @@ namespace SistemaVotacion.API.Migrations
                     b.Property<int>("IdUsuario")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("JuntaId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("ProcesoId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("IdJunta");
+
+                    b.HasIndex("IdProceso");
 
                     b.HasIndex("IdRol");
 
                     b.HasIndex("IdUsuario");
-
-                    b.HasIndex("JuntaId");
-
-                    b.HasIndex("ProcesoId");
 
                     b.ToTable("RepresentantesJuntas");
                 });
@@ -462,9 +439,6 @@ namespace SistemaVotacion.API.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("ActaId")
-                        .HasColumnType("integer");
 
                     b.Property<int>("IdActa")
                         .HasColumnType("integer");
@@ -478,7 +452,7 @@ namespace SistemaVotacion.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ActaId");
+                    b.HasIndex("IdActa");
 
                     b.HasIndex("IdLista");
 
@@ -680,33 +654,21 @@ namespace SistemaVotacion.API.Migrations
                     b.Property<int>("IdTipoVoto")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("JuntaId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("OpcionId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("PreguntaId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("ProcesoId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("IdDignidad");
 
+                    b.HasIndex("IdJunta");
+
                     b.HasIndex("IdLista");
 
+                    b.HasIndex("IdOpcion");
+
+                    b.HasIndex("IdPregunta");
+
+                    b.HasIndex("IdProceso");
+
                     b.HasIndex("IdTipoVoto");
-
-                    b.HasIndex("JuntaId");
-
-                    b.HasIndex("OpcionId");
-
-                    b.HasIndex("PreguntaId");
-
-                    b.HasIndex("ProcesoId");
 
                     b.ToTable("VotoDetalles");
                 });
@@ -715,11 +677,15 @@ namespace SistemaVotacion.API.Migrations
                 {
                     b.HasOne("SistemaVotacion.Modelos.JuntaReceptora", "Juntas")
                         .WithMany("ActasCierre")
-                        .HasForeignKey("JuntasId");
+                        .HasForeignKey("IdJunta")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("SistemaVotacion.Modelos.ProcesoElectoral", "Procesos")
                         .WithMany("ActasGeneradas")
-                        .HasForeignKey("ProcesosId");
+                        .HasForeignKey("IdProceso")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Juntas");
 
@@ -754,13 +720,6 @@ namespace SistemaVotacion.API.Migrations
                         .IsRequired();
 
                     b.Navigation("Provincia");
-                });
-
-            modelBuilder.Entity("SistemaVotacion.Modelos.Dignidad", b =>
-                {
-                    b.HasOne("SistemaVotacion.Modelos.ProcesoElectoral", null)
-                        .WithMany("DignidadesAElegir")
-                        .HasForeignKey("ProcesoElectoralId");
                 });
 
             modelBuilder.Entity("SistemaVotacion.Modelos.JuntaReceptora", b =>
@@ -825,15 +784,17 @@ namespace SistemaVotacion.API.Migrations
 
             modelBuilder.Entity("SistemaVotacion.Modelos.Padron", b =>
                 {
+                    b.HasOne("SistemaVotacion.Modelos.ProcesoElectoral", "Proceso")
+                        .WithMany("PadronElectoral")
+                        .HasForeignKey("IdProceso")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("SistemaVotacion.Modelos.Votante", "Votante")
                         .WithMany("VotantesEnPadron")
                         .HasForeignKey("IdVotante")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("SistemaVotacion.Modelos.ProcesoElectoral", "Proceso")
-                        .WithMany("PadronElectoral")
-                        .HasForeignKey("ProcesoId");
 
                     b.Navigation("Proceso");
 
@@ -855,7 +816,9 @@ namespace SistemaVotacion.API.Migrations
                 {
                     b.HasOne("SistemaVotacion.Modelos.ProcesoElectoral", "ProcesosElectorales")
                         .WithMany("PreguntasConsulta")
-                        .HasForeignKey("ProcesosElectoralesId");
+                        .HasForeignKey("IdProceso")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("ProcesosElectorales");
                 });
@@ -884,6 +847,18 @@ namespace SistemaVotacion.API.Migrations
 
             modelBuilder.Entity("SistemaVotacion.Modelos.RepresentanteJunta", b =>
                 {
+                    b.HasOne("SistemaVotacion.Modelos.JuntaReceptora", "Junta")
+                        .WithMany("Representantes")
+                        .HasForeignKey("IdJunta")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SistemaVotacion.Modelos.ProcesoElectoral", "Proceso")
+                        .WithMany("RepresentantesMesas")
+                        .HasForeignKey("IdProceso")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("SistemaVotacion.Modelos.Rol", "Rol")
                         .WithMany("RepresentantesConEsteRol")
                         .HasForeignKey("IdRol")
@@ -895,14 +870,6 @@ namespace SistemaVotacion.API.Migrations
                         .HasForeignKey("IdUsuario")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("SistemaVotacion.Modelos.JuntaReceptora", "Junta")
-                        .WithMany("Representantes")
-                        .HasForeignKey("JuntaId");
-
-                    b.HasOne("SistemaVotacion.Modelos.ProcesoElectoral", "Proceso")
-                        .WithMany("RepresentantesMesas")
-                        .HasForeignKey("ProcesoId");
 
                     b.Navigation("Junta");
 
@@ -917,7 +884,9 @@ namespace SistemaVotacion.API.Migrations
                 {
                     b.HasOne("SistemaVotacion.Modelos.ActaAuditoria", "Acta")
                         .WithMany("DetallesResultados")
-                        .HasForeignKey("ActaId");
+                        .HasForeignKey("IdActa")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("SistemaVotacion.Modelos.Lista", "Lista")
                         .WithMany()
@@ -984,9 +953,33 @@ namespace SistemaVotacion.API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("SistemaVotacion.Modelos.JuntaReceptora", "Junta")
+                        .WithMany("VotosRecibidos")
+                        .HasForeignKey("IdJunta")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("SistemaVotacion.Modelos.Lista", "Lista")
                         .WithMany("VotosRecibidos")
                         .HasForeignKey("IdLista")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SistemaVotacion.Modelos.OpcionConsulta", "Opcion")
+                        .WithMany("VotosRecibidos")
+                        .HasForeignKey("IdOpcion")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SistemaVotacion.Modelos.PreguntaConsulta", "Pregunta")
+                        .WithMany("VotosRecibidos")
+                        .HasForeignKey("IdPregunta")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SistemaVotacion.Modelos.ProcesoElectoral", "Proceso")
+                        .WithMany("VotoDetallados")
+                        .HasForeignKey("IdProceso")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -995,22 +988,6 @@ namespace SistemaVotacion.API.Migrations
                         .HasForeignKey("IdTipoVoto")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("SistemaVotacion.Modelos.JuntaReceptora", "Junta")
-                        .WithMany("VotosRecibidos")
-                        .HasForeignKey("JuntaId");
-
-                    b.HasOne("SistemaVotacion.Modelos.OpcionConsulta", "Opcion")
-                        .WithMany("VotosRecibidos")
-                        .HasForeignKey("OpcionId");
-
-                    b.HasOne("SistemaVotacion.Modelos.PreguntaConsulta", "Pregunta")
-                        .WithMany("VotosRecibidos")
-                        .HasForeignKey("PreguntaId");
-
-                    b.HasOne("SistemaVotacion.Modelos.ProcesoElectoral", "Proceso")
-                        .WithMany("VotoDetallados")
-                        .HasForeignKey("ProcesoId");
 
                     b.Navigation("Dignidad");
 
@@ -1096,8 +1073,6 @@ namespace SistemaVotacion.API.Migrations
             modelBuilder.Entity("SistemaVotacion.Modelos.ProcesoElectoral", b =>
                 {
                     b.Navigation("ActasGeneradas");
-
-                    b.Navigation("DignidadesAElegir");
 
                     b.Navigation("ListasParticipantes");
 

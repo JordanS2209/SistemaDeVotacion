@@ -1,141 +1,91 @@
 ﻿@{
     ViewData["Title"] = "Inicio - Sistema de Votación";
+    ViewData["HideSidebar"] = true;
 }
 
-<style>
-    body {
-        background-color: #1b263b; 
-        color: white; 
-    }
-
-    html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-    }
-
-</style>
-<br />
-<br />
-<br />
-<br />
-
-<div class="container text-center mt-4">
-    <h1 class="display-4 fw-bold text-white">Bienvenido al Sistema de Votación</h1>
-    <p class="fs-5 text-light opacity-75">Plataforma oficial para procesos electorales</p>
-</div>
-
-<br />
-<br />
-
-<div class="container-fluid px-0 my-4">
-    <div class="row g-0">
-        <div class="col-12">
-            <img src="~/img/Banner.jpg"
-                 class="img-fluid w-100"
-                 alt="Banner Principal"
-                 style="max-height: 500px; max-width:2600px; object-fit: cover;">
+<main role="main">
+    <div id="myCarousel" class="carousel slide shadow-lg" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="1"></button>
         </div>
-    </div>
-</div>
-
-<div class="container mb-5">
-    <div id="carouselExample" class="carousel slide shadow-lg" data-bs-ride="carousel">
-        <div class="carousel-inner rounded">
-
+        <div class="carousel-inner">
             <div class="carousel-item active">
-                <img src="~/img/CuentaBloqueada1.jpg" class="d-block w-100" alt="Soporte Técnico">
-
-                <div class="carousel-caption d-none d-md-block bg-primary bg-opacity-75 rounded p-4"
-                     style="top: 30px; bottom: auto; display: inline-block; width: fit-content; left: 50%; transform: translateX(-50%);">
-
-                    <h2 class="m-0 text-white fw-bold fs-1">¿Cuenta Bloqueada?</h2>
-                    <p class="m-0 text-white fs-4 mt-2 mb-3">Contáctanos directamente por WhatsApp.</p>
-
-                    <a href="https://w.app/cr8lfr"
-                       target="_blank"
-                       class="btn btn-success btn-lg fw-bold rounded-pill shadow">
-                        <i class="bi bi-whatsapp"></i> Chatear ahora
-                    </a>
+                <img src="~/img/CuentaBloqueada1.jpg" alt="Soporte">
+                <div class="container">
+                    <div class="carousel-caption text-start">
+                        <h1 class="display-3 fw-bold">¿Cuenta Bloqueada?</h1>
+                        <p class="lead">Contáctanos por WhatsApp para soporte inmediato.</p>
+                        <p><a class="btn btn-lg btn-success rounded-pill px-4 shadow" href="https://w.app/cr8lfr" target="_blank"><i class="bi bi-whatsapp"></i> Chatear ahora</a></p>
+                    </div>
                 </div>
             </div>
-
             <div class="carousel-item">
-                <a asp-controller="Home" asp-action="Privacy">
-                    <img src="~/img/Banner1.jpg" class="d-block w-100" alt="Proceso Electoral">
-                </a>
-                <div class="carousel-caption d-none d-md-block bg-primary bg-opacity-75 rounded p-4"
-                     style="top: 30px; bottom: auto; display: inline-block; width: fit-content; left: 50%; transform: translateX(-50%);">
-                    <h2 class="m-0 text-white fw-bold fs-1">Proceso Electoral 2026</h2>
-                    <p class="m-0 text-white fs-4 mt-2">Haz clic para más detalles.</p>
+                <img src="~/img/Banner1.jpg" alt="Electoral">
+                <div class="container">
+                    <div class="carousel-caption">
+                        <h1 class="display-3 fw-bold">Elecciones 2026</h1>
+                        <p class="lead">Asegúrate de conocer todos los detalles de este proceso.</p>
+                        <p><a class="btn btn-lg btn-primary shadow" asp-controller="Home" asp-action="Privacy">Ver Información</a></p>
+                    </div>
                 </div>
             </div>
-
-        </div>
-
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon"></span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
-            <span class="carousel-control-next-icon"></span>
-        </button>
-    </div>
-</div>
-
-<footer class="mt-5 py-5 border-top border-secondary border-opacity-25" style="background-color: #0d1b2a; color: #a0aec0;">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-4 text-center text-md-start mb-4 mb-md-0">
-                <h5 class="text-white fw-bold mb-1">Sistema de Votación</h5>
-                <p class="small mb-0">© 2026 - Proceso Electoral Oficial</p>
-                <p class="x-small opacity-50">Desarrollado para la transparencia ciudadana.</p>
-            </div>
-
-            <div class="col-md-4 text-center mb-4 mb-md-0">
-                <ul class="list-inline mb-0">
-                    <a asp-controller="VotoDetalle"
-                       asp-action="Index"
-                       class="btn btn-primary mt-4">
-                        Ver detalles de la votación
-                    </a>
-                    <a asp-controller="Acceso"
-                       asp-action="IngresarCodigo"
-                       class="btn btn-primary mt-4">
-                        Ver detalles de la votación
-                    </a>
-                    <a asp-controller="Mesa"
-                       asp-action="Index"
-                       class="btn btn-primary mt-4">
-                        Ver detalles de la votación
-                    </a>
-                    <a asp-controller="Boletas"
-                       asp-action="ConsultaPopular"
-                       class="btn btn-primary mt-4">
-                        ConsultaPopular
-                    </a>
-                    <li class="list-inline-item">
-                        <a asp-controller="Home" asp-action="Index" class="text-decoration-none text-light opacity-75 small">Inicio</a>
-                    </li>
-                    <li class="list-inline-item mx-2 text-secondary">|</li>
-                    <li class="list-inline-item">
-                        <a asp-controller="Home" asp-action="Privacy" class="text-decoration-none text-light opacity-75 small">Privacidad</a>
-                    </li>
-                    <li class="list-inline-item mx-2 text-secondary">|</li>
-                    <li class="list-inline-item">
-                        <a href="#" class="text-decoration-none text-light opacity-75 small">Ayuda</a>
-                    </li>
-                </ul>
-            </div>
-
-           
-        </div>
-
-        <hr class="my-4 border-secondary border-opacity-25">
-
-        <div class="text-center">
-            <small class="opacity-50">
-                Este sistema cumple con  estándares de seguridad electoral vigentes.
-            </small>
         </div>
     </div>
-</footer>
+
+    <div class="container marketing">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="bg-dark p-4 rounded-circle mx-auto mb-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 140px; height: 140px;">
+                    <i class="bi bi-clipboard-data fs-1 text-primary-custom"></i>
+                </div>
+                <h2>Resultados</h2>
+                <p><a class="btn btn-secondary" asp-controller="VotoDetalle" asp-action="Index">Ver Detalles »</a></p>
+            </div>
+            <div class="col-lg-3">
+                <div class="bg-dark p-4 rounded-circle mx-auto mb-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 140px; height: 140px;">
+                    <i class="bi bi-shield-lock fs-1 text-primary-custom"></i>
+                </div>
+                <h2>Acceso</h2>
+                <p><a class="btn btn-secondary" asp-controller="Acceso" asp-action="IngresarCodigo">Validar »</a></p>
+            </div>
+            <div class="col-lg-3">
+                <div class="bg-dark p-4 rounded-circle mx-auto mb-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 140px; height: 140px;">
+                    <i class="bi bi-geo-alt fs-1 text-primary-custom"></i>
+                </div>
+                <h2>Mesas</h2>
+                <p><a class="btn btn-secondary" asp-controller="Mesa" asp-action="Index">Ir a Mesas »</a></p>
+            </div>
+            <div class="col-lg-3">
+                <div class="bg-dark p-4 rounded-circle mx-auto mb-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 140px; height: 140px;">
+                    <i class="bi bi-file-earmark-ruled fs-1 text-primary-custom"></i>
+                </div>
+                <h2>Boletas</h2>
+                <p><a class="btn btn-secondary" asp-controller="Boletas" asp-action="ConsultaPopular">Ver Boletas »</a></p>
+            </div>
+        </div>
+
+        <hr class="featurette-divider">
+        <div class="row featurette align-items-center">
+            <div class="col-md-7">
+                <h2 class="featurette-heading display-4 fw-bold">Seguridad en tu <span class="text-primary-custom">Voto Digital</span></h2>
+                <p class="lead opacity-75">Encriptación de extremo a extremo para asegurar tu privacidad.</p>
+            </div>
+            <div class="col-md-5">
+                <img src="~/img/Banner.jpg" class="featurette-image img-fluid mx-auto rounded shadow-lg" style="width: 500px; height: 350px; object-fit: cover;">
+            </div>
+        </div>
+
+        <hr class="featurette-divider">
+        <div class="row featurette align-items-center">
+            <div class="col-md-7 order-md-2">
+                <h2 class="featurette-heading display-4 fw-bold">Transparencia <span class="text-primary-custom">Total</span></h2>
+                <p class="lead opacity-75">Monitoreo en tiempo real de la participación ciudadana.</p>
+            </div>
+            <div class="col-md-5 order-md-1">
+                <img src="~/img/Banner.jpg" class="featurette-image img-fluid mx-auto rounded shadow-lg" style="width: 500px; height: 350px; object-fit: cover;">
+            </div>
+        </div>
+        <hr class="featurette-divider">
+    </div>
+</main>

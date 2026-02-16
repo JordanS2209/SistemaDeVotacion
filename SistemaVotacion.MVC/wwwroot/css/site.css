@@ -1,126 +1,137 @@
-/* ========== VARIABLES DE DISEÑO ========== */
+/* ========== VARIABLES DE COLOR ========== */
 :root {
     --sidebar-width: 260px;
-    --primary-blue: #4DBFEB; /* El azul de tu imagen */
-    --dark-main: #1b263b; /* Tu fondo actual */
-    --dark-sidebar: #0d1523; /* Azul casi negro para el sidebar */
-    --dark-navbar: #141d2f; /* Tono intermedio para el navbar */
+    --primary-blue: #4DBFEB; /* Azul brillante */
+    --dark-main: #1b263b; /* Tu fondo azul oscuro */
+    --dark-sidebar: #0d1523; /* Fondo casi negro para el sidebar */
+    --dark-navbar: #141d2f;
     --text-glass: rgba(255, 255, 255, 0.7);
 }
 
 body {
     background-color: var(--dark-main);
     color: white;
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    overflow-x: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
 }
 
-/* ========== ESTRUCTURA ANTI-CHOQUE ========== */
+/* ========== ESTRUCTURA DE MÁRGENES ========== */
 #content-wrapper {
     margin-left: var(--sidebar-width);
     min-height: 100vh;
-    transition: margin-left 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .navbar-custom-offset {
     left: var(--sidebar-width) !important;
     width: calc(100% - var(--sidebar-width)) !important;
     background-color: var(--dark-navbar) !important;
-    border-bottom: 1px solid rgba(77, 191, 235, 0.2);
 }
 
-/* ========== SIDEBAR MODERNO (SIN BLANCO, SIN ROJO) ========== */
+/* REGLAS PARA EL HOME (SIN SIDEBAR) */
+.layout-no-sidebar #content-wrapper {
+    margin-left: 0 !important;
+}
+
+.layout-no-sidebar .navbar-custom-offset {
+    left: 0 !important;
+    width: 100% !important;
+}
+
+/* ========== ESTILOS DEL SIDEBAR ========== */
 .sidebar {
     width: var(--sidebar-width);
     background-color: var(--dark-sidebar);
-    border-right: 1px solid rgba(77, 191, 235, 0.1);
-    /* Reducimos el padding superior de 1.5rem a 0.8rem para "subirlo" */
-    padding: 0.8rem 1rem;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
     position: fixed;
-    top: 0; /* Asegura que inicie pegado al techo de la página */
+    top: 0;
     left: 0;
     height: 100vh;
     z-index: 1050;
-    transition: transform 0.3s ease;
+    padding: 1rem;
 }
 
 .sidebar-header {
     display: flex;
     align-items: center;
     gap: 12px;
-    /* Reducimos el margen inferior para que los links suban también */
-    margin-bottom: 1.5rem;
-    padding: 0 10px;
-    margin-top: 0.5rem; /* Ajuste fino superior */
+    margin-bottom: 2rem;
+    padding: 10px;
 }
 
 .logo-box {
     width: 40px;
     height: 40px;
-    background: var(--primary-blue); /* Caja azul brillante */
-    border-radius: 10px;
+    background: var(--primary-blue);
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--dark-sidebar);
-    box-shadow: 0 0 15px rgba(77, 191, 235, 0.4);
 }
 
-.logo-text h5 {
-    margin: 0;
-    font-weight: 700;
-    font-size: 0.85rem;
-    color: white;
-    line-height: 1.2;
+/* IMPORTANTE: Arreglo de los enlaces */
+.nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
-/* Links del Sidebar */
 .nav-item-sidebar {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 16px;
-    border-radius: 12px;
-    text-decoration: none;
-    color: var(--text-glass);
+    padding: 12px 15px;
+    border-radius: 10px;
+    text-decoration: none !important; /* Quita el subrayado azul */
+    color: var(--text-glass) !important;
     font-weight: 500;
-    margin-bottom: 4px;
-    transition: all 0.3s;
+    transition: all 0.2s;
 }
-
-    .nav-item-sidebar i {
-        font-size: 1.1rem;
-    }
 
     .nav-item-sidebar:hover {
         background: rgba(255, 255, 255, 0.05);
-        color: var(--primary-blue);
+        color: var(--primary-blue) !important;
     }
 
     .nav-item-sidebar.active {
-        background: rgba(77, 191, 235, 0.15); /* Fondo sutil azul */
-        color: var(--primary-blue); /* Texto azul brillante */
+        background: rgba(77, 191, 235, 0.15);
+        color: var(--primary-blue) !important;
         border-left: 4px solid var(--primary-blue);
-        border-radius: 4px 12px 12px 4px;
     }
 
-.navbar-custom-offset {
-    left: var(--sidebar-width) !important;
-    width: calc(100% - var(--sidebar-width)) !important;
-    background-color: var(--dark-navbar) !important;
-    border-bottom: 1px solid rgba(77, 191, 235, 0.2);
-    height: 70px; /* Altura fija para mayor control */
+/* ========== ELEMENTOS DEL HOME (CARRUSEL) ========== */
+.carousel-item {
+    height: 32rem;
 }
 
-/* ========== BOTONES Y COMPONENTES ========== */
-.btn-primary-custom {
-    background-color: var(--primary-blue) !important;
-    border: none;
-    color: var(--dark-sidebar) !important;
-    font-weight: 600;
-    border-radius: 8px;
+    .carousel-item > img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 32rem;
+        object-fit: cover;
+        opacity: 0.6;
+    }
+
+.marketing {
+    margin-top: 5rem;
+    text-align: center;
+}
+
+.featurette-divider {
+    margin: 5rem 0;
+    border-color: rgba(255,255,255,0.1);
 }
 
 .text-primary-custom {
     color: var(--primary-blue) !important;
+}
+
+.btn-primary-custom {
+    background-color: var(--primary-blue) !important;
+    color: #111 !important;
+    border: none;
+    font-weight: bold;
 }

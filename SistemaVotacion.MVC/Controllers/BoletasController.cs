@@ -1,92 +1,107 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SistemaVotacion.ApiConsumer;
-using SistemaVotacion.Modelos;
-using Newtonsoft.Json;
-using System.Net;
-using System.Net.Http.Json;
-using System.Collections.Generic;
-using System.Linq;
+﻿    using Microsoft.AspNetCore.Mvc;
+    using SistemaVotacion.ApiConsumer;
+    using SistemaVotacion.Modelos;
+    using Newtonsoft.Json;
+    using System.Net;
+    using System.Net.Http.Json;
+    using System.Collections.Generic;
+    using System.Linq;
 
-namespace SistemaVotacion.MVC.Controllers
-{
-    public class BoletasController : Controller
+    namespace SistemaVotacion.MVC.Controllers
     {
-        // ================================
-        // ENTRADA ÚNICA AL SISTEMA DE VOTO
-        // ================================
-        [HttpGet]
-        public async Task<IActionResult> Index(string codigo)
+        public class BoletasController : Controller
         {
-            try
+            // ================================
+            // ENTRADA ÚNICA AL SISTEMA DE VOTO
+            // ================================
+            [HttpGet]
+            public async Task<IActionResult> Index(string codigo)
             {
-                using var client = new HttpClient
+                try
                 {
-                    BaseAddress = new Uri("https://localhost:7202/")
-                };
+                    using var client = new HttpClient
+                    {
+                        BaseAddress = new Uri("https://localhost:7202/")
+                    };
 
-                var response = await client.GetAsync("api/ProcesosElectorales/activo");
+                    var response = await client.GetAsync("api/ProcesosElectorales/activo");
 
-                if (response.StatusCode == HttpStatusCode.NotFound)
-                    return View("ProcesoNoDisponible");
+                    if (response.StatusCode == HttpStatusCode.NotFound)
+                        return View("ProcesoNoDisponible");
 
-                if (!response.IsSuccessStatusCode)
-                    return View("ProcesoNoDisponible");
+                    if (!response.IsSuccessStatusCode)
+                        return View("ProcesoNoDisponible");
 
-                var proceso = JsonConvert.DeserializeObject<ProcesoElectoral>(
-                    await response.Content.ReadAsStringAsync()
-                );
+                    var proceso = JsonConvert.DeserializeObject<ProcesoElectoral>(
+                        await response.Content.ReadAsStringAsync()
+                    );
 
-                if (proceso == null)
-                    return View("ProcesoNoDisponible");
+                    if (proceso == null)
+                        return View("ProcesoNoDisponible");
 
-                // REDIRECCIÓN SEGÚN TIPO DE PROCESO
-                return proceso.IdTipoProceso switch
+                    // REDIRECCIÓN SEGÚN TIPO DE PROCESO
+                    return proceso.IdTipoProceso switch
+                    {
+                        1 => RedirigirAEleccionesGenerales(codigo),
+                        2 => RedirectToAction("ConsultaPopular", new { codigo }),
+                        3 => RedirectToAction("EleccionesSeccionales"),
+                        _ => View("ProcesoNoDisponible")
+                    };
+                }
+                catch
                 {
-                    1 => RedirigirAEleccionesGenerales(codigo),
-                    2 => RedirectToAction("ConsultaPopular", new { codigo }),
-                    3 => RedirectToAction("EleccionesSeccionales"),
-                    _ => View("ProcesoNoDisponible")
-                };
+                    return View("ProcesoNoDisponible");
+                }
             }
-            catch
+
+            // ================================
+            // ELECCIONES GENERALES
+            // ================================
+        
+            // POST: Procesar Voto Generales
+            [HttpPost]
+            public async Task<IActionResult> Index(string codigo, int idLista)
             {
-                return View("ProcesoNoDisponible");
+                if (string.IsNullOrWhiteSpace(codigo) || idLista <= 0)
+                {
+                    TempData["Error"] = "Datos de votación inválidos.";
+                    return RedirectToAction("IngresarCodigo", "Acceso");
+                }
+
+                try
+                {
+                    var votoDto = new VotoGeneralDto
+                    {
+                        CodigoAcceso = codigo,
+                        IdLista = idLista
+                    };
+
+                    using var client = new HttpClient
+                    {
+                        BaseAddress = new Uri("https://localhost:7202/")
+                    };
+
+                    var response = await client.PostAsJsonAsync("api/VotoDetalles/votar-general", votoDto);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return RedirectToAction("VotoRealizado");
+                    }
+                    else
+                    {
+                        var msg = await response.Content.ReadAsStringAsync();
+                        TempData["Error"] = $"Error al registrar voto: {msg}";
+                        return RedirectToAction("IngresarCodigo", "Acceso");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TempData["Error"] = "Error de conexión con el servidor.";
+                    return RedirectToAction("IngresarCodigo", "Acceso");
+                }
             }
-        }
 
-        // ================================
-        // ELECCIONES GENERALES
-        // ================================
-        private IActionResult RedirigirAEleccionesGenerales(string codigo)
-        {
-            if (string.IsNullOrWhiteSpace(codigo))
-            {
-                TempData["Error"] = "Debe ingresar un código válido.";
-                return RedirectToAction("IngresarCodigo", "Acceso");
-            }
-
-            ViewBag.Codigo = codigo;
-            var listas = Crud<Lista>.GetAll();
-            return View("Index", listas);
-        }
-
-        // ================================
-        // ELECCIONES SECCIONALES
-        // ================================
-        [HttpGet]
-        public IActionResult EleccionesSeccionales()
-        {
-            var listas = Crud<Lista>.GetAll();
-            return View(listas);
-        }
-
-        // ================================
-        // CONSULTA POPULAR
-        // ================================
-        [HttpGet]
-        public async Task<IActionResult> ConsultaPopular(string codigo)
-        {
-            try
+            private IActionResult RedirigirAEleccionesGenerales(string codigo)
             {
                 if (string.IsNullOrWhiteSpace(codigo))
                 {
@@ -94,118 +109,147 @@ namespace SistemaVotacion.MVC.Controllers
                     return RedirectToAction("IngresarCodigo", "Acceso");
                 }
 
-                using var client = new HttpClient
-                {
-                    BaseAddress = new Uri("https://localhost:7202/")
-                };
-
-                // 1️⃣ Obtener proceso activo
-                var procesoResp = await client.GetAsync("api/ProcesosElectorales/activo");
-                if (!procesoResp.IsSuccessStatusCode)
-                    return View("ProcesoNoDisponible");
-
-                var proceso = JsonConvert.DeserializeObject<ProcesoElectoral>(
-                    await procesoResp.Content.ReadAsStringAsync()
-                );
-
-                // 2️⃣ Validar que sea CONSULTA POPULAR
-                if (proceso == null || proceso.IdTipoProceso != 2)
-                    return View("ProcesoNoDisponible");
-
-                // 3️⃣ Validar padrón por código
-                var padron = Crud<Padron>.GetAll()
-                    .FirstOrDefault(p => p.CodigoAcceso == codigo && p.IdProceso == proceso.Id);
-
-                if (padron == null)
-                    return View("ProcesoNoDisponible");
-
-                if (padron.HaVotado)
-                    return View("VotoRealizado");
-
-                // 4️⃣ Obtener preguntas
-                var preguntasResp = await client.GetAsync(
-                    $"api/PreguntasConsultas?procesoId={proceso.Id}"
-                );
-
-                var preguntas = preguntasResp.IsSuccessStatusCode
-                    ? JsonConvert.DeserializeObject<List<PreguntaConsulta>>(
-                        await preguntasResp.Content.ReadAsStringAsync())
-                    : new List<PreguntaConsulta>();
-
-                // 4️⃣.1 Obtener opciones
-                var opcionesResp = await client.GetAsync(
-                    $"api/OpcionesConsultas/por-proceso/{proceso.Id}"
-                );
-
-                var opciones = opcionesResp.IsSuccessStatusCode
-                    ? JsonConvert.DeserializeObject<List<OpcionConsulta>>(
-                        await opcionesResp.Content.ReadAsStringAsync())
-                    : new List<OpcionConsulta>();
-
-                // 5️⃣ Enviar datos a la vista
-                ViewBag.IdProceso = proceso.Id;
-                ViewBag.IdPadron = padron.Id;
-                ViewBag.Preguntas = preguntas;
-                ViewBag.Opciones = opciones;
-
-                return View();
+                ViewBag.Codigo = codigo;
+                var listas = Crud<Lista>.GetAll();
+                return View("Index", listas);
             }
-            catch
+
+            // ================================
+            // ELECCIONES SECCIONALES
+            // ================================
+            [HttpGet]
+            public IActionResult EleccionesSeccionales()
             {
-                return View("ProcesoNoDisponible");
+                var listas = Crud<Lista>.GetAll();
+                return View(listas);
             }
-        }
 
-        // ================================
-        // REGISTRAR VOTO (CONSULTA POPULAR)
-        // ================================
-        [HttpPost]
-        public async Task<IActionResult> Votar(int idProceso, int idPadron, Dictionary<int, int> respuestas)
-        {
-            try
+            // ================================
+            // CONSULTA POPULAR
+            // ================================
+            [HttpGet]
+            public async Task<IActionResult> ConsultaPopular(string codigo)
             {
-                if (respuestas == null || respuestas.Count == 0)
-                    return View("VotoRealizado");
-
-                using var client = new HttpClient
+                try
                 {
-                    BaseAddress = new Uri("https://localhost:7202/")
-                };
+                    if (string.IsNullOrWhiteSpace(codigo))
+                    {
+                        TempData["Error"] = "Debe ingresar un código válido.";
+                        return RedirectToAction("IngresarCodigo", "Acceso");
+                    }
 
-                foreach (var respuesta in respuestas)
+                    using var client = new HttpClient
+                    {
+                        BaseAddress = new Uri("https://localhost:7202/")
+                    };
+
+                    // 1️⃣ Obtener proceso activo
+                    var procesoResp = await client.GetAsync("api/ProcesosElectorales/activo");
+                    if (!procesoResp.IsSuccessStatusCode)
+                        return View("ProcesoNoDisponible");
+
+                    var proceso = JsonConvert.DeserializeObject<ProcesoElectoral>(
+                        await procesoResp.Content.ReadAsStringAsync()
+                    );
+
+                    // 2️⃣ Validar que sea CONSULTA POPULAR
+                    if (proceso == null || proceso.IdTipoProceso != 2)
+                        return View("ProcesoNoDisponible");
+
+                    // 3️⃣ Validar padrón por código
+                    var padron = Crud<Padron>.GetAll()
+                        .FirstOrDefault(p => p.CodigoAcceso == codigo && p.IdProceso == proceso.Id);
+
+                    if (padron == null)
+                        return View("ProcesoNoDisponible");
+
+                    if (padron.HaVotado)
+                        return View("VotoRealizado");
+
+                    // 4️⃣ Obtener preguntas
+                    var preguntasResp = await client.GetAsync(
+                        $"api/PreguntasConsultas?procesoId={proceso.Id}"
+                    );
+
+                    var preguntas = preguntasResp.IsSuccessStatusCode
+                        ? JsonConvert.DeserializeObject<List<PreguntaConsulta>>(
+                            await preguntasResp.Content.ReadAsStringAsync())
+                        : new List<PreguntaConsulta>();
+
+                    // 4️⃣.1 Obtener opciones
+                    var opcionesResp = await client.GetAsync(
+                        $"api/OpcionesConsultas/por-proceso/{proceso.Id}"
+                    );
+
+                    var opciones = opcionesResp.IsSuccessStatusCode
+                        ? JsonConvert.DeserializeObject<List<OpcionConsulta>>(
+                            await opcionesResp.Content.ReadAsStringAsync())
+                        : new List<OpcionConsulta>();
+
+                    // 5️⃣ Enviar datos a la vista
+                    ViewBag.IdProceso = proceso.Id;
+                    ViewBag.IdPadron = padron.Id;
+                    ViewBag.Preguntas = preguntas;
+                    ViewBag.Opciones = opciones;
+
+                    return View();
+                }
+                catch
                 {
+                    return View("ProcesoNoDisponible");
+                }
+            }
+
+            // ================================
+            // REGISTRAR VOTO (CONSULTA POPULAR)
+            // ================================
+            [HttpPost]
+            public async Task<IActionResult> Votar(int idProceso, int idPadron, Dictionary<int, int> respuestas)
+            {
+                try
+                {
+                    if (respuestas == null || respuestas.Count == 0)
+                        return View("VotoRealizado");
+
+                    using var client = new HttpClient
+                    {
+                        BaseAddress = new Uri("https://localhost:7202/")
+                    };
+
                     var payload = new
                     {
                         idProceso,
-                        idPregunta = respuesta.Key,
-                        idOpcion = respuesta.Value,
-                        idPadron
+                        idPadron,
+                        respuestas = respuestas.Select(r => new
+                        {
+                            idPregunta = r.Key,
+                            idOpcion = r.Value
+                        }).ToList()
                     };
 
                     var resp = await client.PostAsJsonAsync(
-                        "api/VotoDetalles/registrar-consulta-simple",
+                        "api/VotoDetalles/registrar-consulta",
                         payload
                     );
 
                     if (!resp.IsSuccessStatusCode)
                         return View("ProcesoNoDisponible");
+
+                    return RedirectToAction("VotoRealizado");
                 }
-
-                return RedirectToAction("VotoRealizado");
+                catch
+                {
+                    return View("ProcesoNoDisponible");
+                }
             }
-            catch
+
+            // ================================
+            // CONFIRMACIÓN FINAL
+            // ================================
+            [HttpGet]
+            public IActionResult VotoRealizado()
             {
-                return View("ProcesoNoDisponible");
+                return View();
             }
-        }
-
-        // ================================
-        // CONFIRMACIÓN FINAL
-        // ================================
-        [HttpGet]
-        public IActionResult VotoRealizado()
-        {
-            return View();
         }
     }
-}

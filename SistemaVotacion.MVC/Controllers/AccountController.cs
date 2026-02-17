@@ -88,53 +88,52 @@ namespace SistemaVotacion.MVC.Controllers
 
         [HttpPost]
         public async Task<IActionResult> Register(
-            string email,
-            string nombre,
-            string apellido,
-            string password,
-            DateTime fechaNac,
-            string cedula,
-            string codigoDactilar,
-            int idRol,
-            int idTipoIdent,
-            int idGenero)
+    string email,
+    string nombre,
+    string apellido,
+    string password,
+    DateTime fechaNac,
+    string cedula,
+    string codigoDactilar,
+    int idRol,
+    int idTipoIdent,
+    int idGenero)
         {
-            // 1. Limpieza y validaciones básicas
-            email = email.Trim().ToLower();
-
-
-            // 2. Verificar si el usuario ya existe (por Email o Cédula)
-            var usuarios = Crud<Usuario>.GetAll();
-            var existe = usuarios.Any(u => u.Email.ToLower() == email || u.NumeroIdentificacion == cedula);
-
-            if (existe)
+            try
             {
-                ViewBag.ErrorMessage = "El correo o número de identificación ya están registrados.";
-                return View();
-            }
+                // 1. Limpieza y validaciones básicas
+                email = email.Trim().ToLower();
 
-            // 3. Llamar al servicio con todos los parámetros requeridos
-            var exito = await _authService.Register(
-                email,
-                nombre,
-                apellido,
-                password,
-                fechaNac,
-                cedula,
-                codigoDactilar,
-                idRol,
-                idTipoIdent,
-                idGenero
-            );
+                // 2. Verificar si el usuario ya existe (Cédula o Email)
+                var usuarios = Crud<Usuario>.GetAll() ?? new List<Usuario>();
+                var existe = usuarios.Any(u => u.Email.ToLower() == email || u.NumeroIdentificacion == cedula);
 
-            if (exito)
-            {
-                // Al tener éxito, redirigimos al Login (que es el Index de este controlador)
+                if (existe)
+                {
+                    throw new Exception("El correo o número de identificación ya están registrados.");
+                }
+
+                // 3. Llamar al servicio (El servicio ahora lanzará excepciones en lugar de solo devolver false)
+                await _authService.Register(
+                    email, nombre, apellido, password, fechaNac,
+                    cedula, codigoDactilar, idRol, idTipoIdent, idGenero
+                );
+
+                // Si llega aquí, el registro fue exitoso
                 return RedirectToAction("Index", "Account");
             }
+            catch (Exception ex)
+            {
+                // 4. CAPTURA DEL ERROR: Aquí es donde verás el mensaje real
+                ViewBag.ErrorMessage = ex.Message;
 
-            ViewBag.ErrorMessage = "Ocurrió un error al procesar el registro.";
-            return View();
+                // 5. RECARGA CRÍTICA: Debemos repoblar los ViewBags para que los Dropdowns no crasheen al recargar la vista
+                ViewBag.Roles = Crud<Rol>.GetAll() ?? new List<Rol>();
+                ViewBag.Generos = Crud<Genero>.GetAll() ?? new List<Genero>();
+                ViewBag.TiposIdentificacion = Crud<TipoIdentificacion>.GetAll() ?? new List<TipoIdentificacion>();
+
+                return View();
+            }
         }
 
         public async Task<IActionResult> Logout()

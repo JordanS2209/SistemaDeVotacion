@@ -1,0 +1,65 @@
+﻿@model SistemaVotacion.Modelos.JuntaReceptora
+
+@{
+    ViewData["Title"] = "Crear Junta";
+}
+
+<div class="container mt-5 pt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0 bg-white">
+                <div class="card-header py-4 text-center" style="background-color: #4DBFEB;">
+                    <h3 class="mb-0 text-dark fw-bold">
+                        <i class="bi bi-clipboard-plus me-2"></i>Nueva Junta Receptora
+                    </h3>
+                </div>
+
+                <div class="card-body p-4">
+                    <form asp-action="CreateJuntas" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                        @* Selector de Recinto (Sigue viniendo de la API) *@
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-dark small text-uppercase">Recinto Electoral</label>
+                            <select asp-for="IdRecinto" class="form-select border-secondary text-dark"
+                                    asp-items="@(new SelectList(ViewBag.Recintos ?? new List<SistemaVotacion.Modelos.RecintoElectoral>(), "Id", "NombreRecinto"))"
+                                    required>
+                                <option value="" disabled selected>-- Seleccione el Recinto --</option>
+                            </select>
+                            <span asp-validation-for="IdRecinto" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="NumeroJunta" class="form-label fw-bold text-dark small text-uppercase">Número de Junta</label>
+                                <input asp-for="NumeroJunta" type="number" class="form-control border-secondary text-dark"
+                                       placeholder="Ej: 1" min="1" required />
+                                <span asp-validation-for="NumeroJunta" class="text-danger small"></span>
+                            </div>
+
+                            @* Selector de Género (Opciones Fijas) *@
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold text-dark small text-uppercase">Género de la Mesa</label>
+                                <select asp-for="IdGenero" class="form-select border-secondary text-dark" required>
+                                    <option value="" disabled selected>-- Seleccione Género --</option>
+                                    <option value="1">Masculino</option>
+                                    <option value="2">Femenino</option>
+                                </select>
+                                <span asp-validation-for="IdGenero" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn fw-bold shadow-sm py-2" style="background-color: #4DBFEB; color: #1b263b;">
+                                <i class="bi bi-check-circle-fill me-2"></i>Guardar Junta
+                            </button>
+                            <a asp-action="ListJuntas" class="btn btn-outline-secondary py-2 border-0">
+                                <i class="bi bi-arrow-left"></i> Volver al listado
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

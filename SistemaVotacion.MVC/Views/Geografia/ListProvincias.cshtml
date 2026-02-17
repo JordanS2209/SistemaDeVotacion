@@ -22,8 +22,8 @@
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td>@item.Id</td>
-                        <td>@item.NombreProvincia</td>
+                        <td class="text-white fw-medium" >@item.Id</td>
+                        <td class ="text-white fw-medium">@item.NombreProvincia</td>
                         <td class="text-center">
                             <span class="badge bg-info text-dark">
                                 @(item.Ciudades?.Count ?? 0)

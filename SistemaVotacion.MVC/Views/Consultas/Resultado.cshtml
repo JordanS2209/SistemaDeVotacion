@@ -1,9 +1,11 @@
 ﻿@model SistemaVotacion.Modelos.Usuario
 @{
     ViewData["Title"] = "Mi Información Electoral";
+    ViewData["HideSidebar"] = true;
     var infoVotante = Model.PerfilesVotante?.FirstOrDefault();
 }
 
+<br /><br /><br />
 <div class="container mt-4">
     <div class="card border-primary shadow">
         <div class="card-header bg-primary text-white">
@@ -19,25 +21,28 @@
                 <div class="row g-4">
                     <div class="col-md-6">
                         <h5 class="text-secondary border-bottom pb-2">Ubicación Geográfica</h5>
-                        <p><strong>Provincia:</strong> @infoVotante.Junta.Recintos.Parroquia.Ciudad.Provincia.NombreProvincia</p>
-                        <p><strong>Ciudad:</strong> @infoVotante.Junta.Recintos.Parroquia.Ciudad.NombreCiudad</p>
-                        <p><strong>Parroquia:</strong> @infoVotante.Junta.Recintos.Parroquia.NombreParroquia</p>
+                        @* Aplicamos text-dark para que resalte sobre el fondo blanco *@
+                        <p class="text-dark"><strong>Provincia:</strong> @infoVotante.Junta.Recintos.Parroquia.Ciudad.Provincia.NombreProvincia</p>
+                        <p class="text-dark"><strong>Ciudad:</strong> @infoVotante.Junta.Recintos.Parroquia.Ciudad.NombreCiudad</p>
+                        <p class="text-dark"><strong>Parroquia:</strong> @infoVotante.Junta.Recintos.Parroquia.NombreParroquia</p>
                     </div>
                     <div class="col-md-6">
                         <h5 class="text-secondary border-bottom pb-2">Datos del Voto</h5>
-                        <p><strong>Recinto:</strong> @infoVotante.Junta.Recintos.NombreRecinto</p>
-                        <p><strong>Junta No:</strong> @infoVotante.Junta.NumeroJunta (@infoVotante.Junta.Genero?.DetalleGenero)</p>
-                        <p><strong>Dirección:</strong> @infoVotante.Junta.Recintos.DireccionRecinto</p>
+                        <p class="text-dark"><strong>Recinto:</strong> @infoVotante.Junta.Recintos.NombreRecinto</p>
+                        <p class="text-dark"><strong>Junta No:</strong> @infoVotante.Junta.NumeroJunta (@infoVotante.Junta.Genero?.DetalleGenero)</p>
+                        <p class="text-dark"><strong>Dirección:</strong> @infoVotante.Junta.Recintos.DireccionRecinto</p>
                     </div>
                 </div>
 
-                <div class="mt-4 p-3 bg-light border rounded">
-                    <strong>Referencia del Recinto:</strong> @infoVotante.Junta.Recintos.DetalleRecinto
+                @* Cambiamos a text-dark también en la referencia *@
+                <div class="mt-4 p-3 bg-light border rounded text-dark">
+                    <strong class="text-primary">Referencia del Recinto:</strong> @infoVotante.Junta.Recintos.DetalleRecinto
                 </div>
             }
             else
             {
-                <div class="alert alert-warning">
+                <div class="alert alert-warning shadow-sm">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
                     Usted no tiene una Junta Receptora asignada actualmente.
                 </div>
             }

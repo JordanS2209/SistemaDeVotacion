@@ -276,5 +276,183 @@ namespace SistemaVotacion.MVC.Controllers
                 return View(Crud<Parroquia>.GetById(id));
             }
         }
+
+        // SECCIÓN: RECINTOS
+
+        public IActionResult ListRecintos()
+        {
+            try
+            {
+                var recintos = Crud<RecintoElectoral>.GetAll();
+                return View(recintos);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = "Error: " + ex.Message;
+                return View(new List<RecintoElectoral>());
+            }
+        }
+
+        public IActionResult CreateRecinto()
+        {
+            try
+            {
+                var parroquias = Crud<Parroquia>.GetAll();
+                ViewBag.Parroquia = parroquias;
+                return View();
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al cargar parroquias: " + ex.Message;
+                return RedirectToAction(nameof(ListRecintos));
+            }
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CreateRecinto(RecintoElectoral nuevoRecinto)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    Crud<RecintoElectoral>.Create(nuevoRecinto);
+                    return RedirectToAction(nameof(ListRecintos));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error: " + ex.Message);
+                }
+            }
+            return View(nuevoRecinto);
+        }
+
+        public IActionResult DeleteRecinto(int id)
+        {
+            try
+            {
+                var recinto = Crud<RecintoElectoral>.GetById(id);
+                if (recinto == null)
+                {
+                    return NotFound();
+                }
+
+                return View(recinto);
+
+            }
+            catch (Exception ex)
+            {
+
+                // Si hay error de conexión con la API
+                TempData["Error"] = "Error al obtener el rol: " + ex.Message;
+                return RedirectToAction(nameof(ListParroquias));
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteRecintoConfirmed(int id)
+        {
+            try
+            {
+                // Llamada a la API para eliminar
+                Crud<RecintoElectoral>.Delete(id);
+
+                // Si tiene éxito, volvemos a la lista
+                return RedirectToAction(nameof(ListRecintos));
+            }
+            catch (Exception ex)
+            {
+                // Si falla (ej. por integridad referencial), mostramos el error en la misma vista
+                ViewBag.Error = "No se pudo eliminar el recinto. Asegúrese de que no tenga Juntas Receptoras asociadas.";
+                var recinto = Crud<RecintoElectoral>.GetById(id);
+                return View("DeleteRecinto", recinto);
+            }
+        }
+
+        // SECCIÓN: JUNTAS
+
+        public IActionResult ListJuntas()
+        {
+            try
+            {
+                var juntas = Crud<JuntaReceptora>.GetAll();
+                return View(juntas);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = "Error: " + ex.Message;
+                return View(new List<JuntaReceptora>());
+            }
+        }
+
+        // GET: Geografia/CreateJuntas
+        public IActionResult CreateJuntas()
+        {
+            try
+            {
+                var recinto = Crud<RecintoElectoral>.GetAll();
+                ViewBag.Recintos = recinto;
+                return View();
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al cargar catálogos: " + ex.Message;
+                return RedirectToAction(nameof(ListJuntas));
+            }
+        }
+
+        // POST: Geografia/CreateJuntas
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CreateJuntas(JuntaReceptora juntaReceptora)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    Crud<JuntaReceptora>.Create(juntaReceptora);
+                    return RedirectToAction(nameof(ListJuntas));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error al guardar: " + ex.Message);
+                }
+            }
+
+            ViewBag.Generos = Crud<Genero>.GetAll() ?? new List<Genero>();
+            ViewBag.Recintos = Crud<RecintoElectoral>.GetAll() ?? new List<RecintoElectoral>();
+
+            return View(juntaReceptora);
+        }
+
+        // GET: Muestra la confirmación
+        public IActionResult DeleteJunta(int id)
+        {
+            var junta = Crud<JuntaReceptora>.GetById(id);
+            if (junta == null) return NotFound();
+
+            return View(junta);
+        }
+
+        // POST: Realiza la eliminación
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteJuntaConfirmed(int id)
+        {
+            try
+            {
+                Crud<JuntaReceptora>.Delete(id);
+                return RedirectToAction(nameof(ListJuntas));
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = "No se pudo eliminar la junta. Es probable que tenga ciudadanos asignados en el padrón.";
+                var junta = Crud<JuntaReceptora>.GetById(id);
+                return View("DeleteJunta", junta);
+            }
+        }
+
     }
 }

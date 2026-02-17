@@ -1,6 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Inicio - Sistema de Votación";
-    ViewData["HideSidebar"] = true;
+    ViewData["HideSidebar"] = !User.Identity.IsAuthenticated;
 }
 
 <main role="main">

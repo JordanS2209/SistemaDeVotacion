@@ -1,0 +1,66 @@
+﻿@model SistemaVotacion.Modelos.RecintoElectoral
+
+@{
+    ViewData["Title"] = "Crear Recinto";
+}
+
+<div class="container mt-5 pt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0 bg-dark text-white" style="border-top: 4px solid #4DBFEB !important;">
+                <div class="card-header bg-transparent py-4 text-center">
+                    <h3 class="mb-0 text-primary-custom fw-bold">
+                        <i class="bi bi-building-add me-2"></i>Registrar Nuevo Recinto
+                    </h3>
+                    <p class="text-white-50 small mt-2">Complete la información geográfica del punto de votación</p>
+                </div>
+
+                <div class="card-body p-4 pt-2">
+                    <form asp-action="CreateRecinto" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-primary-custom small text-uppercase">Parroquia</label>
+                            <select asp-for="IdParroquia" class="form-select bg-dark text-white border-secondary"
+                                    asp-items="@(new SelectList(ViewBag.Parroquia, "Id", "NombreParroquia"))"
+                                    required>
+                                <option value="" disabled selected>-- Seleccione la ubicación --</option>
+                            </select>
+                            <span asp-validation-for="IdParroquia" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="NombreRecinto" class="form-label fw-bold text-primary-custom small text-uppercase">Nombre del Recinto</label>
+                            <input asp-for="NombreRecinto" class="form-control bg-dark text-white border-secondary shadow-sm"
+                                   placeholder="Ej: Unidad Educativa Ibarra" required />
+                            <span asp-validation-for="NombreRecinto" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="DetalleRecinto" class="form-label fw-bold text-primary-custom small text-uppercase">Detalles / Bloques</label>
+                            <input asp-for="DetalleRecinto" class="form-control bg-dark text-white border-secondary shadow-sm"
+                                   placeholder="Ej: Coliseo Principal / Bloque A" />
+                            <span asp-validation-for="DetalleRecinto" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="DireccionRecinto" class="form-label fw-bold text-primary-custom small text-uppercase">Dirección Exacta</label>
+                            <textarea asp-for="DireccionRecinto" class="form-control bg-dark text-white border-secondary shadow-sm"
+                                      rows="2" placeholder="Calle Bolívar y García Moreno" required></textarea>
+                            <span asp-validation-for="DireccionRecinto" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary-custom py-2 fw-bold shadow">
+                                <i class="bi bi-cloud-arrow-up-fill me-2"></i>Guardar en el Sistema
+                            </button>
+                            <a asp-action="ListRecintos" class="btn btn-outline-secondary py-2 border-0">
+                                <i class="bi bi-arrow-left"></i> Volver al listado
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

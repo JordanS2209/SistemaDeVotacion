@@ -1,0 +1,57 @@
+﻿@model SistemaVotacion.Modelos.TipoProceso
+
+@{
+    ViewData["Title"] = "Detalles del Tipo de Proceso";
+}
+
+<div class="elec-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-7 col-lg-6">
+                <div class="elec-card">
+
+                    <div class="elec-card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-file-text"></i>
+                            Detalles del Tipo de Proceso
+                        </h5>
+
+                        <span class="elec-badge elec-badge-info">
+                            Información
+                        </span>
+                    </div>
+
+                    <div class="elec-card-body">
+
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4 elec-section-title">ID</dt>
+                            <dd class="col-sm-8">@Model.Id</dd>
+
+                            <dt class="col-sm-4 elec-section-title">Nombre</dt>
+                            <dd class="col-sm-8">@Model.NombreTipoProceso</dd>
+
+                            <dt class="col-sm-4 elec-section-title">Descripción</dt>
+                            <dd class="col-sm-8">@Model.Descripcion</dd>
+                        </dl>
+
+                        <hr class="elec-hr my-4" />
+
+                        <div class="d-grid gap-2">
+                            <a asp-action="EditTipoProceso"
+                               asp-route-id="@Model.Id"
+                               class="btn elec-btn elec-btn-warn py-2">
+                                <i class="bi bi-pencil-square"></i> Editar
+                            </a>
+
+                            <a asp-action="CreateProcesoElectoral"
+                               class="btn elec-btn elec-btn-secondary py-2">
+                                <i class="bi bi-arrow-left"></i> Volver
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -25,11 +25,14 @@ namespace SistemaVotacion.API.Controllers
         {
             try
             {
-                // Incluimos Proceso y Votante para mostrar quién vota y en qué elección
                 var padrones = await _context.Padrones
-                    .Include(p => p.Proceso)
                     .Include(p => p.Votante)
+                        .ThenInclude(v => v.Usuario)  // nombre y apellido
+                    .Include(p => p.Votante)
+                        .ThenInclude(v => v.Junta)    // número de junta
+                    .Include(p => p.Proceso)
                     .ToListAsync();
+
                 return Ok(padrones);
             }
             catch (Exception ex)
@@ -46,14 +49,15 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 var padron = await _context.Padrones
-                    .Include(p => p.Proceso)
                     .Include(p => p.Votante)
+                        .ThenInclude(v => v.Usuario)
+                    .Include(p => p.Votante)
+                        .ThenInclude(v => v.Junta)
+                    .Include(p => p.Proceso)
                     .FirstOrDefaultAsync(p => p.Id == id);
 
                 if (padron == null)
-                {
                     return NotFound($"Registro de padrón con ID {id} no encontrado.");
-                }
 
                 return Ok(padron);
             }
@@ -248,9 +252,7 @@ namespace SistemaVotacion.API.Controllers
         public async Task<IActionResult> PutPadron(int id, Padron padron)
         {
             if (id != padron.Id)
-            {
                 return BadRequest("El ID de la URL no coincide con el ID del registro de padrón.");
-            }
 
             _context.Entry(padron).State = EntityState.Modified;
 
@@ -262,13 +264,9 @@ namespace SistemaVotacion.API.Controllers
             catch (DbUpdateConcurrencyException)
             {
                 if (!PadronExists(id))
-                {
                     return NotFound("El registro de padrón no existe.");
-                }
                 else
-                {
                     throw;
-                }
             }
             catch (Exception ex)
             {
@@ -285,7 +283,6 @@ namespace SistemaVotacion.API.Controllers
             {
                 _context.Padrones.Add(padron);
                 await _context.SaveChangesAsync();
-
                 return CreatedAtAction(nameof(GetPadron), new { id = padron.Id }, padron);
             }
             catch (Exception ex)
@@ -303,13 +300,10 @@ namespace SistemaVotacion.API.Controllers
             {
                 var padron = await _context.Padrones.FindAsync(id);
                 if (padron == null)
-                {
                     return NotFound("Registro de padrón no encontrado.");
-                }
 
                 _context.Padrones.Remove(padron);
                 await _context.SaveChangesAsync();
-
                 return Ok(padron);
             }
             catch (Exception ex)

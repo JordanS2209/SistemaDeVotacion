@@ -1,113 +1,162 @@
-﻿<!DOCTYPE html>
+﻿@{
+    // Detectamos si la vista pidió esconder el sidebar (como en el Index)
+    bool hideSidebar = ViewData["HideSidebar"] as bool? ?? false;
+}
+
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - SistemaVotacion.MVC</title>
+    <title>@ViewData["Title"] - Sistema Electoral</title>
 
     @* Estilos Base *@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/elecciones.css" asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", required: false)
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow fixed-top mb-3">
-            <div class="container-fluid">
-                @* Logo / Nombre del Sistema *@
-                <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
-                    <i class="bi bi-check2-square text-primary"></i> Sistema Votación
-                </a>
+<body class="@(hideSidebar ? "layout-no-sidebar" : "layout-with-sidebar")">
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    @* LADO IZQUIERDO: Navegación y Menús de Admin *@
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-light fw-bold" asp-controller="Home" asp-action="Index">Inicio</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-light fw-bold" asp-controller="Consultas" asp-action="Index">Consulta lugar de votacion</a>
-                        </li>
-
-                        @* Acciones para SUPER ADMINISTRADOR *@
-                        @if (User.Identity.IsAuthenticated && User.IsInRole("SUPER ADMINISTRADOR"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-light fw-bold" asp-controller="Account" asp-action="Register">Registrar Usuarios</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-light fw-bold" asp-controller="Account" asp-action="UsuariosBloqueados">Gestión de Bloqueos</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-light fw-bold" asp-controller="Creation" asp-action="ListRoles">Gestión de Roles</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-light fw-bold" asp-controller="Geografia" asp-action="Index">Gestión Geografica</a>
-                            </li>
-                        }
-
-                        @* Acciones para ADMINISTRADOR *@
-                        @if (User.Identity.IsAuthenticated && User.IsInRole("ADMINISTRADOR"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-warning fw-bold" asp-controller="Account" asp-action="Register">
-                                    <i class="bi bi-shield-lock"></i> Registrar Usuarios
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-light" asp-controller="Geografia" asp-action="Index">Gestionar Zona Geografica</a>
-                            </li>
-                        }
-                    </ul>
-
-                    @* LADO DERECHO: Login o Perfil de Usuario (Soluciona el ícono faltante) *@
-                    <ul class="navbar-nav ms-auto">
-                        @if (!User.Identity.IsAuthenticated)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-light fw-bold btn btn-outline-primary px-3 shadow-sm"
-                                   asp-controller="Account" asp-action="Index">
-                                    <i class="bi bi-box-arrow-in-right"></i> Login
-                                </a>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-white bg-primary rounded-3 px-3 shadow-sm"
-                                   href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                    <i class="bi bi-person-circle"></i> @User.Identity.Name
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end shadow">
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <a class="dropdown-item text-danger" asp-controller="Account" asp-action="Logout">
-                                            <i class="bi bi-power"></i> Cerrar Sesión
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                        }
-                    </ul>
+    @if (!hideSidebar)
+    {
+        <aside class="sidebar shadow" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-box">
+                    <i class="bi bi-shield-check fs-4"></i>
+                </div>
+                <div class="logo-text">
+                    <h5 class="mb-0">SISTEMA ELECTORAL<br />UTN</h5>
+                    <small class="text-info opacity-75" style="font-size: 0.7rem;">Gestión Académica</small>
                 </div>
             </div>
-        </nav>
-    </header>
 
-    @* Contenedor Principal *@
-    <main role="main" class="pb-3" style="margin-top: 80px;">
-        @RenderBody()
-    </main>
+            <nav class="nav-links">
+                <a asp-controller="Home" asp-action="Index"
+                   class="nav-item-sidebar @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+
+                <a asp-controller="Aspirantes" asp-action="ListAspirantes" class="nav-item-sidebar">
+                    <i class="bi bi-people"></i> Aspirantes
+                </a>
+
+                <a asp-controller="CamposConocimientos" asp-action="ListCamposConocimientos" class="nav-item-sidebar">
+                    <i class="bi bi-book"></i> Campos Conoc.
+                </a>
+
+                <a asp-controller="Programas" asp-action="ListProgramas" class="nav-item-sidebar">
+                    <i class="bi bi-mortarboard"></i> Programas
+                </a>
+
+                @if (User.IsInRole("Super Administrador") || User.IsInRole("ADMINISTRADOR"))
+                {
+                    <div class="mt-4 mb-2 px-3 small text-uppercase opacity-50 fw-bold" style="font-size: 0.65rem; letter-spacing: 1px;">Gestión</div>
+                    <a asp-controller="Accounts" asp-action="ListUsuarios" class="nav-item-sidebar">
+                        <i class="bi bi-person-gear"></i> Personal Admin.
+                    </a>
+                }
+            </nav>
+        </aside>
+    }
+
+    <div id="content-wrapper" class="@(hideSidebar ? "no-sidebar" : "")">
+        <header>
+            <nav class="navbar navbar-expand-sm navbar-dark fixed-top navbar-custom-offset shadow-sm @(hideSidebar ? "no-sidebar" : "")">
+                <div class="container-fluid px-3">
+                    <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">
+                        <i class="bi bi-check2-square text-primary-custom"></i> Sistema Votación
+                    </a>
+
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                        @* LADO IZQUIERDO: Navegación Principal *@
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="Home" asp-action="Index">Inicio</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white-50" asp-controller="Consultas" asp-action="Index">Consulta Lugar</a>
+                            </li>
+
+                            @* Menús condicionales de Roles (Tu código original) *@
+                            @if (User.Identity.IsAuthenticated && User.IsInRole("SUPER ADMINISTRADOR"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-warning fw-bold" href="#" data-bs-toggle="dropdown">Admin Pro</a>
+                                    <ul class="dropdown-menu shadow bg-dark">
+                                        <li><a class="dropdown-item text-light" asp-controller="Account" asp-action="Register">Registrar Usuarios</a></li>
+                                        <li><a class="dropdown-item text-light" asp-controller="Account" asp-action="UsuariosBloqueados">Bloqueos</a></li>
+                                        <li><a class="dropdown-item text-light" asp-controller="Creation" asp-action="ListRoles">Roles</a></li>
+                                        <li><a class="dropdown-item text-light" asp-controller="Geografia" asp-action="Index">Geografía</a></li>
+                                    </ul>
+                                </li>
+                            }
+                        </ul>
+
+                        @* LADO DERECHO: Login / Usuario *@
+                        <ul class="navbar-nav ms-auto">
+                            @if (!User.Identity.IsAuthenticated)
+                            {
+                                <li class="nav-item">
+                                    <a class="btn btn-primary-custom btn-sm rounded-pill px-4 shadow-sm" asp-controller="Account" asp-action="Index">
+                                        <i class="bi bi-box-arrow-in-right me-1"></i> Login
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle btn btn-outline-info btn-sm rounded-pill px-3 text-white" href="#" role="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-person-circle me-1"></i> @User.Identity.Name
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 bg-dark mt-2">
+                                        <li><div class="dropdown-header text-info">Mi Cuenta</div></li>
+                                        <li><hr class="dropdown-divider border-secondary"></li>
+                                        <li>
+                                            <a class="dropdown-item text-danger fw-bold" asp-controller="Account" asp-action="Logout">
+                                                <i class="bi bi-power me-2"></i>Cerrar Sesión
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        @* Contenido de las Vistas *@
+        <main role="main" class="pb-5">
+            @if (hideSidebar)
+            {
+                @* El Home no lleva padding extra para que el carrusel pegue arriba *@
+                @RenderBody()
+            }
+            else
+            {
+                <div class="container-fluid pt-4 px-4">
+                    @RenderBody()
+                </div>
+            }
+        </main>
+
+        <footer class="mt-auto py-3 text-center opacity-50 small border-top border-secondary">
+            © 2026 - Universidad Técnica del Norte
+        </footer>
+    </div>
 
     @* Scripts *@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

@@ -1,0 +1,38 @@
+﻿@model IEnumerable<SistemaVotacion.Modelos.Votante>
+
+@{
+    ViewData["Title"] = "ListVotantes";
+}
+
+<h1>ListVotantes</h1>
+
+<p>
+    <a asp-action="CreateVotante">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Id)</th>
+            <th>Junta Receptora</th>
+            <th>Votante (Usuario)</th>
+            <th>@Html.DisplayNameFor(model => model.Estado)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Id)</td>
+                <td>@(item.Junta != null ? $"Junta {item.Junta.NumeroJunta}" : "Sin asignar")</td>
+                <td>@(item.Usuario != null ? item.Usuario.Nombres + " " + item.Usuario.Apellidos : "Sin asignar")</td>
+                <td>@Html.DisplayFor(modelItem => item.Estado)</td>
+                <td>
+                    @Html.ActionLink("Edit", "EditVotante", new { id = item.Id }) |
+                    @Html.ActionLink("Details", "DetailsVotante", new { id = item.Id }) |
+                    @Html.ActionLink("Delete", "DeleteVotante", new { id = item.Id })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

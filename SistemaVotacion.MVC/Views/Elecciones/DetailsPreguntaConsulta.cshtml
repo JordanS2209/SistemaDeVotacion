@@ -1,42 +1,43 @@
 ﻿@model SistemaVotacion.Modelos.PreguntaConsulta
 
 @{
-    ViewData["Title"] = "DetailsPreguntaConsulta";
+    ViewData["Title"] = "Detalles Pregunta Consulta";
 }
 
-<h1>DetailsPreguntaConsulta</h1>
+<div class="container form-container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card form-card shadow border-0">
+                <div class="card-header form-card-header bg-info text-white text-center">
+                    <i class="bi bi-question-circle"></i> Detalles de Pregunta Consulta
+                </div>
+                <div class="card-body form-card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">ID</dt>
+                        <dd class="col-sm-8">@Model.Id</dd>
 
-<div>
-    <h4>PreguntaConsulta</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Id)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TextoPregunta)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TextoPregunta)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NumeroPregunta)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NumeroPregunta)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdProceso)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IdProceso)
-        </dd>
-    </dl>
-</div>
-<div>
-    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
-    <a asp-action="Index">Back to List</a>
+                        <dt class="col-sm-4">Texto Pregunta</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.TextoPregunta)</dd>
+
+                        <dt class="col-sm-4">Número Pregunta</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.NumeroPregunta)</dd>
+
+                        <dt class="col-sm-4">Proceso Electoral</dt>
+                        <dd class="col-sm-8">
+                            @(Model.ProcesosElectorales?.NombreProceso ?? "No definido")
+                        </dd>
+                    </dl>
+
+                    <div class="d-grid gap-2 mt-3">
+                        <a asp-action="EditPreguntaConsulta" asp-route-id="@Model.Id" class="btn btn-warning py-2">
+                            Editar
+                        </a>
+                        <a asp-action="ListPreguntaConsulta" class="btn btn-secondary py-2">
+                            Volver al listado
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

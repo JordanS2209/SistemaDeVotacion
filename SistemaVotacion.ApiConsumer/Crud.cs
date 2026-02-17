@@ -124,5 +124,14 @@ namespace SistemaVotacion.ApiConsumer
                 return default;
             }
         }
+        public static bool PutCustom(string customUrl)
+        {
+            using (var client = new HttpClient())
+            {
+                var response = client.PutAsync(customUrl, null).Result;
+                return response.IsSuccessStatusCode;
+            }
+        }
+
     }
 }

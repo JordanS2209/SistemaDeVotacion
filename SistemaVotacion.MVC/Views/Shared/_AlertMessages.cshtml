@@ -1,0 +1,57 @@
+﻿@{
+    var success = TempData["Success"] as string;
+    var error = TempData["Error"] as string;
+
+    // Mensajes específicos para el modal TipoProceso (si los usas)
+    var successTipo = TempData["SuccessTipoProceso"] as string;
+    var errorTipo = TempData["ErrorTipoProceso"] as string;
+}
+
+@if (!string.IsNullOrWhiteSpace(success))
+{
+    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+        <i class="bi bi-check-circle"></i> @success
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (!string.IsNullOrWhiteSpace(error))
+{
+    <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> @error
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (!string.IsNullOrWhiteSpace(successTipo))
+{
+    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+        <i class="bi bi-check-circle"></i> @successTipo
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (!string.IsNullOrWhiteSpace(errorTipo))
+{
+    <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> @errorTipo
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<script>
+    // Auto-cerrar alerts luego de 4 segundos (opcional)
+    (function () {
+        var alerts = document.querySelectorAll('.alert');
+        if (!alerts || alerts.length === 0) return;
+
+        setTimeout(function () {
+            alerts.forEach(function (a) {
+                try {
+                    var alert = bootstrap.Alert.getOrCreateInstance(a);
+                    alert.close();
+                } catch { }
+            });
+        }, 10000);
+    })();
+</script>

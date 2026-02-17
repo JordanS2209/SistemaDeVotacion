@@ -1,0 +1,300 @@
+﻿/ 
+/*  Variables (solo paleta; no afecta si las repites con :root) */
+:root {
+    --primary-blue: #4DBFEB;
+    --dark-main: #1b263b;
+    --dark-navbar: #141d2f;
+    --dark-card: rgba(255,255,255,0.04);
+    --dark-card-2: rgba(255,255,255,0.06);
+    --border-soft: rgba(255,255,255,0.08);
+    --text-glass: rgba(255,255,255,0.72);
+    --text-strong: rgba(255,255,255,0.92);
+}
+
+/*  Contenedor general  */
+.elec-page {
+    color: var(--text-strong);
+    padding-top: 72px; /* evita que el navbar fixed-top tape el contenido */
+}
+
+/* Títulos */
+.elec-title {
+    font-weight: 800;
+    letter-spacing: .2px;
+}
+
+.elec-subtitle {
+    color: var(--text-glass);
+}
+
+/* Cards  */
+.elec-card {
+    background: linear-gradient(180deg, var(--dark-card), var(--dark-card-2));
+    border: 1px solid var(--border-soft);
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    overflow: hidden;
+}
+
+.elec-card-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border-soft);
+    background: rgba(20, 29, 47, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+    .elec-card-header h5 {
+        margin: 0;
+        font-weight: 700;
+    }
+
+.elec-card-body {
+    padding: 18px;
+}
+
+/*  Secciones dentro de forms */
+.elec-section-title {
+    color: var(--text-glass);
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.elec-hr {
+    border-color: rgba(255,255,255,0.10);
+    opacity: 1;
+}
+
+/* Inputs */
+.elec-page .form-control,
+.elec-page .form-select {
+    background-color: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: var(--text-strong);
+}
+
+    .elec-page .form-control:focus,
+    .elec-page .form-select:focus {
+        border-color: rgba(77,191,235,0.7);
+        box-shadow: 0 0 0 .2rem rgba(77,191,235,0.18);
+        background-color: rgba(255,255,255,0.08);
+        color: var(--text-strong);
+    }
+
+.elec-page label {
+    color: var(--text-glass);
+    font-weight: 600;
+}
+
+/* Tabla estilo dashboard */
+.elec-table-wrap {
+    border: 1px solid var(--border-soft);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,.18);
+}
+
+.elec-table {
+    margin: 0;
+    color: var(--text-strong);
+}
+
+    .elec-table thead {
+        background: rgba(13, 21, 35, 0.9);
+    }
+
+        .elec-table thead th {
+            border-color: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.85);
+            font-weight: 700;
+        }
+
+    .elec-table tbody td {
+        border-color: rgba(255,255,255,0.06);
+        vertical-align: middle;
+    }
+
+    .elec-table tbody tr {
+        background: rgba(255,255,255,0.02);
+    }
+
+        .elec-table tbody tr:hover {
+            background: rgba(77,191,235,0.06);
+        }
+
+/*  Badges */
+.elec-badge {
+    display: inline-block;
+    padding: .4rem .6rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: .78rem;
+    border: 1px solid rgba(255,255,255,0.10);
+}
+
+.elec-badge-pendiente {
+    background: rgba(255,255,255,0.14);
+    color: #fff;
+}
+
+.elec-badge-activo {
+    background: rgba(25,135,84,0.35);
+    color: #d7ffe6;
+    border-color: rgba(25,135,84,0.55);
+}
+
+.elec-badge-pausado {
+    background: rgba(255,193,7,0.28);
+    color: #fff3c4;
+    border-color: rgba(255,193,7,0.45);
+}
+
+.elec-badge-cerrado {
+    background: rgba(220,53,69,0.28);
+    color: #ffd5da;
+    border-color: rgba(220,53,69,0.45);
+}
+
+/* Botones base para tabla y acciones */
+.elec-btn {
+    border-radius: 10px;
+    font-weight: 700;
+    border: 1px solid rgba(255,255,255,0.14) !important;
+    color: #fff !important;
+}
+
+.elec-btn-primary {
+    background-color: var(--primary-blue) !important;
+    color: #0d1523 !important;
+    border: none !important;
+    font-weight: 800;
+}
+
+/* Variantes más visibles en fondo oscuro */
+.elec-btn-warn {
+    background: rgba(255,193,7,0.55) !important;
+    border-color: rgba(255,193,7,0.55) !important;
+    color: #1b263b !important;
+}
+
+.elec-btn-info {
+    background: rgba(77,191,235,0.40) !important;
+    border-color: rgba(77,191,235,0.50) !important;
+    color: #eaffff !important;
+}
+
+.elec-btn-success {
+    background: rgba(0,200,83,0.38) !important;
+    border-color: rgba(0,200,83,0.55) !important;
+    color: #eafff2 !important;
+}
+
+.elec-btn-danger {
+    background: rgba(255,82,82,0.38) !important;
+    border-color: rgba(255,82,82,0.55) !important;
+    color: #ffecec !important;
+}
+
+.elec-btn-secondary {
+    background: rgba(255,255,255,0.10) !important;
+    border-color: rgba(255,255,255,0.18) !important;
+    color: #fff !important;
+}
+
+/* Outline */
+.elec-btn-outline {
+    border: 1px solid rgba(77,191,235,0.55) !important;
+    color: var(--primary-blue) !important;
+    background: transparent !important;
+}
+
+    .elec-btn-outline:hover {
+        background: rgba(77,191,235,0.12) !important;
+    }
+
+/* Disabled */
+.elec-page .btn:disabled,
+.elec-page .btn.disabled {
+    opacity: .45 !important;
+    cursor: not-allowed !important;
+}
+
+/* Alerts (TempData) */
+.elec-alert {
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.10);
+    background: rgba(0,0,0,0.12);
+    color: var(--text-strong);
+}
+
+.elec-alert-success {
+    border-color: rgba(25,135,84,0.35);
+    background: rgba(25,135,84,0.10);
+}
+
+.elec-alert-danger {
+    border-color: rgba(220,53,69,0.35);
+    background: rgba(220,53,69,0.10);
+}
+
+/*  Modal oscuro */
+.elec-page .modal-content {
+    background-color: var(--dark-navbar);
+    border: 1px solid var(--border-soft);
+    color: var(--text-strong);
+    border-radius: 16px;
+}
+
+.elec-page .modal-header {
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.elec-page .modal-footer {
+    border-top: 1px solid var(--border-soft);
+}
+
+.elec-page {
+    padding-top: 72px; 
+}
+
+
+
+
+
+
+/*aqui me ayudo la IA a corregir no sabia porque tenia mis visualizaciones extrañas*/
+/* FIX: los modales dentro de cards no deben estar recortados */
+.elec-card {
+    overflow: visible !important;
+}
+
+/* Si quieres mantener bordes redondeados/recorte SOLO en tablas */
+.elec-table-wrap {
+    overflow: hidden; /* aquí sí */
+    border-radius: 14px;
+}
+/* Select: texto visible y dropdown legible */
+.elec-page .form-select {
+    color: var(--text-strong) !important;
+    background-color: rgba(255,255,255,0.06) !important;
+    border: 1px solid rgba(255,255,255,0.12) !important;
+}
+
+/* Opciones del dropdown (limitado por el navegador, pero ayuda mucho) */
+.elec-page .form-select option {
+    background-color: #0d1523; /* oscuro */
+    color: #ffffff;           /* blanco */
+}
+
+/* Placeholder "-- Seleccione un tipo --" (primera opción vacía) */
+.elec-page .form-select option[value=""] {
+    color: rgba(255,255,255,0.65);
+}
+
+/* Flecha del select en tema oscuro (Chrome/Safari) */
+.elec-page .form-select {
+    color-scheme: dark;
+}
+

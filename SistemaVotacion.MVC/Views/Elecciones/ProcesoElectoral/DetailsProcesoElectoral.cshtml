@@ -1,0 +1,67 @@
+﻿@model SistemaVotacion.Modelos.ProcesoElectoral
+
+@{
+    ViewData["Title"] = "Detalles Proceso Electoral";
+}
+
+<div class="elec-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-7">
+                <div class="elec-card">
+
+                    <div class="elec-card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-calendar-event"></i>
+                            Detalles del Proceso Electoral
+                        </h5>
+
+                        <span class="elec-badge elec-badge-info">
+                            Información
+                        </span>
+                    </div>
+
+                    <div class="elec-card-body">
+
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4 elec-section-title">ID</dt>
+                            <dd class="col-sm-8">@Model.Id</dd>
+
+                            <dt class="col-sm-4 elec-section-title">Nombre</dt>
+                            <dd class="col-sm-8">@Model.NombreProceso</dd>
+
+                            <dt class="col-sm-4 elec-section-title">Fecha Inicio</dt>
+                            <dd class="col-sm-8">@Model.FechaInicio.ToString("dd/MM/yyyy")</dd>
+
+                            <dt class="col-sm-4 elec-section-title">Fecha Fin</dt>
+                            <dd class="col-sm-8">@Model.FechaFin.ToString("dd/MM/yyyy")</dd>
+
+                            <dt class="col-sm-4 elec-section-title">Tipo</dt>
+                            <dd class="col-sm-8">
+                                @(Model.TipoProceso != null
+                                                                ? Model.TipoProceso.NombreTipoProceso
+                                                                : "No definido")
+                            </dd>
+                        </dl>
+
+                        <hr class="elec-hr my-4" />
+
+                        <div class="d-grid gap-2">
+                            <a asp-action="EditProcesoElectoral"
+                               asp-route-id="@Model.Id"
+                               class="btn elec-btn elec-btn-warn py-2">
+                                <i class="bi bi-pencil-square"></i> Editar
+                            </a>
+
+                            <a asp-action="CreateProcesoElectoral"
+                               class="btn elec-btn elec-btn-secondary py-2">
+                                <i class="bi bi-arrow-left"></i> Volver al Dashboard
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

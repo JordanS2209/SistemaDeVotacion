@@ -1,0 +1,83 @@
+﻿@model SistemaVotacion.Modelos.ProcesoElectoral
+
+@{
+    ViewData["Title"] = "Editar Proceso Electoral";
+    var hoy = DateTime.Now.ToString("yyyy-MM-dd");
+}
+
+<div class="elec-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-7">
+                <div class="elec-card">
+
+                    <div class="elec-card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-pencil-square"></i>
+                            Editar Proceso Electoral
+                        </h5>
+                        <span class="elec-badge elec-badge-pausado">Edición</span>
+                    </div>
+
+                    <div class="elec-card-body">
+                        <form asp-action="EditProcesoElectoral" method="post">
+                            @Html.AntiForgeryToken()
+
+                            <div asp-validation-summary="ModelOnly" class="elec-alert elec-alert-danger mb-3"></div>
+
+                            <input type="hidden" asp-for="Id" />
+
+                            <div class="mb-3">
+                                <label asp-for="NombreProceso" class="form-label"></label>
+                                <input asp-for="NombreProceso" class="form-control" />
+                                <span asp-validation-for="NombreProceso" class="text-danger small"></span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="FechaInicio" class="form-label"></label>
+                                    <input asp-for="FechaInicio" type="date" class="form-control" min="@hoy" />
+                                    <span asp-validation-for="FechaInicio" class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="FechaFin" class="form-label"></label>
+                                    <input asp-for="FechaFin" type="date" class="form-control" min="@hoy" />
+                                    <span asp-validation-for="FechaFin" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="IdTipoProceso" class="form-label">Tipo de Proceso</label>
+                                <select asp-for="IdTipoProceso" class="form-select" asp-items="ViewBag.TipoProceso">
+                                    <option value="">-- Seleccione un tipo --</option>
+                                </select>
+                                <span asp-validation-for="IdTipoProceso" class="text-danger small"></span>
+                            </div>
+
+                            <hr class="elec-hr my-4" />
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn elec-btn elec-btn-primary px-3 py-2">
+                                    <i class="bi bi-save"></i> Guardar
+                                </button>
+
+                                <a asp-action="CreateProcesoElectoral" class="btn elec-btn elec-btn-secondary px-3 py-2">
+                                    <i class="bi bi-arrow-left"></i> Volver
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

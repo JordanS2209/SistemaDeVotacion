@@ -1,0 +1,52 @@
+﻿@model SistemaVotacion.Modelos.TipoProceso
+
+<div class="elec-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-7 col-lg-6">
+                <div class="elec-card">
+                    <div class="elec-card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-trash"></i> Eliminar Tipo de Proceso
+                        </h5>
+                        <span class="elec-badge elec-badge-cerrado">Acción irreversible</span>
+                    </div>
+
+                    <div class="elec-card-body">
+                        <p class="text-center elec-subtitle mb-4">
+                            ¿Estás seguro que deseas eliminar este registro?
+                        </p>
+
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4 elec-section-title">ID</dt>
+                            <dd class="col-sm-8">@Model.Id</dd>
+
+                            <dt class="col-sm-4 elec-section-title">Nombre</dt>
+                            <dd class="col-sm-8">@Model.NombreTipoProceso</dd>
+
+                            <dt class="col-sm-4 elec-section-title">Descripción</dt>
+                            <dd class="col-sm-8">@Model.Descripcion</dd>
+                        </dl>
+
+                        <hr class="elec-hr my-4" />
+
+                        <form asp-action="DeleteTipoProceso" method="post">
+                            <input type="hidden" asp-for="Id" />
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn elec-btn elec-btn-danger py-2">
+                                    <i class="bi bi-trash3"></i> Eliminar
+                                </button>
+
+                                <a asp-action="CreateProcesoElectoral" class="btn elec-btn elec-btn-secondary py-2">
+                                    <i class="bi bi-arrow-left"></i> Volver
+                                </a>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

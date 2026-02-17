@@ -1,46 +1,34 @@
 ﻿@model SistemaVotacion.Modelos.Candidato
 
-@{
-    ViewData["Title"] = "Eliminar Candidato";
-}
+<div class="container form-container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card form-card shadow border-0">
+                <div class="card-header form-card-header bg-danger text-white text-center">
+                    <i class="bi bi-trash"></i> Eliminar Candidato
+                </div>
+                <div class="card-body form-card-body">
+                    <h5 class="text-center mb-3">¿Estás seguro que deseas eliminar este registro?</h5>
+                    <dl class="row">
+                        <dt class="col-sm-4">Nombre Candidato</dt>
+                        <dd class="col-sm-8">@Model.NombreCandidato</dd>
 
-<h1>Eliminar Candidato</h1>
+                        <dt class="col-sm-4">Lista</dt>
+                        <dd class="col-sm-8">@Model.Lista?.NombreLista ?? "No asignada"</dd>
 
-<h3>¿Estás seguro que deseas eliminar este registro?</h3>
-<div>
-    <h4>Candidato</h4>
-    <hr />
-    <dl class="row">
+                        <dt class="col-sm-4">Dignidad</dt>
+                        <dd class="col-sm-8">@Model.Dignidad?.NombreDignidad ?? "No asignada"</dd>
+                    </dl>
 
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.NombreCandidato)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.NombreCandidato)
-        </dd>
-
-        <dt class="col-sm-2">
-            Lista
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Lista.NombreLista)
-        </dd>
-
-        <dt class="col-sm-2">
-            Dignidad
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Dignidad.NombreDignidad)
-        </dd>
-    </dl>
-
-    <form asp-action="DeleteCandidato" method="post">
-        <!-- Campo oculto para enviar el Id -->
-        <input type="hidden" asp-for="Id" />
-
-        <div class="form-group mt-3">
-            <input type="submit" value="Eliminar" class="btn btn-danger" />
-            <a asp-action="ListCandidato" class="btn btn-secondary">Volver a la lista</a>
+                    <form asp-action="DeleteCandidato" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-grid gap-2 mt-3">
+                            <button type="submit" class="btn btn-danger py-2">Eliminar</button>
+                            <a asp-action="ListCandidato" class="btn btn-secondary py-2">Volver a la lista</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-    </form>
+    </div>
 </div>

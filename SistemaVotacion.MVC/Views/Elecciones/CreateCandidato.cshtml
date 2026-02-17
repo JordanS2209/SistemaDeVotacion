@@ -4,40 +4,53 @@
     ViewData["Title"] = "Crear Candidato";
 }
 
-<h1>Crear Candidato</h1>
+<div class="container form-container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card form-card shadow border-0">
+                <div class="card-header form-card-header bg-success">
+                    <i class="bi bi-person-plus"></i> Crear Candidato
+                </div>
+                <div class="card-body form-card-body">
+                    <form asp-action="CreateCandidato" method="post">
+                        @Html.AntiForgeryToken()
 
-<hr />
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="CreateCandidato" method="post">
-            @Html.AntiForgeryToken()
+                        <div class="mb-3">
+                            <label asp-for="NombreCandidato" class="form-label"></label>
+                            <input asp-for="NombreCandidato" class="form-control" />
+                            <span asp-validation-for="NombreCandidato" class="text-danger small"></span>
+                        </div>
 
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="mb-3">
+                            <label asp-for="IdLista" class="form-label">Lista</label>
+                            <select asp-for="IdLista" class="form-select" asp-items="ViewBag.Listas">
+                                <option value="">-- Seleccione Lista --</option>
+                            </select>
+                            <span asp-validation-for="IdLista" class="text-danger small"></span>
+                        </div>
 
-            <div class="form-group">
-                <label asp-for="NombreCandidato"></label>
-                <input asp-for="NombreCandidato" class="form-control" />
-                <span asp-validation-for="NombreCandidato" class="text-danger"></span>
+                        <div class="mb-3">
+                            <label asp-for="IdDignidad" class="form-label">Dignidad</label>
+                            <select asp-for="IdDignidad" class="form-select" asp-items="ViewBag.Dignidades">
+                                <option value="">-- Seleccione Dignidad --</option>
+                            </select>
+                            <span asp-validation-for="IdDignidad" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success py-2">
+                                <i class="bi bi-save"></i> Crear
+                            </button>
+                            <a asp-action="ListCandidato" class="btn btn-outline-secondary py-2">
+                                Volver
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label asp-for="IdLista">Lista</label>
-                <select asp-for="IdLista" class="form-control" asp-items="ViewBag.Listas"></select>
-                <span asp-validation-for="IdLista" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="IdDignidad">Dignidad</label>
-                <select asp-for="IdDignidad" class="form-control" asp-items="ViewBag.Dignidades"></select>
-                <span asp-validation-for="IdDignidad" class="text-danger"></span>
-            </div>
-
-            <div class="mt-3">
-                <button type="submit" class="btn btn-primary">Crear</button>
-                <a asp-action="ListCandidato" class="btn btn-secondary">Volver</a>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 

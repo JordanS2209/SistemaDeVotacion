@@ -1,0 +1,165 @@
+﻿@model IEnumerable<SistemaVotacion.Modelos.ProcesoElectoral>
+
+@{
+    var ahora = DateTime.Now;
+
+    bool EstaCerrado(SistemaVotacion.Modelos.ProcesoElectoral p)
+        => ahora > p.FechaFin;
+
+    bool EstaPausado(SistemaVotacion.Modelos.ProcesoElectoral p)
+        => p.FechaInicio > p.FechaFin && !EstaCerrado(p);
+
+    bool EstaPendiente(SistemaVotacion.Modelos.ProcesoElectoral p)
+        => ahora < p.FechaInicio && !EstaPausado(p) && !EstaCerrado(p);
+
+    bool EstaActivo(SistemaVotacion.Modelos.ProcesoElectoral p)
+        => ahora >= p.FechaInicio && ahora <= p.FechaFin && !EstaPausado(p);
+
+    string Estado(SistemaVotacion.Modelos.ProcesoElectoral p)
+    {
+        if (EstaCerrado(p)) return "Cerrado";
+        if (EstaPausado(p)) return "Pausado";
+        if (EstaPendiente(p)) return "Pendiente";
+        if (EstaActivo(p)) return "Activo";
+        return "Cerrado";
+    }
+
+    string BadgeClass(string estado)
+    {
+        return estado switch
+        {
+            "Pendiente" => "elec-badge elec-badge-secondary",
+            "Activo" => "elec-badge elec-badge-success",
+            "Pausado" => "elec-badge elec-badge-warning",
+            _ => "elec-badge elec-badge-danger"
+        };
+    }
+}
+
+<div class="elec-table-wrap">
+    <div class="table-responsive">
+        <table class="table elec-table mb-0 align-middle">
+            <thead>
+                <tr>
+                    <th style="width:70px;">Id</th>
+                    <th>Nombre</th>
+                    <th style="width:140px;">Fecha Inicio</th>
+                    <th style="width:140px;">Fecha Fin</th>
+                    <th>Tipo de Proceso</th>
+                    <th style="width:110px;">Estado</th>
+                    <th style="width: 320px;">Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model.OrderByDescending(x => x.FechaInicio))
+                    {
+                        var estado = Estado(item);
+
+                        var puedeEditar = (estado == "Pendiente" || estado == "Pausado");
+                        var puedeActivar = (estado == "Pendiente" || estado == "Pausado") && item.FechaFin > ahora;
+                        var puedeCerrar = estado == "Activo";
+
+                        <tr>
+                            <td class="text-muted">@item.Id</td>
+                            <td class="fw-semibold">@item.NombreProceso</td>
+                            <td>@(estado == "Pausado" ? "PAUSADO" : item.FechaInicio.ToString("dd/MM/yyyy"))</td>
+                            <td>@item.FechaFin.ToString("dd/MM/yyyy")</td>
+                            <td>@(item.TipoProceso != null ? item.TipoProceso.NombreTipoProceso : "No definido")</td>
+                            <td>
+                                <span class="@BadgeClass(estado)">@estado</span>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-2">
+
+                                    @* Editar *@
+                                    @if (puedeEditar)
+                                    {
+                                        <a asp-action="EditProcesoElectoral"
+                                           asp-route-id="@item.Id"
+                                           class="btn elec-btn elec-btn-warn btn-sm">
+                                            <i class="bi bi-pencil-square"></i> Editar
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn elec-btn elec-btn-warn btn-sm" disabled
+                                                title="Solo se puede editar un proceso pendiente o pausado.">
+                                            <i class="bi bi-pencil-square"></i> Editar
+                                        </button>
+                                    }
+
+                                    <a asp-action="DetailsProcesoElectoral"
+                                       asp-route-id="@item.Id"
+                                       class="btn elec-btn elec-btn-info btn-sm">
+                                        <i class="bi bi-info-circle"></i> Detalles
+                                    </a>
+
+                                    @* Activar *@
+                                    @if (puedeActivar)
+                                    {
+                                        <button type="button"
+                                                class="btn elec-btn elec-btn-success btn-sm"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalActivarProceso"
+                                                data-proceso-id="@item.Id"
+                                                data-proceso-nombre="@item.NombreProceso">
+                                            <i class="bi bi-play-circle"></i> Activar
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn elec-btn elec-btn-success btn-sm" disabled
+                                                title="Solo se puede activar si está pendiente o pausado y no ha vencido.">
+                                            <i class="bi bi-play-circle"></i> Activar
+                                        </button>
+                                    }
+
+                                    @* Cerrar = Pausar *@
+                                    @if (puedeCerrar)
+                                    {
+                                        <button type="button"
+                                                class="btn elec-btn elec-btn-danger btn-sm"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalCerrarProceso"
+                                                data-proceso-id="@item.Id"
+                                                data-proceso-nombre="@item.NombreProceso">
+                                            <i class="bi bi-x-circle"></i> Cerrar
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn elec-btn elec-btn-danger btn-sm" disabled
+                                                title="Solo se puede cerrar (pausar) un proceso activo.">
+                                            <i class="bi bi-x-circle"></i> Cerrar
+                                        </button>
+                                    }
+
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            No hay procesos electorales registrados.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="p-3">
+            <div class="alert elec-alert elec-alert-danger mb-0">
+                <i class="bi bi-exclamation-triangle"></i> @ViewBag.Error
+            </div>
+        </div>
+    }
+</div>

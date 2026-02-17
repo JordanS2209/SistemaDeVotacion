@@ -1,41 +1,43 @@
 ﻿@model SistemaVotacion.Modelos.OpcionConsulta
-
 @{
     ViewData["Title"] = "Editar Opción de Consulta";
 }
 
-<h1>Editar Opción de Consulta</h1>
+<div class="container form-container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card form-card shadow border-0">
+                <div class="card-header form-card-header bg-warning text-white text-center">
+                    <i class="bi bi-clipboard-data"></i> Editar Opción de Consulta
+                </div>
+                <div class="card-body form-card-body">
+                    <form asp-action="EditOpcionConsulta" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="Id" />
 
-<hr />
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="EditOpcionConsulta" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="mb-3">
+                            <label asp-for="TextoOpcion" class="form-label"></label>
+                            <select asp-for="TextoOpcion" class="form-control" asp-items="ViewBag.Valores">
+                                <option value="">-- Seleccione una opción --</option>
+                            </select>
+                            <span asp-validation-for="TextoOpcion" class="text-danger"></span>
+                        </div>
 
-            <input type="hidden" asp-for="Id" />
+                        <div class="mb-3">
+                            <label asp-for="IdPregunta" class="form-label"></label>
+                            <select asp-for="IdPregunta" class="form-control" asp-items="ViewBag.Preguntas">
+                                <option value="">-- Seleccione la pregunta --</option>
+                            </select>
+                            <span asp-validation-for="IdPregunta" class="text-danger"></span>
+                        </div>
 
-            <div class="form-group">
-                <label asp-for="TextoOpcion" class="control-label"></label>
-                <select asp-for="TextoOpcion" class="form-control" asp-items="ViewBag.Valores"></select>
-                <span asp-validation-for="TextoOpcion" class="text-danger"></span>
+                        <div class="d-grid gap-2 mt-3">
+                            <input type="submit" value="Guardar" class="btn btn-primary py-2" />
+                            <a asp-action="ListOpcionConsulta" class="btn btn-secondary py-2">Volver al listado</a>
+                        </div>
+                    </form>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label asp-for="IdPregunta" class="control-label"></label>
-                <select asp-for="IdPregunta" class="form-control" asp-items="ViewBag.Preguntas"></select>
-                <span asp-validation-for="IdPregunta" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mt-3">
-                <input type="submit" value="Guardar" class="btn btn-primary" />
-                <a asp-action="ListOpcionConsulta" class="btn btn-secondary">Volver al listado</a>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

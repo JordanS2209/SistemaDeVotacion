@@ -1,0 +1,65 @@
+﻿@model SistemaVotacion.Modelos.TipoProceso
+
+@{
+    ViewData["Title"] = "Editar Tipo de Proceso";
+}
+
+<div class="elec-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-7 col-lg-6">
+                <div class="elec-card">
+
+                    <div class="elec-card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-diagram-3"></i>
+                            Editar Tipo de Proceso
+                        </h5>
+                        <span class="elec-badge elec-badge-pausado">Edición</span>
+                    </div>
+
+                    <div class="elec-card-body">
+                        <form asp-action="EditTipoProceso" method="post">
+                            @Html.AntiForgeryToken()
+
+                            <div asp-validation-summary="ModelOnly" class="elec-alert elec-alert-danger mb-3"></div>
+                            <input type="hidden" asp-for="Id" />
+
+                            <div class="mb-3">
+                                <label asp-for="NombreTipoProceso" class="form-label"></label>
+                                <input asp-for="NombreTipoProceso" class="form-control" />
+                                <span asp-validation-for="NombreTipoProceso" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Descripcion" class="form-label"></label>
+                                <textarea asp-for="Descripcion" class="form-control" rows="4"></textarea>
+                                <span asp-validation-for="Descripcion" class="text-danger small"></span>
+                            </div>
+
+                            <hr class="elec-hr my-4" />
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn elec-btn elec-btn-primary py-2">
+                                    <i class="bi bi-save"></i> Guardar cambios
+                                </button>
+
+                                <a asp-action="CreateProcesoElectoral" class="btn elec-btn elec-btn-secondary py-2">
+                                    <i class="bi bi-arrow-left"></i> Volver
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

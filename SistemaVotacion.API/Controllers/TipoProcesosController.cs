@@ -26,7 +26,10 @@ namespace SistemaVotacion.API.Controllers
             try
             {
                 var tipos = await _context.TipoProcesos
+                    .AsNoTracking()
+                    .OrderBy(tp => tp.NombreTipoProceso)
                     .ToListAsync();
+
                 return Ok(tipos);
             }
             catch (Exception ex)
@@ -34,6 +37,7 @@ namespace SistemaVotacion.API.Controllers
                 Console.WriteLine($"Error al obtener tipos de proceso: {ex.Message}");
                 return StatusCode(500, $"Error interno: {ex.Message}");
             }
+
         }
 
         // GET: api/TipoProcesos/5
@@ -42,7 +46,11 @@ namespace SistemaVotacion.API.Controllers
         {
             try
             {
+                if (id <= 0)
+                    return BadRequest("ID inválido.");
+
                 var tipo = await _context.TipoProcesos
+                    .AsNoTracking()
                     .Include(tp => tp.ProcesosAsociados)
                     .FirstOrDefaultAsync(tp => tp.Id == id);
 
@@ -58,6 +66,7 @@ namespace SistemaVotacion.API.Controllers
                 Console.WriteLine($"Error en GetTipoProceso: {ex.Message}");
                 return StatusCode(500, $"Error interno del servidor: {ex.Message}");
             }
+
         }
 
         // POST: api/TipoProcesos
@@ -66,8 +75,26 @@ namespace SistemaVotacion.API.Controllers
         {
             try
             {
+                if (nuevoTipo == null)
+                    return BadRequest("El cuerpo de la petición está vacío.");
+
+                if (string.IsNullOrWhiteSpace(nuevoTipo.NombreTipoProceso))
+                    return BadRequest("NombreTipoProceso es obligatorio.");
+
+                // Opcional: evitar duplicados por nombre (si quieres)
+                var existe = await _context.TipoProcesos
+                    .AnyAsync(tp => tp.NombreTipoProceso.ToLower() == nuevoTipo.NombreTipoProceso.Trim().ToLower());
+
+                if (existe)
+                    return Conflict("Ya existe un Tipo de Proceso con el mismo nombre.");
+
+                nuevoTipo.NombreTipoProceso = nuevoTipo.NombreTipoProceso.Trim();
+                if (!string.IsNullOrWhiteSpace(nuevoTipo.Descripcion))
+                    nuevoTipo.Descripcion = nuevoTipo.Descripcion.Trim();
+
                 _context.TipoProcesos.Add(nuevoTipo);
                 await _context.SaveChangesAsync();
+
                 return CreatedAtAction(nameof(GetTipoProceso), new { id = nuevoTipo.Id }, nuevoTipo);
             }
             catch (Exception ex)
@@ -75,6 +102,7 @@ namespace SistemaVotacion.API.Controllers
                 Console.WriteLine($"Error al crear tipo de proceso: {ex.Message}");
                 return StatusCode(500, $"Error al guardar el tipo de proceso: {ex.Message}");
             }
+
         }
 
         // PUT: api/TipoProcesos/5
@@ -86,12 +114,34 @@ namespace SistemaVotacion.API.Controllers
                 return BadRequest("El ID de la URL no coincide con el ID del tipo de proceso.");
             }
 
-            _context.Entry(tipoProceso).State = EntityState.Modified;
+            if (tipoProceso == null)
+                return BadRequest("El cuerpo de la petición está vacío.");
+
+            if (string.IsNullOrWhiteSpace(tipoProceso.NombreTipoProceso))
+                return BadRequest("NombreTipoProceso es obligatorio.");
 
             try
             {
+                // Traemos el existente para no sobreescribir navegación/relaciones accidentalmente
+                var existente = await _context.TipoProcesos.FirstOrDefaultAsync(tp => tp.Id == id);
+                if (existente == null)
+                    return NotFound("El tipo de proceso no existe.");
+
+                // Opcional: evitar duplicado de nombre
+                var nuevoNombre = tipoProceso.NombreTipoProceso.Trim();
+                var existeOtro = await _context.TipoProcesos
+                    .AnyAsync(tp => tp.Id != id && tp.NombreTipoProceso.ToLower() == nuevoNombre.ToLower());
+
+                if (existeOtro)
+                    return Conflict("Ya existe otro Tipo de Proceso con ese nombre.");
+
+                existente.NombreTipoProceso = nuevoNombre;
+                existente.Descripcion = string.IsNullOrWhiteSpace(tipoProceso.Descripcion)
+                    ? null
+                    : tipoProceso.Descripcion.Trim();
+
                 await _context.SaveChangesAsync();
-                return NoContent();
+                return Ok("Tipo de proceso actualizado correctamente.");
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -109,6 +159,7 @@ namespace SistemaVotacion.API.Controllers
                 Console.WriteLine($"Error al actualizar tipo de proceso: {ex.Message}");
                 return StatusCode(500, $"Error al actualizar: {ex.Message}");
             }
+
         }
 
         // DELETE: api/TipoProcesos/5
@@ -117,10 +168,23 @@ namespace SistemaVotacion.API.Controllers
         {
             try
             {
-                var tipo = await _context.TipoProcesos.FindAsync(id);
+                if (id <= 0)
+                    return BadRequest("ID inválido.");
+
+                // Importante: incluir procesos asociados para validar FK antes de borrar
+                var tipo = await _context.TipoProcesos
+                    .Include(tp => tp.ProcesosAsociados)
+                    .FirstOrDefaultAsync(tp => tp.Id == id);
+
                 if (tipo == null)
                 {
                     return NotFound("Tipo de proceso no encontrado.");
+                }
+
+                // Si tiene procesos asociados, NO borrar (evita romper FK)
+                if (tipo.ProcesosAsociados != null && tipo.ProcesosAsociados.Any())
+                {
+                    return Conflict("No se puede eliminar: este Tipo de Proceso tiene procesos electorales asociados.");
                 }
 
                 _context.TipoProcesos.Remove(tipo);
@@ -133,6 +197,7 @@ namespace SistemaVotacion.API.Controllers
                 Console.WriteLine($"Error al eliminar tipo de proceso: {ex.Message}");
                 return StatusCode(500, $"Error al eliminar: {ex.Message}");
             }
+
         }
 
         private bool TipoProcesoExists(int id)

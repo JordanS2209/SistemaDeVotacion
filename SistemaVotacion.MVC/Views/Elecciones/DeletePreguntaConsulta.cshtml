@@ -1,0 +1,37 @@
+﻿@model SistemaVotacion.Modelos.PreguntaConsulta
+
+<div class="container form-container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card form-card shadow border-0">
+                <div class="card-header form-card-header bg-danger text-white text-center">
+                    <i class="bi bi-trash"></i> Eliminar Pregunta de Consulta
+                </div>
+                <div class="card-body form-card-body">
+                    <h5 class="text-center mb-3">¿Estás seguro que deseas eliminar esta pregunta?</h5>
+                    <dl class="row">
+                        <dt class="col-sm-4">ID</dt>
+                        <dd class="col-sm-8">@Model.Id</dd>
+
+                        <dt class="col-sm-4">Texto Pregunta</dt>
+                        <dd class="col-sm-8">@Model.TextoPregunta</dd>
+
+                        <dt class="col-sm-4">Número Pregunta</dt>
+                        <dd class="col-sm-8">@Model.NumeroPregunta</dd>
+
+                        <dt class="col-sm-4">Proceso Electoral</dt>
+                        <dd class="col-sm-8">@Model.ProcesosElectorales?.NombreProceso ?? "No asignado"</dd>
+                    </dl>
+
+                    <form asp-action="DeletePreguntaConsulta" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-grid gap-2 mt-3">
+                            <button type="submit" class="btn btn-danger py-2">Eliminar</button>
+                            <a asp-action="ListPreguntaConsulta" class="btn btn-secondary py-2">Volver a la lista</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

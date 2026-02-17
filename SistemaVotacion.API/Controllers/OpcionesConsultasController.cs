@@ -135,6 +135,57 @@ namespace SistemaVotacion.API.Controllers
                 return StatusCode(500, $"Error al eliminar: {ex.Message}");
             }
         }
+        // GET: api/OpcionesConsultas/por-proceso/5
+        [HttpGet("por-proceso/{idProceso}")]
+        public async Task<ActionResult<List<OpcionConsulta>>> GetOpcionesPorProceso(int idProceso)
+        {
+            if (idProceso <= 0)
+                return BadRequest("Proceso inválido.");
+
+            var preguntas = await _context.PreguntasConsultas
+                .Where(p => p.IdProceso == idProceso)
+                .Select(p => p.Id)
+                .ToListAsync();
+
+            if (!preguntas.Any())
+                return Ok(new List<OpcionConsulta>());
+
+            var opcionesExistentes = await _context.OpcionConsultas
+                .Where(o => preguntas.Contains(o.IdPregunta))
+                .ToListAsync();
+
+            var opcionesPorPregunta = opcionesExistentes
+                .GroupBy(o => o.IdPregunta)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            foreach (var idPregunta in preguntas)
+            {
+                if (!opcionesPorPregunta.TryGetValue(idPregunta, out var opciones) || opciones.Count == 0)
+                {
+                    _context.OpcionConsultas.Add(new OpcionConsulta
+                    {
+                        IdPregunta = idPregunta,
+                        TextoOpcion = "Sí"
+                    });
+
+                    _context.OpcionConsultas.Add(new OpcionConsulta
+                    {
+                        IdPregunta = idPregunta,
+                        TextoOpcion = "No"
+                    });
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            var resultado = await _context.OpcionConsultas
+                .Include(o => o.Pregunta)
+                .Where(o => preguntas.Contains(o.IdPregunta))
+                .ToListAsync();
+
+            return Ok(resultado);
+        }
+
 
         private bool OpcionConsultaExists(int id)
         {

@@ -1,18 +1,20 @@
 ﻿@{
     Layout = null;
+    ViewData["Title"] = "Proceso no disponible";
 }
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
     <title>Proceso no disponible</title>
-    <link rel="stylesheet" href="~/css/Boleta.css" />
+    <link rel="stylesheet" href="~/css/EstadoBoleta.css" />
 </head>
 <body>
-    <div class="boleta-container">
-        <div class="boleta-header">
-            <h1>Proceso no disponible</h1>
-            <p>No existe un proceso electoral activo en este momento.</p>
+    <div class="estado-container">
+        <div class="estado-card">
+            <div class="estado-icon">⚠️</div>
+            <h1 class="estado-title">Proceso no disponible</h1>
+            <p class="estado-text">No existe un proceso electoral activo en este momento.</p>
         </div>
     </div>
 </body>

@@ -139,6 +139,18 @@ namespace SistemaVotacion.API.Controllers
                 return StatusCode(500, $"Error al eliminar: {ex.Message}");
             }
         }
+        // GET: api/PreguntasConsultas/por-proceso/5
+        [HttpGet("por-proceso/{idProceso}")]
+        public async Task<ActionResult<List<PreguntaConsulta>>> GetPreguntasPorProceso(int idProceso)
+        {
+            var preguntas = await _context.PreguntasConsultas
+                .Where(p => p.IdProceso == idProceso)
+                .OrderBy(p => p.NumeroPregunta)
+                .ToListAsync();
+
+            return Ok(preguntas);
+        }
+
 
         private bool PreguntaConsultaExists(int id)
         {

@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SistemaVotacion.API.DTOs;
+
 
 namespace SistemaVotacion.API.Controllers
 {
@@ -94,6 +96,114 @@ namespace SistemaVotacion.API.Controllers
                 .ToListAsync();
 
             return Ok(resultados);
+        }
+        [HttpGet("consulta-popular")]
+        public async Task<IActionResult> ObtenerResultadosConsultaPopular()
+        {
+            var ahora = DateTime.Now;
+
+            var proceso = await _context.ProcesosElectorales
+                .FirstOrDefaultAsync(p =>
+                    ahora >= p.FechaInicio &&
+                    ahora <= p.FechaFin &&
+                    p.IdTipoProceso == 2);
+
+            if (proceso == null)
+                return BadRequest("No hay consulta popular activa");
+
+            var preguntas = await _context.PreguntasConsultas
+                .Where(p => p.IdProceso == proceso.Id)
+                .ToListAsync();
+
+            var resultados = new List<ResultadoPreguntaDto>();
+
+            foreach (var pregunta in preguntas)
+            {
+                var votos = await _context.VotoDetalles
+                    .Where(v =>
+                        v.IdProceso == proceso.Id &&
+                        v.IdPregunta == pregunta.Id)
+                    .Include(v => v.Opcion)
+                    .Include(v => v.TipoVoto)
+                    .ToListAsync();
+
+                var totalSi = votos.Count(v =>
+                    (v.Opcion?.TextoOpcion ?? string.Empty).ToUpper() == "SÍ");
+
+                var totalNo = votos.Count(v =>
+                    (v.Opcion?.TextoOpcion ?? string.Empty).ToUpper() == "NO");
+
+                var totalBlanco = votos.Count(v =>
+                    (v.TipoVoto?.NombreTipo ?? string.Empty).ToUpper().Contains("BLANCO"));
+
+                var ganador =
+                    totalSi > totalNo ? "SÍ" :
+                    totalNo > totalSi ? "NO" :
+                    "EMPATE";
+
+                resultados.Add(new ResultadoPreguntaDto
+                {
+                    IdPregunta = pregunta.Id,
+                    TextoPregunta = pregunta.TextoPregunta,
+                    TotalSi = totalSi,
+                    TotalNo = totalNo,
+                    TotalBlancos = totalBlanco,
+                    Ganador = ganador
+                });
+            }
+
+            var dto = new ResultadoConsultaDto
+            {
+                IdProceso = proceso.Id,
+                NombreProceso = proceso.NombreProceso,
+                Resultados = resultados
+            };
+
+            return Ok(dto);
+        }
+
+        [HttpGet("eleccion-general")]
+        public async Task<IActionResult> ObtenerResultadosEleccionGeneral()
+        {
+            var ahora = DateTime.Now;
+
+            var proceso = await _context.ProcesosElectorales
+                .FirstOrDefaultAsync(p =>
+                    ahora >= p.FechaInicio &&
+                    ahora <= p.FechaFin &&
+                    p.IdTipoProceso == 1);
+
+            if (proceso == null)
+                return BadRequest("No hay elección general activa");
+
+            var listas = await _context.VotoDetalles
+                .Where(v =>
+                    v.IdProceso == proceso.Id &&
+                    v.IdLista != null)
+                .GroupBy(v => new { v.IdLista, v.Lista.NombreLista })
+                .Select(g => new ResultadoListaDto
+                {
+                    IdLista = g.Key.IdLista.Value,
+                    NombreLista = g.Key.NombreLista,
+                    TotalVotos = g.Count()
+                })
+                .OrderByDescending(x => x.TotalVotos)
+                .ToListAsync();
+
+            var totalVotos = listas.Sum(l => l.TotalVotos);
+
+            var ganador = listas.FirstOrDefault()?.NombreLista ?? "Sin votos";
+
+            var dto = new ResultadoEleccionDto
+            {
+                IdProceso = proceso.Id,
+                NombreProceso = proceso.NombreProceso,
+                TotalVotos = totalVotos,
+                Ganador = ganador,
+                Resultados = listas
+            };
+
+            return Ok(dto);
         }
 
     }

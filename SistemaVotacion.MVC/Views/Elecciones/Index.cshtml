@@ -1,0 +1,121 @@
+﻿@{
+    ViewData["Title"] = "Panel de Elecciones";
+}
+<br />
+<br />
+<br />
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary">Administración de Elecciones</h1>
+        <p class="lead text-muted">Gestione todos los elementos de su proceso electoral</p>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+
+        <div class="col-md-4 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 dashboard-card">
+                <div class="card-body text-center p-4">
+                    <div class="icon-box mb-3 mx-auto bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-file-text fs-1"></i>
+                    </div>
+                    <h4 class="card-title fw-bold">Procesos Electorales</h4>
+                    <p class="card-text text-muted small">Crear y gestionar procesos electorales y fechas importantes.</p>
+                    <a asp-action="ListProcesoElectoral" class="btn btn-primary w-100 mt-3 stretched-link">
+                        Entrar a Procesos
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 dashboard-card">
+                <div class="card-body text-center p-4">
+                    <div class="icon-box mb-3 mx-auto bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-clipboard-check fs-1"></i>
+                    </div>
+                    <h4 class="card-title fw-bold">Tipos de Proceso</h4>
+                    <p class="card-text text-muted small">Definir el tipo de elecciones: ordinarias, extraordinarias, consultas, etc.</p>
+                    <a asp-action="ListTipoProceso" class="btn btn-success w-100 mt-3 stretched-link">
+                        Entrar a Tipos
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 dashboard-card">
+                <div class="card-body text-center p-4">
+                    <div class="icon-box mb-3 mx-auto bg-warning bg-opacity-10 text-warning">
+                        <i class="bi bi-list-check fs-1"></i>
+                    </div>
+                    <h4 class="card-title fw-bold">Listas</h4>
+                    <p class="card-text text-muted small">Administrar listas de candidatos vinculadas a cada dignidad.</p>
+                    <a asp-action="ListLista" class="btn btn-warning w-100 mt-3 stretched-link">
+                        Entrar a Listas
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 dashboard-card">
+                <div class="card-body text-center p-4">
+                    <div class="icon-box mb-3 mx-auto bg-danger bg-opacity-10 text-danger">
+                        <i class="bi bi-person fs-1"></i>
+                    </div>
+                    <h4 class="card-title fw-bold">Candidatos</h4>
+                    <p class="card-text text-muted small">Gestionar los candidatos y su información personal y política.</p>
+                    <a asp-action="ListCandidato" class="btn btn-danger w-100 mt-3 stretched-link">
+                        Entrar a Candidatos
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 dashboard-card">
+                <div class="card-body text-center p-4">
+                    <div class="icon-box mb-3 mx-auto bg-secondary bg-opacity-10 text-secondary">
+                        <i class="bi bi-question-circle fs-1"></i>
+                    </div>
+                    <h4 class="card-title fw-bold">Preguntas de Consulta</h4>
+                    <p class="card-text text-muted small">Definir preguntas de consulta popular y sus opciones de votación.</p>
+                    <a asp-action="ListPreguntaConsulta" class="btn btn-secondary w-100 mt-3 stretched-link">
+                        Entrar a Preguntas
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 dashboard-card">
+                <div class="card-body text-center p-4">
+                    <div class="icon-box mb-3 mx-auto bg-dark bg-opacity-10 text-dark">
+                        <i class="bi bi-check2-square fs-1"></i>
+                    </div>
+                    <h4 class="card-title fw-bold">Opciones de Consulta</h4>
+                    <p class="card-text text-muted small">Administrar las opciones vinculadas a cada pregunta de consulta.</p>
+                    <a asp-action="ListOpcionConsulta" class="btn btn-dark w-100 mt-3 stretched-link">
+                        Entrar a Opciones
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 dashboard-card">
+                <div class="card-body text-center p-4">
+                    <div class="icon-box mb-3 mx-auto bg-info bg-opacity-10 text-info">
+                        <i class="bi bi-image fs-1"></i>
+                    </div>
+                    <h4 class="card-title fw-bold">Multimedia</h4>
+                    <p class="card-text text-muted small">Gestionar imágenes, videos y otros recursos para candidatos y procesos.</p>
+                    <a asp-action="ListMultimedia" class="btn btn-info w-100 text-white mt-3 stretched-link">
+                        Entrar a Multimedia
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

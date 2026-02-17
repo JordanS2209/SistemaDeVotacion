@@ -123,18 +123,15 @@ namespace SistemaVotacion.API.Controllers
             {
                 var opcion = await _context.OpcionConsultas.FindAsync(id);
                 if (opcion == null)
-                {
                     return NotFound("Opción de consulta no encontrada.");
-                }
 
                 _context.OpcionConsultas.Remove(opcion);
                 await _context.SaveChangesAsync();
-
-                return Ok(opcion); 
+                return Ok(opcion);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error al eliminar la opción: {ex.Message}");
+                Console.WriteLine($"Error al eliminar opción: {ex.Message}");
                 return StatusCode(500, $"Error al eliminar: {ex.Message}");
             }
         }

@@ -1,0 +1,53 @@
+﻿@model SistemaVotacion.Modelos.ProcesoElectoral
+@{
+    ViewData["Title"] = "Editar Proceso Electoral";
+}
+
+<div class="container form-container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card form-card shadow border-0">
+                <div class="card-header form-card-header bg-warning text-white text-center">
+                    <i class="bi bi-file-earmark-text"></i> Editar Proceso Electoral
+                </div>
+                <div class="card-body form-card-body">
+                    <form asp-action="EditProcesoElectoral">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="mb-3">
+                            <label asp-for="NombreProceso" class="form-label"></label>
+                            <input asp-for="NombreProceso" class="form-control" />
+                            <span asp-validation-for="NombreProceso" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="FechaInicio" class="form-label"></label>
+                            <input asp-for="FechaInicio" type="date" class="form-control" />
+                            <span asp-validation-for="FechaInicio" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="FechaFin" class="form-label"></label>
+                            <input asp-for="FechaFin" type="date" class="form-control" />
+                            <span asp-validation-for="FechaFin" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="IdTipoProceso" class="form-label">Tipo de Proceso</label>
+                            <select asp-for="IdTipoProceso" class="form-control" asp-items="ViewBag.TipoProceso">
+                                <option value="">-- Seleccione un tipo --</option>
+                            </select>
+                            <span asp-validation-for="IdTipoProceso" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-3">
+                            <input type="submit" value="Guardar" class="btn btn-primary py-2" />
+                            <a asp-action="ListProcesoElectoral" class="btn btn-secondary py-2">Volver a la lista</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,71 @@
+﻿@model SistemaVotacion.Modelos.Padron
+
+@{
+    ViewData["Title"] = "CreatePadron";
+}
+
+<h1>CreatePadron</h1>
+
+<h4>Padron</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="CreatePadron">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- HaVotado -->
+            <div class="form-group form-check">
+                <input class="form-check-input" asp-for="HaVotado" />
+                <label class="form-check-label" asp-for="HaVotado"></label>
+                <span asp-validation-for="HaVotado" class="text-danger"></span>
+            </div>
+
+            <!-- Código de acceso -->
+            <div class="form-group">
+                <label asp-for="CodigoAcceso" class="control-label"></label>
+                <input asp-for="CodigoAcceso" class="form-control" />
+                <span asp-validation-for="CodigoAcceso" class="text-danger"></span>
+            </div>
+
+            <!-- Selección de Votante -->
+            <div class="form-group">
+                <label asp-for="Votante" class="control-label"></label>
+                <select asp-for="IdVotante" class="form-control" asp-items="ViewBag.Votantes">
+                    <option value="">-- Selecciona un votante --</option>
+                </select>
+                @if (ViewBag.Votantes.Count == 0)
+                {
+                    <small class="text-warning">No hay votantes registrados. Por favor crea uno primero.</small>
+                }
+                <span asp-validation-for="IdVotante" class="text-danger"></span>
+            </div>
+
+            <!-- Selección de Proceso Electoral -->
+            <div class="form-group">
+                <label asp-for="Proceso" class="control-label"></label>
+                <select asp-for="IdProceso" class="form-control" asp-items="ViewBag.Procesos">
+                    <option value="">-- Selecciona un proceso --</option>
+                </select>
+                @if (ViewBag.Procesos.Count == 0)
+                {
+                    <small class="text-warning">No hay procesos activos. Por favor crea uno primero.</small>
+                }
+                <span asp-validation-for="IdProceso" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="ListPadron">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

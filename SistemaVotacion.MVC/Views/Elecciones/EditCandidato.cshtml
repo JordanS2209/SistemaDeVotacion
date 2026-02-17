@@ -1,47 +1,45 @@
 ﻿@model SistemaVotacion.Modelos.Candidato
-
 @{
     ViewData["Title"] = "Editar Candidato";
 }
 
-<h1>Editar Candidato</h1>
+<div class="container form-container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card form-card shadow border-0">
+                <div class="card-header form-card-header bg-warning text-white text-center">
+                    <i class="bi bi-person-lines-fill"></i> Editar Candidato
+                </div>
+                <div class="card-body form-card-body">
+                    <form asp-action="EditCandidato" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="Id" />
 
-<h4>Candidato</h4>
-<hr />
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="EditCandidato" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
+                        <div class="mb-3">
+                            <label asp-for="NombreCandidato" class="form-label"></label>
+                            <input asp-for="NombreCandidato" class="form-control" />
+                            <span asp-validation-for="NombreCandidato" class="text-danger"></span>
+                        </div>
 
-            <div class="form-group">
-                <label asp-for="NombreCandidato" class="control-label"></label>
-                <input asp-for="NombreCandidato" class="form-control" />
-                <span asp-validation-for="NombreCandidato" class="text-danger"></span>
+                        <div class="mb-3">
+                            <label asp-for="IdLista" class="form-label"></label>
+                            <select asp-for="IdLista" class="form-control" asp-items="ViewBag.Listas"></select>
+                            <span asp-validation-for="IdLista" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="IdDignidad" class="form-label"></label>
+                            <select asp-for="IdDignidad" class="form-control" asp-items="ViewBag.Dignidades"></select>
+                            <span asp-validation-for="IdDignidad" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-3">
+                            <input type="submit" value="Guardar cambios" class="btn btn-primary py-2" />
+                            <a asp-action="ListCandidato" class="btn btn-secondary py-2">Volver a la lista</a>
+                        </div>
+                    </form>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label asp-for="IdLista" class="control-label"></label>
-                <select asp-for="IdLista" class="form-control" asp-items="ViewBag.Listas"></select>
-                <span asp-validation-for="IdLista" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="IdDignidad" class="control-label"></label>
-                <select asp-for="IdDignidad" class="form-control" asp-items="ViewBag.Dignidades"></select>
-                <span asp-validation-for="IdDignidad" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mt-3">
-                <input type="submit" value="Guardar cambios" class="btn btn-primary" />
-                <a asp-action="ListCandidato" class="btn btn-secondary">Volver a la lista</a>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

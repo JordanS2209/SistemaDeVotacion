@@ -1,0 +1,46 @@
+﻿@model SistemaVotacion.Modelos.Votante
+
+@{
+    ViewData["Title"] = "DetailsVotante";
+}
+
+<h1>DetailsVotante</h1>
+
+<div>
+    <h4>Votante</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+
+        <dt class="col-sm-2">
+            Junta Receptora
+        </dt>
+        <dd class="col-sm-10">
+            @(Model.Junta != null ? $"Junta {Model.Junta.NumeroJunta}" : "Sin asignar")
+        </dd>
+
+        <dt class="col-sm-2">
+            Votante (Usuario)
+        </dt>
+        <dd class="col-sm-10">
+            @(Model.Usuario != null ? Model.Usuario.Nombres + " " + Model.Usuario.Apellidos : "Sin asignar")
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Estado)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Estado)
+        </dd>
+    </dl>
+</div>
+
+<div>
+    @Html.ActionLink("Edit", "EditVotante", new { id = Model.Id }) |
+    <a asp-action="ListVotantes">Back to List</a>
+</div>

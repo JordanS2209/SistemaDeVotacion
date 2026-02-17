@@ -6,6 +6,7 @@ using SistemaVotacion.Modelos;
 using SistemaVotacion.Servicios.Interfaces;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 
 namespace SistemaVotacion.MVC.Controllers
 {
@@ -21,31 +22,73 @@ namespace SistemaVotacion.MVC.Controllers
             return View();
         }
         // tipo electoral - crud 
-
         private List<SelectListItem> GetTipoProceso()
         {
-            return Crud<TipoProceso>.GetAll()
-                .Select(tp => new SelectListItem
-                {
-                    Value = tp.Id.ToString(),
-                    Text = tp.NombreTipoProceso
-                })
-                .ToList();
-        }
-
-        public IActionResult ListProcesoElectoral()
-        {
+            
             try
             {
-                var procesoElectoral = Crud<ProcesoElectoral>.GetAll();
-                return View(procesoElectoral);
+                var tipos = Crud<TipoProceso>.GetAll();
+
+                // Por si JsonConvert devolviera null 
+                if (tipos == null) return new List<SelectListItem>();
+
+                return tipos
+                    .OrderBy(tp => tp.NombreTipoProceso)
+                    .Select(tp => new SelectListItem
+                    {
+                        Value = tp.Id.ToString(),
+                        Text = tp.NombreTipoProceso
+                    })
+                    .ToList();
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View(new List<ProcesoElectoral>());
+                Console.WriteLine("Error GetTipoProceso(): " + ex.Message);
+                return new List<SelectListItem>();
             }
         }
+        private bool EstaActivo(ProcesoElectoral p)
+        {
+            var ahora = DateTime.Now;
+            return ahora >= p.FechaInicio && ahora <= p.FechaFin;
+        }
+
+        private bool EstaCerrado(ProcesoElectoral p)
+        {
+            return DateTime.Now > p.FechaFin;
+        }
+
+        private void CargarDashboardProcesoElectoral()
+        {
+            // Esta vista (CreateProcesoElectoral) actúa como Dashboard para:
+            // - Crear TipoProceso
+            // - Crear ProcesoElectoral
+            // - Listar ambos
+            // Esta vista actúa como “Dashboard” (TipoProceso + ProcesoElectoral)
+            try
+            {
+                var tipos = Crud<TipoProceso>.GetAll();
+                var procesos = Crud<ProcesoElectoral>.GetAll();
+
+                bool existenTipos = tipos != null && tipos.Any();
+                ViewBag.ExistenTipos = existenTipos;
+
+                if (existenTipos)
+                    ViewBag.TipoProceso = GetTipoProceso();
+
+                ViewBag.ListaTiposProceso = tipos ?? new List<TipoProceso>();
+                ViewBag.ListaProcesosElectorales = procesos ?? new List<ProcesoElectoral>();
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ExistenTipos = false;
+                ViewBag.TipoProceso = new List<SelectListItem>();
+                ViewBag.ListaTiposProceso = new List<TipoProceso>();
+                ViewBag.ListaProcesosElectorales = new List<ProcesoElectoral>();
+                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
+            }
+        }
+
         public IActionResult DetailsProcesoElectoral(int id)
         {
             try
@@ -54,46 +97,117 @@ namespace SistemaVotacion.MVC.Controllers
                 if (procesoElectoral == null)
                     return NotFound();
 
-                return View(procesoElectoral);
+                return View("ProcesoElectoral/DetailsProcesoElectoral", procesoElectoral);
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View();
+                TempData["Error"] = "Error al conectar con la API: " + ex.Message;
+                return RedirectToAction(nameof(CreateProcesoElectoral));
             }
         }
+
         public IActionResult CreateProcesoElectoral()
         {
-            ViewBag.TipoProceso = GetTipoProceso();
-            return View();
+            CargarDashboardProcesoElectoral();
+            return View("ProcesoElectoral/CreateProcesoElectoral");
         }
+
+        //para ver exactamente mis errores no entendia que estaba haciendo mal
+        private string ObtenerDetalleBadRequestDesdeApi<TPayload>(string url, TPayload payload)
+        {
+            try
+            {
+                using var client = new HttpClient();
+
+                var json = Newtonsoft.Json.JsonConvert.SerializeObject(payload);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = client.PostAsync(url, content).Result;
+
+                var body = response.Content.ReadAsStringAsync().Result;
+
+                // Recortamos para que no sea infinito en TempData
+                if (!string.IsNullOrWhiteSpace(body) && body.Length > 1200)
+                    body = body.Substring(0, 1200) + "...";
+
+                return $"HTTP {(int)response.StatusCode} {response.StatusCode}. Detalle API: {body}";
+            }
+            catch (Exception ex)
+            {
+                return "No se pudo leer el detalle del error desde la API: " + ex.Message;
+            }
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult CreateProcesoElectoral(ProcesoElectoral nuevoProcesoElectoral)
         {
-            // Validación lógica mínima
-            if (nuevoProcesoElectoral.FechaInicio >= nuevoProcesoElectoral.FechaFin)
+            var hoy = DateTime.Now.Date;
+
+            if (nuevoProcesoElectoral == null)
             {
-                ModelState.AddModelError("", "La fecha de inicio debe ser menor a la fecha de fin.");
+                TempData["Error"] = "Datos inválidos.";
+                return RedirectToAction(nameof(CreateProcesoElectoral));
             }
 
-            if (ModelState.IsValid)
+            // Validaciones 
+            if (string.IsNullOrWhiteSpace(nuevoProcesoElectoral.NombreProceso))
+                ModelState.AddModelError(nameof(ProcesoElectoral.NombreProceso), "El nombre del proceso es obligatorio.");
+
+            if (nuevoProcesoElectoral.IdTipoProceso <= 0)
+                ModelState.AddModelError(nameof(ProcesoElectoral.IdTipoProceso), "Debe seleccionar un Tipo de Proceso.");
+
+            if (nuevoProcesoElectoral.FechaInicio == default)
+                ModelState.AddModelError(nameof(ProcesoElectoral.FechaInicio), "La fecha de inicio es obligatoria.");
+
+            if (nuevoProcesoElectoral.FechaFin == default)
+                ModelState.AddModelError(nameof(ProcesoElectoral.FechaFin), "La fecha de fin es obligatoria.");
+
+            if (nuevoProcesoElectoral.FechaInicio != default && nuevoProcesoElectoral.FechaFin != default)
             {
-                try
-                {
-                    Crud<ProcesoElectoral>.Create(nuevoProcesoElectoral);
-                    return RedirectToAction(nameof(ListProcesoElectoral));
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", "Error al crear: " + ex.Message);
-                }
+                if (nuevoProcesoElectoral.FechaInicio.Date >= nuevoProcesoElectoral.FechaFin.Date)
+                    ModelState.AddModelError("", "La fecha de inicio debe ser menor a la fecha de fin.");
+
+                if (nuevoProcesoElectoral.FechaFin.Date < hoy)
+                    ModelState.AddModelError(nameof(ProcesoElectoral.FechaFin), "No se puede crear un proceso con fecha fin pasada.");
             }
 
-            // IMPORTANTE: volver a cargar el dropdown
-            ViewBag.TipoProceso = GetTipoProceso();
-            return View(nuevoProcesoElectoral);
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Revisa los datos del proceso electoral.";
+                CargarDashboardProcesoElectoral();
+                return View("ProcesoElectoral/CreateProcesoElectoral", nuevoProcesoElectoral);
+            }
+
+            try
+            {
+                nuevoProcesoElectoral.NombreProceso = nuevoProcesoElectoral.NombreProceso.Trim();
+
+                Crud<ProcesoElectoral>.Create(nuevoProcesoElectoral);
+
+                TempData["Success"] = "Proceso electoral creado correctamente.";
+                return RedirectToAction(nameof(CreateProcesoElectoral));
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.Contains("BadRequest", StringComparison.OrdinalIgnoreCase))
+                {
+                    var detalle = ObtenerDetalleBadRequestDesdeApi(Crud<ProcesoElectoral>.EndPoint, nuevoProcesoElectoral);
+                    TempData["Error"] = "La API rechazó la solicitud. " + detalle;
+                }
+                else
+                {
+                    TempData["Error"] = "Error al crear proceso electoral: " + ex.Message;
+                }
+
+                //  IMPORTANTÍSIMO: recargar combos/listas y devolver la vista con el modelo
+                CargarDashboardProcesoElectoral();
+                return View("ProcesoElectoral/CreateProcesoElectoral", nuevoProcesoElectoral);
+            }
         }
+
+
+
 
         public IActionResult EditProcesoElectoral(int id)
         {
@@ -103,13 +217,28 @@ namespace SistemaVotacion.MVC.Controllers
                 if (procesoElectoral == null)
                     return NotFound();
 
+                // Regla UX (igual la API lo bloquea): no editar si activo/cerrado
+                if (EstaActivo(procesoElectoral))
+                {
+                    TempData["Error"] = "No se puede editar un proceso activo.";
+                    return RedirectToAction(nameof(CreateProcesoElectoral));
+                }
+
+                if (EstaCerrado(procesoElectoral))
+                {
+                    TempData["Error"] = "No se puede editar un proceso cerrado.";
+                    return RedirectToAction(nameof(CreateProcesoElectoral));
+                }
+
                 ViewBag.TipoProceso = GetTipoProceso();
-                return View(procesoElectoral);
+                return View("ProcesoElectoral/EditProcesoElectoral", procesoElectoral);
+
+
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View();
+                TempData["Error"] = "Error al conectar con la API: " + ex.Message;
+                return RedirectToAction(nameof(CreateProcesoElectoral));
             }
         }
 
@@ -117,61 +246,104 @@ namespace SistemaVotacion.MVC.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult EditProcesoElectoral(int id, ProcesoElectoral procesoElectoral)
         {
-            if (procesoElectoral.FechaInicio >= procesoElectoral.FechaFin)
+            if (procesoElectoral == null)
             {
-                ModelState.AddModelError("", "La fecha de inicio debe ser menor a la fecha de fin.");
+                TempData["Error"] = "Datos inválidos.";
+                return RedirectToAction(nameof(CreateProcesoElectoral));
             }
+
+            if (string.IsNullOrWhiteSpace(procesoElectoral.NombreProceso))
+                ModelState.AddModelError(nameof(ProcesoElectoral.NombreProceso), "NombreProceso es obligatorio.");
+
+            if (procesoElectoral.FechaInicio >= procesoElectoral.FechaFin)
+                ModelState.AddModelError("", "La fecha de inicio debe ser menor a la fecha de fin.");
 
             if (ModelState.IsValid)
             {
                 try
                 {
+                    // Revalidación contra estado actual
+                    var actual = Crud<ProcesoElectoral>.GetById(id);
+                    if (actual == null)
+                        return NotFound();
+
+                    if (EstaActivo(actual))
+                    {
+                        TempData["Error"] = "No se puede editar un proceso activo.";
+                        return RedirectToAction(nameof(CreateProcesoElectoral));
+                    }
+
+                    if (EstaCerrado(actual))
+                    {
+                        TempData["Error"] = "No se puede editar un proceso cerrado.";
+                        return RedirectToAction(nameof(CreateProcesoElectoral));
+                    }
+
+                    procesoElectoral.NombreProceso = procesoElectoral.NombreProceso.Trim();
+
                     Crud<ProcesoElectoral>.Update(id, procesoElectoral);
-                    return RedirectToAction(nameof(ListProcesoElectoral));
+                    TempData["Success"] = "Proceso electoral actualizado correctamente.";
+                    return RedirectToAction(nameof(CreateProcesoElectoral));
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("", "Error al actualizar: " + ex.Message);
+                    TempData["Error"] = "Error al actualizar proceso electoral: " + ex.Message;
                 }
+            }
+            else
+            {
+                TempData["Error"] = "Revisa los datos del proceso electoral.";
             }
 
             ViewBag.TipoProceso = GetTipoProceso();
-            return View(procesoElectoral);
+            return View("ProcesoElectoral/EditProcesoElectoral", procesoElectoral);
+
+
         }
 
 
-        public IActionResult DeleteProcesoElectoral(int id)
+        public IActionResult ActivarProcesoElectoral(int id)
         {
             try
             {
-                var procesoElectoral = Crud<ProcesoElectoral>.GetById(id);
-                if (procesoElectoral == null)
-                    return NotFound();
+                var url = $"{Crud<ProcesoElectoral>.EndPoint}/Activar/{id}";
+                var resultado = Crud<ProcesoElectoral>.PutCustom(url);
 
-                return View(procesoElectoral);
+                if (!resultado)
+                    TempData["Error"] = "No se pudo activar el proceso electoral.";
+                else
+                    TempData["Success"] = "Proceso activado correctamente.";
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View();
+                TempData["Error"] = "Error al activar proceso: " + ex.Message;
             }
+
+            return RedirectToAction(nameof(CreateProcesoElectoral));
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult DeleteProcesoElectoral(int id, ProcesoElectoral procesoElectoral)
+        public IActionResult CerrarProcesoElectoral(int id)
         {
+
             try
             {
-                Crud<ProcesoElectoral>.Delete(id);
-                return RedirectToAction(nameof(ListProcesoElectoral));
+                var url = $"{Crud<ProcesoElectoral>.EndPoint}/Cerrar/{id}";
+                var resultado = Crud<ProcesoElectoral>.PutCustom(url);
+
+                if (!resultado)
+                    TempData["Error"] = "No se pudo cerrar el proceso electoral.";
+                else
+                    TempData["Success"] = "Proceso cerrado correctamente.";
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "Error al eliminar: " + ex.Message);
-                return View(procesoElectoral);
+                TempData["Error"] = "Error al cerrar proceso: " + ex.Message;
             }
+
+            return RedirectToAction(nameof(CreateProcesoElectoral));
         }
+
+
 
 
 
@@ -180,19 +352,8 @@ namespace SistemaVotacion.MVC.Controllers
 
         // TIPO DE PROCESOS - CRUD
         //index
-        public IActionResult ListTipoProceso()
-        {
-            try
-            {
-                var tipoProcesosData = Crud<TipoProceso>.GetAll();
-                return View(tipoProcesosData);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View(new List<TipoProceso>());
-            }
-        }
+       
+
         public IActionResult DetailsTipoProceso(int id)
         {
             try
@@ -201,35 +362,54 @@ namespace SistemaVotacion.MVC.Controllers
                 if (tipoProcesoData == null)
                     return NotFound();
 
-                return View(tipoProcesoData);
+                return View("TipoProceso/DetailsTipoProceso", tipoProcesoData);
+
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View();
+                TempData["Error"] = "Error al conectar con la API: " + ex.Message;
+                return RedirectToAction(nameof(CreateProcesoElectoral));
             }
+
         }
         public IActionResult CreateTipoProceso()
         {
-            return View();
+            return RedirectToAction(nameof(CreateProcesoElectoral));
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult CreateTipoProceso(TipoProceso nuevoTipoProceso)
         {
+            if (nuevoTipoProceso == null)
+            {
+                TempData["Error"] = "Datos inválidos.";
+                return RedirectToAction(nameof(CreateProcesoElectoral));
+            }
+
+            if (string.IsNullOrWhiteSpace(nuevoTipoProceso.NombreTipoProceso))
+                ModelState.AddModelError(nameof(TipoProceso.NombreTipoProceso), "NombreTipoProceso es obligatorio.");
+
             if (ModelState.IsValid)
             {
                 try
                 {
+                    nuevoTipoProceso.NombreTipoProceso = nuevoTipoProceso.NombreTipoProceso.Trim();
+                    if (!string.IsNullOrWhiteSpace(nuevoTipoProceso.Descripcion))
+                        nuevoTipoProceso.Descripcion = nuevoTipoProceso.Descripcion.Trim();
+
                     Crud<TipoProceso>.Create(nuevoTipoProceso);
-                    return RedirectToAction(nameof(ListTipoProceso));
+                    TempData["Success"] = "Tipo de Proceso creado correctamente.";
+                    return RedirectToAction(nameof(CreateProcesoElectoral));
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("", "Error al crear: " + ex.Message);
+                    TempData["Error"] = "Error al crear Tipo de Proceso: " + ex.Message;
+                    return RedirectToAction(nameof(CreateProcesoElectoral));
                 }
             }
-            return View(nuevoTipoProceso);
+
+            TempData["Error"] = "Revisa los datos del Tipo de Proceso.";
+            return RedirectToAction(nameof(CreateProcesoElectoral));
         }
         public IActionResult EditTipoProceso(int id)
         {
@@ -239,12 +419,13 @@ namespace SistemaVotacion.MVC.Controllers
                 if (tipoProcesoData == null)
                     return NotFound();
 
-                return View(tipoProcesoData);
+                return View("TipoProceso/EditTipoProceso", tipoProcesoData);
+
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View();
+                TempData["Error"] = "Error al conectar con la API: " + ex.Message;
+                return RedirectToAction(nameof(CreateProcesoElectoral));
             }
         }
 
@@ -252,20 +433,38 @@ namespace SistemaVotacion.MVC.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult EditTipoProceso(int id, TipoProceso tipoProcesoData)
         {
+            if (tipoProcesoData == null)
+            {
+                TempData["Error"] = "Datos inválidos.";
+                return RedirectToAction(nameof(CreateProcesoElectoral));
+            }
+
+            if (string.IsNullOrWhiteSpace(tipoProcesoData.NombreTipoProceso))
+                ModelState.AddModelError(nameof(TipoProceso.NombreTipoProceso), "NombreTipoProceso es obligatorio.");
+
             if (ModelState.IsValid)
             {
                 try
                 {
+                    tipoProcesoData.NombreTipoProceso = tipoProcesoData.NombreTipoProceso.Trim();
+                    if (!string.IsNullOrWhiteSpace(tipoProcesoData.Descripcion))
+                        tipoProcesoData.Descripcion = tipoProcesoData.Descripcion.Trim();
+
                     Crud<TipoProceso>.Update(id, tipoProcesoData);
-                    return RedirectToAction(nameof(ListTipoProceso));
+                    TempData["Success"] = "Tipo de Proceso actualizado correctamente.";
+                    return RedirectToAction(nameof(CreateProcesoElectoral));
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("", "Error al actualizar: " + ex.Message);
+                    TempData["Error"] = "Error al actualizar Tipo de Proceso: " + ex.Message;
+                    return View("TipoProceso/EditTipoProceso", tipoProcesoData);
                 }
             }
-            return View(tipoProcesoData);
+
+            TempData["Error"] = "Revisa los datos del Tipo de Proceso.";
+            return View("TipoProceso/EditTipoProceso", tipoProcesoData);
         }
+
 
         public IActionResult DeleteTipoProceso(int id)
         {
@@ -275,14 +474,15 @@ namespace SistemaVotacion.MVC.Controllers
                 if (tipo == null)
                     return NotFound();
 
-                return View(tipo);
+                return View("TipoProceso/_DeleteTipoProceso", tipo);
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View();
+                TempData["Error"] = "Error al conectar con la API: " + ex.Message;
+                return RedirectToAction(nameof(CreateProcesoElectoral));
             }
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteTipoProceso(int id, TipoProceso tipoProcesoData)
@@ -290,14 +490,16 @@ namespace SistemaVotacion.MVC.Controllers
             try
             {
                 Crud<TipoProceso>.Delete(id);
-                return RedirectToAction(nameof(ListTipoProceso));
+                TempData["Success"] = "Tipo de Proceso eliminado correctamente.";
+                return RedirectToAction(nameof(CreateProcesoElectoral));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "Error al eliminar: " + ex.Message);
-                return View(tipoProcesoData);
+                TempData["Error"] = "Error al eliminar Tipo de Proceso: " + ex.Message;
+                return View("TipoProceso/_DeleteTipoProceso", tipoProcesoData);
             }
         }
+
 
         // CADIDATOS - CRUD
         // Helper para obtener las listas
@@ -546,8 +748,11 @@ namespace SistemaVotacion.MVC.Controllers
         {
             try
             {
-                var opcionConsultaData = Crud<OpcionConsulta>.GetById(id);
-                return View(opcionConsultaData);
+                var opcion = Crud<OpcionConsulta>.GetById(id);
+                if (opcion == null)
+                    return NotFound();
+
+                return View(opcion);
             }
             catch (Exception ex)
             {
@@ -571,6 +776,9 @@ namespace SistemaVotacion.MVC.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult CreateOpcionConsulta(OpcionConsulta nuevaOpcion)
         {
+            if (string.IsNullOrWhiteSpace(nuevaOpcion.TextoOpcion))
+                ModelState.AddModelError("", "El texto de la opción es obligatorio.");
+
             if (ModelState.IsValid)
             {
                 try
@@ -580,12 +788,12 @@ namespace SistemaVotacion.MVC.Controllers
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("", "Error: " + ex.Message);
+                    ModelState.AddModelError("", "Error al crear: " + ex.Message);
                 }
             }
 
+            ViewBag.Pregunta = GetPreguntasConsulta();
             ViewBag.Valores = GetOpcionesConsulta();
-            ViewBag.Preguntas = GetPreguntasConsulta();
             return View(nuevaOpcion);
         }
 
@@ -594,10 +802,13 @@ namespace SistemaVotacion.MVC.Controllers
         {
             try
             {
-                var opcionConsultaData = Crud<OpcionConsulta>.GetById(id);
+                var opcion = Crud<OpcionConsulta>.GetById(id);
+                if (opcion == null)
+                    return NotFound();
+
+                ViewBag.Pregunta = GetPreguntasConsulta();
                 ViewBag.Valores = GetOpcionesConsulta();
-                ViewBag.Preguntas = GetPreguntasConsulta();
-                return View(opcionConsultaData);
+                return View(opcion);
             }
             catch (Exception ex)
             {
@@ -611,6 +822,9 @@ namespace SistemaVotacion.MVC.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult EditOpcionConsulta(int id, OpcionConsulta opcionConsultaData)
         {
+            if (string.IsNullOrWhiteSpace(opcionConsultaData.TextoOpcion))
+                ModelState.AddModelError("", "El texto de la opción es obligatorio.");
+
             if (ModelState.IsValid)
             {
                 try
@@ -620,20 +834,31 @@ namespace SistemaVotacion.MVC.Controllers
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("", "Error: " + ex.Message);
+                    ModelState.AddModelError("", "Error al actualizar: " + ex.Message);
                 }
             }
 
+            ViewBag.Pregunta = GetPreguntasConsulta();
             ViewBag.Valores = GetOpcionesConsulta();
-            ViewBag.Preguntas = GetPreguntasConsulta();
             return View(opcionConsultaData);
         }
 
         // ELIMINAR (GET)
         public IActionResult DeleteOpcionConsulta(int id)
         {
-            var opcionConsultaData = Crud<OpcionConsulta>.GetById(id);
-            return View(opcionConsultaData);
+            try
+            {
+                var opcion = Crud<OpcionConsulta>.GetById(id);
+                if (opcion == null)
+                    return NotFound();
+
+                return View(opcion);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
+                return View();
+            }
         }
 
         // ELIMINAR (POST)
@@ -648,11 +873,10 @@ namespace SistemaVotacion.MVC.Controllers
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "Error: " + ex.Message);
+                ModelState.AddModelError("", "Error al eliminar: " + ex.Message);
                 return View(opcionConsultaData);
             }
         }
-
 
         //PREGUNTA CONSULTA - CRUD
         public IActionResult ListPreguntaConsulta()
@@ -945,6 +1169,18 @@ namespace SistemaVotacion.MVC.Controllers
             }
         }
         // Multimedia-Crud
+        private List<SelectListItem> GetCandidatos()
+        {
+            return Crud<Candidato>.GetAll()
+                .Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.NombreCandidato // Cambia según tu propiedad de nombre
+                })
+                .ToList();
+        }
+
+       
         public async Task<IActionResult> ListMultimedia()
         {
             try
@@ -976,6 +1212,8 @@ namespace SistemaVotacion.MVC.Controllers
         }
         public IActionResult CreateMultimedia()
         {
+            ViewBag.Candidatos = GetCandidatos();
+            ViewBag.Listas = GetListas();
             return View();
         }
 
@@ -983,32 +1221,41 @@ namespace SistemaVotacion.MVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateMultimedia(IFormFile file, int idCandidato, int idLista, string? descripcion)
         {
-            if (file != null)
+            if (file == null || idCandidato == 0 || idLista == 0)
             {
-                try
-                {
-                    await _multimediaService.UploadAsync(file, idCandidato, idLista, descripcion);
-                    return RedirectToAction(nameof(ListMultimedia));
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", "Error: " + ex.Message);
-                }
+                ModelState.AddModelError("", "Archivo, Candidato y Lista son obligatorios.");
+                ViewBag.Candidatos = GetCandidatos();
+                ViewBag.Listas = GetListas();
+                return View();
             }
-            return View();
 
+            try
+            {
+                await _multimediaService.UploadAsync(file, idCandidato, idLista, descripcion);
+                return RedirectToAction(nameof(ListMultimedia));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Error: " + ex.Message);
+                ViewBag.Candidatos = GetCandidatos();
+                ViewBag.Listas = GetListas();
+                return View();
+            }
         }
+
         public async Task<IActionResult> EditMultimedia(int id)
         {
             try
             {
                 var multimediaData = await _multimediaService.GetByIdAsync(id);
+                ViewBag.Candidatos = GetCandidatos();
+                ViewBag.Listas = GetListas();
                 return View(multimediaData);
             }
             catch (Exception ex)
             {
                 ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View(id);
+                return View();
             }
         }
 
@@ -1030,9 +1277,20 @@ namespace SistemaVotacion.MVC.Controllers
 
         public async Task<IActionResult> DeleteMultimedia(int id)
         {
-            var multimediaData = await _multimediaService.GetByIdAsync(id);
-            return View(multimediaData);
+            try
+            {
+                var multimediaData = await _multimediaService.GetByIdAsync(id);
+                if (multimediaData == null)
+                    return NotFound();
+                return View(multimediaData);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
+                return View();
+            }
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteMultimedia(int id, Multimedia multimediaData)

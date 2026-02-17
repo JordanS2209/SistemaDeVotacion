@@ -26,6 +26,8 @@ namespace SistemaVotacion.MVC
             Crud<ProcesoElectoral>.EndPoint = "https://localhost:7202/api/ProcesosElectorales";
             Crud<Lista>.EndPoint = "https://localhost:7202/api/Boletas/activas";
             Crud<Padron>.EndPoint = "https://localhost:7202/api/Padrones";
+            Crud<Votante>.EndPoint = "https://localhost:7202/api/Votantes";
+            
 
 
             var builder = WebApplication.CreateBuilder(args);

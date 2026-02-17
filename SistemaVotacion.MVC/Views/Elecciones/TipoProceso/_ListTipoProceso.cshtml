@@ -1,0 +1,59 @@
+﻿@model IEnumerable<SistemaVotacion.Modelos.TipoProceso>
+
+<div class="elec-table-wrap mt-3">
+    <div class="table-responsive">
+        <table class="table elec-table mb-0 align-middle">
+            <thead>
+                <tr>
+                    <th style="width:70px;">Id</th>
+                    <th style="width:220px;">Nombre</th>
+                    <th>Descripción</th>
+                    <th style="width:260px;">Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model.OrderBy(x => x.NombreTipoProceso))
+                    {
+                        <tr>
+                            <td class="text-muted">@item.Id</td>
+                            <td class="fw-semibold">@item.NombreTipoProceso</td>
+                            <td class="text-muted">@item.Descripcion</td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <a asp-action="EditTipoProceso"
+                                       asp-route-id="@item.Id"
+                                       class="btn elec-btn elec-btn-warn btn-sm">
+                                        <i class="bi bi-pencil-square"></i> Editar
+                                    </a>
+
+                                    <a asp-action="DetailsTipoProceso"
+                                       asp-route-id="@item.Id"
+                                       class="btn elec-btn elec-btn-info btn-sm">
+                                        <i class="bi bi-info-circle"></i> Detalles
+                                    </a>
+
+                                    <a asp-action="DeleteTipoProceso"
+                                       asp-route-id="@item.Id"
+                                       class="btn elec-btn elec-btn-danger btn-sm">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-4">
+                            No hay tipos de proceso registrados.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

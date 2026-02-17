@@ -4,56 +4,58 @@
     ViewData["Title"] = "Detalles Multimedia";
 }
 
-<h1>Detalles Multimedia</h1>
-
-<div>
-    <h4>Multimedia</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Id)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Id)
-        </dd>
-
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.UrlFoto)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.UrlFoto)
-            @if (!string.IsNullOrEmpty(Model.UrlFoto))
-            {
-                <div class="mt-2">
-                    <img src="@Model.UrlFoto" alt="Vista previa" style="max-width:400px; max-height:400px;" />
+<div class="container form-container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card form-card shadow border-0">
+                <div class="card-header form-card-header bg-info text-white text-center">
+                    <i class="bi bi-file-earmark-image"></i> Detalles Multimedia
                 </div>
-            }
-        </dd>
+                <div class="card-body form-card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">ID</dt>
+                        <dd class="col-sm-8">@Model.Id</dd>
 
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Descripcion)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Descripcion)
-        </dd>
+                        <dt class="col-sm-4">Archivo</dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.UrlFoto)
+                            @if (!string.IsNullOrEmpty(Model.UrlFoto))
+                            {
+                                <div class="mt-2">
+                                    <img src="@Model.UrlFoto" alt="Vista previa" class="img-thumbnail" style="max-width:400px; max-height:400px;" />
+                                </div>
+                            }
+                        </dd>
 
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.IdCandidato)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.IdCandidato)
-        </dd>
+                        <dt class="col-sm-4">Descripción</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.Descripcion)</dd>
 
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.IdLista)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.IdLista)
-        </dd>
-    </dl>
-</div>
+                        <dt class="col-sm-4">Candidato</dt>
+                        <dd class="col-sm-8">
+                            @(Model.Candidato != null ? Model.Candidato.NombreCandidato : Model.IdCandidato.ToString())
+                        </dd>
 
-<div class="mt-3">
-    @Html.ActionLink("Editar", "EditMultimedia", new { id = Model.Id }, new { @class = "btn btn-warning" }) |
-    <a asp-action="ListMultimedia" class="btn btn-secondary">Volver a la lista</a>
+                        <dt class="col-sm-4">Lista</dt>
+                        <dd class="col-sm-8">
+                            @(Model.Lista != null ? Model.Lista.NombreLista : Model.IdLista.ToString())
+                        </dd>
+                    </dl>
+
+                    <div class="d-grid gap-2 mt-3">
+                        <a asp-action="EditMultimedia" asp-route-id="@Model.Id" class="btn btn-warning py-2">
+                            Editar
+                        </a>
+                        <a asp-action="ListMultimedia" class="btn btn-secondary py-2">
+                            Volver a la lista
+                        </a>
+                    </div>
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger mt-3 small">@ViewBag.Error</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

@@ -1,0 +1,280 @@
+﻿@model SistemaVotacion.Modelos.ProcesoElectoral
+
+@{
+    ViewData["Title"] = "Crear Proceso Electoral";
+    var hoy = DateTime.Now.ToString("yyyy-MM-dd");
+    bool existenTipos = ViewBag.ExistenTipos ?? false;
+
+    var listaTipos = ViewBag.ListaTiposProceso as IEnumerable<SistemaVotacion.Modelos.TipoProceso>
+                     ?? new List<SistemaVotacion.Modelos.TipoProceso>();
+
+    var listaProcesos = ViewBag.ListaProcesosElectorales as IEnumerable<SistemaVotacion.Modelos.ProcesoElectoral>
+                        ?? new List<SistemaVotacion.Modelos.ProcesoElectoral>();
+
+    // Para volver aquí después de gestionar TipoProceso
+    var returnUrl = Url.Action("CreateProcesoElectoral", "Elecciones");
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/elecciones.css" asp-append-version="true" />
+}
+
+<div class="elec-page">
+    <div class="container-fluid py-3">
+
+        <div class="mb-3">
+            <h2 class="elec-title mb-1"><i class="bi bi-check2-square"></i> @ViewData["Title"]</h2>
+            <div class="elec-subtitle">
+                Administra Tipos de Proceso y Procesos Electorales desde un solo panel.
+            </div>
+        </div>
+
+        @await Html.PartialAsync("_AlertMessages")
+
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+
+                <!-- Tipos de Proceso -->
+                <div class="elec-card mb-4">
+                    <div class="elec-card-header">
+                        <h5><i class="bi bi-diagram-3"></i> Tipos de Proceso</h5>
+
+                        <button type="button"
+                                class="btn elec-btn elec-btn-primary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalTipoProceso">
+                            <i class="bi bi-plus-circle"></i> Crear Tipo de Proceso
+                        </button>
+                    </div>
+
+                    <div class="elec-card-body">
+                        <p class="elec-subtitle mb-3">
+                            Antes de crear un Proceso Electoral, asegúrese de tener al menos un Tipo de Proceso registrado.
+                        </p>
+
+                        <div class="elec-card mt-2">
+                            <div class="elec-card-header">
+                                <h5 class="mb-0"><i class="bi bi-list-check"></i> Tipos de Proceso Registrados</h5>
+                            </div>
+                            <div class="elec-card-body">
+                                @await Html.PartialAsync("TipoProceso/_ListTipoProceso", listaTipos)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (existenTipos)
+                {
+                    <!-- Crear Proceso Electoral -->
+                    <div class="elec-card">
+                        <div class="elec-card-header">
+                            <h5><i class="bi bi-calendar-event"></i> Crear Proceso Electoral</h5>
+                        </div>
+
+                        <div class="elec-card-body">
+                            <form asp-action="CreateProcesoElectoral" method="post" class="mt-1">
+                                @Html.AntiForgeryToken()
+
+                                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                                <!-- Información Básica -->
+                                <div class="mb-3">
+                                    <div class="elec-section-title">📋 Información básica</div>
+                                    <hr class="elec-hr" />
+
+                                    <div class="mb-3">
+                                        <label asp-for="NombreProceso" class="form-label"></label>
+                                        <input asp-for="NombreProceso"
+                                               class="form-control"
+                                               placeholder="Ej: Elecciones Municipales 2026" />
+                                        <span asp-validation-for="NombreProceso" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Fechas -->
+                                <div class="mb-3">
+                                    <div class="elec-section-title">📅 Fechas</div>
+                                    <hr class="elec-hr" />
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label asp-for="FechaInicio" class="form-label"></label>
+                                            <input asp-for="FechaInicio"
+                                                   type="date"
+                                                   class="form-control"
+                                                   min="@hoy" />
+                                            <span asp-validation-for="FechaInicio" class="text-danger small"></span>
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <label asp-for="FechaFin" class="form-label"></label>
+                                            <input asp-for="FechaFin"
+                                                   type="date"
+                                                   class="form-control"
+                                                   min="@hoy" />
+                                            <span asp-validation-for="FechaFin" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tipo de Proceso -->
+                                <div class="mb-3">
+                                    <div class="elec-section-title">⚙️ Tipo de Proceso</div>
+                                    <hr class="elec-hr" />
+
+                                    <div class="mb-3">
+                                        <label asp-for="IdTipoProceso" class="form-label">Tipo de Proceso</label>
+                                        <select asp-for="IdTipoProceso"
+                                                class="form-select"
+                                                asp-items="ViewBag.TipoProceso"
+                                                required>
+                                            <option value="">-- Seleccione un tipo --</option>
+                                        </select>
+                                        <span asp-validation-for="IdTipoProceso" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Botón -->
+                                <div class="d-flex justify-content-end mt-3">
+                                    <button type="submit" class="btn elec-btn elec-btn-primary">
+                                        <i class="bi bi-check-circle"></i> Crear
+                                    </button>
+                                </div>
+                            </form>
+
+                            <!-- Lista de Procesos Electorales -->
+                            <div class="elec-card mt-4">
+                                <div class="elec-card-header">
+                                    <h5 class="mb-0"><i class="bi bi-list-check"></i> Procesos Electorales Registrados</h5>
+                                </div>
+                                <div class="elec-card-body">
+                                    @await Html.PartialAsync("ProcesoElectoral/_ListProcesoElectoral", listaProcesos)
+
+                                    <!-- Modal Activar -->
+                                    <div class="modal fade" id="modalActivarProceso" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content elec-modal shadow-lg">
+                                                <div class="modal-header elec-modal-header">
+                                                    <h5 class="modal-title">
+                                                        <i class="bi bi-play-circle"></i> Activar Proceso Electoral
+                                                    </h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p class="mb-1">
+                                                        ¿Deseas activar el proceso <strong id="activarNombreProceso"></strong>?
+                                                    </p>
+                                                    <small class="elec-subtitle">
+                                                        Podrás activarlo siempre que la fecha fin programada no haya vencido.
+                                                    </small>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                    <a id="btnConfirmarActivar" class="btn btn-success">Activar</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Modal Cerrar -->
+                                    <div class="modal fade" id="modalCerrarProceso" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content elec-modal shadow-lg">
+                                                <div class="modal-header elec-modal-header">
+                                                    <h5 class="modal-title">
+                                                        <i class="bi bi-x-circle"></i> Cerrar Proceso Electoral
+                                                    </h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p class="mb-1">
+                                                        ¿Deseas cerrar (pausar) el proceso <strong id="cerrarNombreProceso"></strong>?
+                                                    </p>
+                                                    <small class="elec-subtitle">
+                                                        Esta acción pausa el proceso sin cambiar la fecha fin programada.
+                                                        Podrás reactivarlo mientras no haya vencido.
+                                                    </small>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                    <a id="btnConfirmarCerrar" class="btn btn-danger">Cerrar</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <script>
+                                        (function () {
+                                            var activarModal = document.getElementById('modalActivarProceso');
+                                            if (activarModal) {
+                                                activarModal.addEventListener('show.bs.modal', function (event) {
+                                                    var button = event.relatedTarget;
+                                                    var id = button.getAttribute('data-proceso-id');
+                                                    var nombre = button.getAttribute('data-proceso-nombre');
+
+                                                    document.getElementById('activarNombreProceso').textContent = nombre;
+                                                    document.getElementById('btnConfirmarActivar')
+                                                        .setAttribute('href', '@Url.Action("ActivarProcesoElectoral", "Elecciones")' + '?id=' + id);
+                                                });
+                                            }
+
+                                            var cerrarModal = document.getElementById('modalCerrarProceso');
+                                            if (cerrarModal) {
+                                                cerrarModal.addEventListener('show.bs.modal', function (event) {
+                                                    var button = event.relatedTarget;
+                                                    var id = button.getAttribute('data-proceso-id');
+                                                    var nombre = button.getAttribute('data-proceso-nombre');
+
+                                                    document.getElementById('cerrarNombreProceso').textContent = nombre;
+                                                    document.getElementById('btnConfirmarCerrar')
+                                                        .setAttribute('href', '@Url.Action("CerrarProcesoElectoral", "Elecciones")' + '?id=' + id);
+                                                });
+                                            }
+                                        })();
+                                    </script>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert elec-alert elec-alert-danger mt-3">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        No existen Tipos de Proceso registrados. Cree uno para habilitar la creación de Procesos Electorales.
+                    </div>
+                }
+
+            </div>
+        </div>
+
+        <!-- Modal Crear TipoProceso -->
+        <div class="modal fade"
+             id="modalTipoProceso"
+             tabindex="-1"
+             aria-labelledby="modalTipoProcesoLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content shadow-lg">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalTipoProcesoLabel">
+                            <i class="bi bi-diagram-3"></i> Crear Tipo de Proceso
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        @await Html.PartialAsync("TipoProceso/_CreateTipoProceso", new SistemaVotacion.Modelos.TipoProceso())
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

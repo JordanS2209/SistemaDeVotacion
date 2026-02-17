@@ -1,53 +1,41 @@
 ﻿@model IEnumerable<SistemaVotacion.Modelos.PreguntaConsulta>
-
 @{
-    ViewData["Title"] = "ListPreguntaConsulta";
+    ViewData["Title"] = "Preguntas de Consulta";
 }
 
-<h1>ListPreguntaConsulta</h1>
+<div class="container mt-5">
+    <div class="d-flex justify-content-between mb-3">
+        <h1>Preguntas de Consulta</h1>
+        <a asp-action="CreatePreguntaConsulta" class="btn btn-primary">Crear Nueva</a>
+    </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Id)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TextoPregunta)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NumeroPregunta)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdProceso)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TextoPregunta)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NumeroPregunta)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdProceso)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <div class="table-responsive card shadow-sm">
+        <table class="table table-striped table-hover mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.Id)</th>
+                    <th>@Html.DisplayNameFor(model => model.TextoPregunta)</th>
+                    <th>@Html.DisplayNameFor(model => model.NumeroPregunta)</th>
+                    <th>Proceso Electoral</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.TextoPregunta</td>
+                        <td>@item.NumeroPregunta</td>
+                        <td>@item.ProcesosElectorales?.NombreProceso</td>
+                        <td>
+                            <a asp-action="EditPreguntaConsulta" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Editar</a>
+                            <a asp-action="DetailsPreguntaConsulta" asp-route-id="@item.Id" class="btn btn-info btn-sm">Detalles</a>
+                            <a asp-action="DeletePreguntaConsulta" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Eliminar</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

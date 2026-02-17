@@ -26,10 +26,11 @@ namespace SistemaVotacion.API.Controllers
         {
             try
             {
-                // Incluimos la Junta para saber su ubicación básica en el listado
                 var votantes = await _context.Votantes
+                    .Include(v => v.Usuario)
                     .Include(v => v.Junta)
                     .ToListAsync();
+
                 return Ok(votantes);
             }
             catch (Exception ex)
@@ -48,13 +49,10 @@ namespace SistemaVotacion.API.Controllers
                 var votante = await _context.Votantes
                     .Include(v => v.Usuario)
                     .Include(v => v.Junta)
-                    .Include(v => v.VotantesEnPadron)
                     .FirstOrDefaultAsync(v => v.Id == id);
 
                 if (votante == null)
-                {
                     return NotFound($"No se encontró el votante con ID {id}.");
-                }
 
                 return Ok(votante);
             }
@@ -70,27 +68,21 @@ namespace SistemaVotacion.API.Controllers
         public async Task<IActionResult> PutVotante(int id, Votante votante)
         {
             if (id != votante.Id)
-            {
                 return BadRequest("El ID de la URL no coincide con el ID del votante.");
-            }
 
             _context.Entry(votante).State = EntityState.Modified;
 
             try
             {
                 await _context.SaveChangesAsync();
-                return NoContent(); 
+                return NoContent();
             }
             catch (DbUpdateConcurrencyException)
             {
                 if (!VotanteExists(id))
-                {
                     return NotFound("El votante no existe.");
-                }
                 else
-                {
                     throw;
-                }
             }
             catch (Exception ex)
             {
@@ -103,11 +95,11 @@ namespace SistemaVotacion.API.Controllers
         [HttpPost]
         public async Task<ActionResult<Votante>> PostVotante(Votante votante)
         {
+
             try
             {
                 _context.Votantes.Add(votante);
                 await _context.SaveChangesAsync();
-
                 return CreatedAtAction(nameof(GetVotante), new { id = votante.Id }, votante);
             }
             catch (Exception ex)
@@ -125,14 +117,12 @@ namespace SistemaVotacion.API.Controllers
             {
                 var votante = await _context.Votantes.FindAsync(id);
                 if (votante == null)
-                {
                     return NotFound("Votante no encontrado.");
-                }
 
                 _context.Votantes.Remove(votante);
                 await _context.SaveChangesAsync();
 
-                return Ok(votante); 
+                return Ok(votante);
             }
             catch (Exception ex)
             {

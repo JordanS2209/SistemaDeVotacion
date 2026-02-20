@@ -1,65 +1,67 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy ASP.Net Core app to Azure Web App - sistema-votacion-web
+name: Build and deploy API to Azure Web App - sistema-votacion-api
 
 on:
   push:
     branches:
       - deply
+    paths:
+      - "SistemaVotacion.API/**"
+      - ".github/workflows/deploy-api.yml"
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up .NET Core
+      - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
+      - name: Restore API
+        run: dotnet restore .\SistemaVotacion.API\SistemaVotacion.API.csproj
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+      - name: Build API
+        run: dotnet build .\SistemaVotacion.API\SistemaVotacion.API.csproj -c Release --no-restore
 
-      - name: Upload artifact for deployment job
+      - name: Publish API
+        run: dotnet publish .\SistemaVotacion.API\SistemaVotacion.API.csproj -c Release --no-build -o ${{ github.workspace }}\publish_api
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          name: api-app
+          path: ${{ github.workspace }}\publish_api
 
   deploy:
     runs-on: windows-latest
     needs: build
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      id-token: write
+      contents: read
 
     steps:
-      - name: Download artifact from build job
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: .net-app
-      
+          name: api-app
+          path: ./publish
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_AD71CD53264B40498699DDE330D5DF18 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_4CC94D409A9B41ECAA5025A39F8682E3 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_9E014C6AF296471FADA772BE59C9AAED }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_8C5545B136E14A5B84A4AF61F96A74B7 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_AFBF6E50F2FC4B0FA143C24396B8C695 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_6F305DDACCAC4BC1AF3B6778A1C3BE5C }}
 
       - name: Deploy to Azure Web App
-        id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'sistema-votacion-web'
+          app-name: 'sistema-votacion-api'
           slot-name: 'Production'
-          package: .
-          
+          package: ./publish

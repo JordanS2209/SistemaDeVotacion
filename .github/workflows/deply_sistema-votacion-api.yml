@@ -1,12 +1,12 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy ASP.Net Core app to Azure Web App - sistema-votacion-api
+name: Build and deploy API to Azure Web App - sistema-votacion-api
 
 on:
   push:
     branches:
       - deply
+    paths:
+      - "SistemaVotacion.API/**"
+      - ".github/workflows/deploy-api.yml"
   workflow_dispatch:
 
 jobs:
@@ -23,18 +23,16 @@ jobs:
         with:
           dotnet-version: '8.x'
 
-      - name: Build with dotnet
-        working-directory: SistemaVotacion.API
-        run: dotnet build --configuration Release
+      - name: Restore API
+        run: dotnet restore .\SistemaVotacion.API\SistemaVotacion.API.csproj
 
-      - name: dotnet publish
-        working-directory: SistemaVotacion.API
-        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+      - name: Build API
+        run: dotnet build .\SistemaVotacion.API\SistemaVotacion.API.csproj -c Release --no-restore
 
       - name: Publish API
         run: dotnet publish .\SistemaVotacion.API\SistemaVotacion.API.csproj -c Release --no-build -o ${{ github.workspace }}\publish_api
 
-      - name: Upload artifact for deployment job
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: api-app
@@ -48,12 +46,12 @@ jobs:
       contents: read
 
     steps:
-      - name: Download artifact from build job
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: .net-app
+          name: api-app
           path: ./publish
-      
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -67,5 +65,3 @@ jobs:
           app-name: 'sistema-votacion-api'
           slot-name: 'Production'
           package: ./publish
-
-          

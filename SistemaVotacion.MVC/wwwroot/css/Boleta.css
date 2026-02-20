@@ -6,7 +6,8 @@
     font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
     width: 100%;
@@ -23,7 +24,8 @@ body {
 .boleta-container {
     width: 100%;
     min-height: 100vh;
-    padding: 40px 30px 100px;
+    padding: 40px 30px 160px;
+    /* Padding extra para barra flotante */
     background: #ffffff;
 }
 
@@ -35,18 +37,18 @@ body {
     margin-bottom: 40px;
 }
 
-    .boleta-header h1 {
-        margin: 0;
-        font-size: 30px;
-        font-weight: 700;
-        color: #1f2937;
-    }
+.boleta-header h1 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 700;
+    color: #1f2937;
+}
 
-    .boleta-header p {
-        margin-top: 8px;
-        color: #4b5563;
-        font-size: 16px;
-    }
+.boleta-header p {
+    margin-top: 8px;
+    color: #4b5563;
+    font-size: 16px;
+}
 
 /* =========================
    OPCIONES (GRID)
@@ -65,10 +67,10 @@ body {
     cursor: pointer;
 }
 
-    .opcion-card input {
-        position: absolute;
-        opacity: 0;
-    }
+.opcion-card input {
+    position: absolute;
+    opacity: 0;
+}
 
 .opcion-content {
     background: #f8fafc;
@@ -81,14 +83,14 @@ body {
 /* Hover */
 .opcion-card:hover .opcion-content {
     transform: translateY(-4px);
-    box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
 }
 
 /* Seleccionado */
-.opcion-card input:checked + .opcion-content {
+.opcion-card input:checked+.opcion-content {
     border-color: #2563eb;
     background: #eef4ff;
-    box-shadow: 0 0 0 4px rgba(37,99,235,0.15);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
 }
 
 /* =========================
@@ -103,28 +105,28 @@ body {
     margin-bottom: 20px;
 }
 
-    .partido img {
-        width: 55px;
-        height: 55px;
-        object-fit: contain;
-    }
+.partido img {
+    width: 55px;
+    height: 55px;
+    object-fit: contain;
+}
 
-    .partido strong {
-        display: block;
-        font-size: 15px;
-        color: #111827;
-    }
+.partido strong {
+    display: block;
+    font-size: 15px;
+    color: #111827;
+}
 
-    .partido .lista {
-        display: inline-block;
-        margin-top: 4px;
-        background: #1d4ed8;
-        color: #ffffff;
-        padding: 4px 12px;
-        border-radius: 999px;
-        font-size: 13px;
-        font-weight: 600;
-    }
+.partido .lista {
+    display: inline-block;
+    margin-top: 4px;
+    background: #1d4ed8;
+    color: #ffffff;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+}
 
 /* =========================
    BINOMIO
@@ -143,18 +145,20 @@ body {
     border-radius: 14px;
     padding: 15px;
     text-align: center;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+    max-width: 220px;
+    margin: 0 auto;
 }
 
-    .persona img {
-        width: 100%;
-        max-width: 130px;
-        height: auto;
-        aspect-ratio: 3 / 4;
-        object-fit: cover;
-        border-radius: 10px;
-        margin-bottom: 10px;
-    }
+.persona img {
+    width: 100%;
+    max-width: 130px;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
 
 .cargo {
     display: block;
@@ -173,27 +177,93 @@ body {
 /* =========================
    BOTÓN VOTAR
 ========================= */
-.acciones {
-    margin-top: 50px;
-    text-align: center;
+/* =========================
+   CONTENEDOR PRINCIPAL
+========================= */
+.boleta-container {
+    width: 100%;
+    min-height: 100vh;
+    padding: 40px 30px 160px;
+    /* Padding extra para barra flotante */
+    background: #ffffff;
 }
 
-.btn-votar {
+/* ... existing styles ... */
+
+/* =========================
+   BARRA FLOTANTE DE ACCIONES
+========================= */
+.floating-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid #e5e7eb;
+    padding: 20px 30px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.btn-votar-floating {
     background: linear-gradient(135deg, #1d4ed8, #2563eb);
     color: #ffffff;
     border: none;
     padding: 16px 50px;
     border-radius: 999px;
     font-size: 18px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+    flex: 1;
+    max-width: 300px;
 }
 
-    .btn-votar:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(37,99,235,0.4);
+.btn-votar-floating:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px rgba(37, 99, 235, 0.5);
+}
+
+.btn-blanco {
+    background: #f3f4f6;
+    color: #4b5563;
+    border: 2px solid #e5e7eb;
+    padding: 16px 40px;
+    border-radius: 999px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex: 1;
+    max-width: 250px;
+}
+
+.btn-blanco:hover {
+    background: #e5e7eb;
+    color: #1f2937;
+    border-color: #d1d5db;
+}
+
+@media (max-width: 600px) {
+    .floating-bar {
+        padding: 15px;
+        flex-direction: column-reverse;
+        /* Blanco abajo en móviles */
+        gap: 10px;
     }
+
+    .btn-votar-floating,
+    .btn-blanco {
+        width: 100%;
+        max-width: none;
+        padding: 14px;
+    }
+}
 
 /* =========================
    CONTADOR DE TIEMPO
@@ -204,31 +274,105 @@ body {
     right: 20px;
     background: rgba(17, 24, 39, 0.95);
     color: #ffffff;
-    padding: 22px 32px; /* MÁS GRANDE */
-    border-radius: 20px; /* Bordes más suaves */
+    padding: 22px 32px;
+    /* MÁS GRANDE */
+    border-radius: 20px;
+    /* Bordes más suaves */
 
-    box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-width: 260px; /* Ancho mínimo */
+    min-width: 260px;
+    /* Ancho mínimo */
     z-index: 999;
 }
 
-    /* Texto "Tiempo restante" */
-    .contador-elecciones .titulo {
-        font-size: 14px; /* Antes 12px */
-        color: #9ca3af;
-        margin-bottom: 6px;
-    }
+/* Texto "Tiempo restante" */
+.contador-elecciones .titulo {
+    font-size: 14px;
+    /* Antes 12px */
+    color: #9ca3af;
+    margin-bottom: 6px;
+}
 
 /* Tiempo 00:15:00 */
 #tiempo-restante {
-    font-size: 30px; /* MÁS GRANDE */
+    font-size: 30px;
+    /* MÁS GRANDE */
     font-weight: 800;
     letter-spacing: 2px;
     color: #38bdf8;
 }
+
+/* =========================
+   OTROS CANDIDATOS (ASAMBLEISTAS)
+========================= */
+.otros-candidatos {
+    margin-top: 20px;
+}
+
+.separador-candidatos {
+    border: 0;
+    height: 1px;
+    background: #e5e7eb;
+    margin: 15px 0;
+}
+
+.otros-candidatos h5 {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.lista-otros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    /* Centrar si son pocos */
+}
+
+.persona-small {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 130px;
+    /* Ancho fijo para consistencia */
+}
+
+.persona-small img {
+    width: 100%;
+    height: 110px;
+    /* Alto fijo */
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+.cargo-small {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #1d4ed8;
+    margin-bottom: 2px;
+}
+
+.nombre-small {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: #374151;
+    line-height: 1.3;
+}
+
 
 /* =========================
    RESPONSIVE

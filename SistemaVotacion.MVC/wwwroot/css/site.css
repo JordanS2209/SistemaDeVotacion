@@ -135,3 +135,5 @@ body {
     border: none;
     font-weight: bold;
 }
+/* Fix for white text on white background */
+.form-control, .form-select { color: #212529 !important; background-color: #fff !important; }

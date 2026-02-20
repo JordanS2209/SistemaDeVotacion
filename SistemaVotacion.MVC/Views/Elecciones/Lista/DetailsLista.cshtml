@@ -1,0 +1,107 @@
+﻿@model SistemaVotacion.Modelos.Lista
+
+@{
+    var candidatos = ViewBag.CandidatosDeLaLista as List<SistemaVotacion.Modelos.Candidato>
+                     ?? new List<SistemaVotacion.Modelos.Candidato>();
+}
+
+<div class="container elec-page">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-9">
+
+            <div class="elec-card">
+
+                <div class="elec-card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-eye"></i> Detalles de la Lista
+                    </h5>
+                </div>
+
+                <div class="elec-card-body">
+
+                    <!-- DATOS DE LA LISTA -->
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">ID</dt>
+                        <dd class="col-sm-8">@Model.Id</dd>
+
+                        <dt class="col-sm-4">Nombre Lista</dt>
+                        <dd class="col-sm-8">@Model.NombreLista</dd>
+
+                        <dt class="col-sm-4">Número Lista</dt>
+                        <dd class="col-sm-8">@Model.NumeroLista</dd>
+
+                        <dt class="col-sm-4">Proceso Electoral</dt>
+                        <dd class="col-sm-8">
+                            @(Model.Proceso?.NombreProceso ?? "No asignado")
+                        </dd>
+                    </dl>
+
+                    <hr class="elec-hr my-4" />
+
+                    <!-- CANDIDATOS DE LA LISTA -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="elec-section-title">
+                                <i class="bi bi-people"></i> Candidatos de esta Lista
+                            </div>
+
+                            <span class="elec-badge elec-badge-pendiente">
+                                @candidatos.Count
+                            </span>
+                        </div>
+
+                        @if (!candidatos.Any())
+                        {
+                            <div class="elec-alert">
+                                No existen candidatos registrados para esta lista.
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="elec-table-wrap">
+                                <div class="table-responsive">
+                                    <table class="table elec-table mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Nombre</th>
+                                                <th>Dignidad</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var c in candidatos)
+                                            {
+                                                <tr>
+                                                    <td>@c.Id</td>
+                                                    <td>@c.NombreCandidato</td>
+                                                    <td>@(c.Dignidad?.NombreDignidad ?? "No asignado")</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <hr class="elec-hr" />
+
+                    <!-- ACCIONES -->
+                    <div class="d-grid gap-2 mt-3">
+                        <a asp-action="EditLista" asp-route-id="@Model.Id"
+                           class="btn elec-btn elec-btn-warn py-2">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+
+                        <a asp-action="ListLista"
+                           class="btn elec-btn elec-btn-secondary py-2">
+                            <i class="bi bi-arrow-left"></i> Volver a lista de Listas
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

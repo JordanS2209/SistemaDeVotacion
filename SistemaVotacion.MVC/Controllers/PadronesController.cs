@@ -4,18 +4,17 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using SistemaVotacion.ApiConsumer;
 using SistemaVotacion.Modelos;
 using System.Net.Http;
+using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SistemaVotacion.MVC.Controllers
 {
+    [Authorize]
     public class PadronesController : Controller
     {
 
-        //private readonly IHttpClientFactory _httpClientFactory;
-
-        //public PadronesController(IHttpClientFactory httpClientFactory)
-        //{
-        //    _httpClientFactory = httpClientFactory;
-        //}
+      
+        [Authorize(Roles = "Admin,SuperAdmin")]
         public IActionResult Index()
         {
             return View();
@@ -29,7 +28,7 @@ namespace SistemaVotacion.MVC.Controllers
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
+                TempData["Error"] = "Error al conectar con la API: " + ex.Message;
                 return View(new List<UsuarioListDto>());
             }
         }
@@ -48,7 +47,7 @@ namespace SistemaVotacion.MVC.Controllers
             }
             catch (Exception ex)
             {
-                ViewBag.Error = ex.Message;
+                TempData["Error"] = ex.Message;
                 return View();
             }
         }
@@ -69,11 +68,12 @@ namespace SistemaVotacion.MVC.Controllers
             try
             {
                 Crud<UsuarioEditDto>.Update(id, dto);
+                TempData["Success"] = "Usuario actualizado correctamente.";
                 return RedirectToAction(nameof(ListUsuarios));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", ex.Message);
+                TempData["Error"] = ex.Message;
                 CargarCombos();
                 return View(dto);
             }
@@ -91,7 +91,7 @@ namespace SistemaVotacion.MVC.Controllers
             }
             catch (Exception ex)
             {
-                ViewBag.Error = ex.Message;
+                TempData["Error"] = ex.Message;
                 return View();
             }
         }
@@ -103,11 +103,12 @@ namespace SistemaVotacion.MVC.Controllers
             try
             {
                 Crud<UsuarioEditDto>.Delete(id);
+                TempData["Success"] = "Usuario eliminado correctamente.";
                 return RedirectToAction(nameof(ListUsuarios));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "Error al eliminar: " + ex.Message);
+                 TempData["Error"] = "Error al eliminar: " + ex.Message;
                 return View(usuario);
             }
         }
@@ -156,7 +157,7 @@ namespace SistemaVotacion.MVC.Controllers
 
         private List<SelectListItem> GetUsuarios()
         {
-            return Crud<Usuario>.GetAll()
+            return Crud<UsuarioListDto>.GetAll()
                 .Select(u => new SelectListItem
                 {
                     Value = u.Id.ToString(),
@@ -185,7 +186,7 @@ namespace SistemaVotacion.MVC.Controllers
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
+                TempData["Error"] = "Error al conectar con la API: " + ex.Message;
                 return View(new List<Votante>());
             }
         }
@@ -201,7 +202,7 @@ namespace SistemaVotacion.MVC.Controllers
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
+                TempData["Error"] = "Error al conectar con la API: " + ex.Message;
                 return View();
             }
         }
@@ -221,11 +222,12 @@ namespace SistemaVotacion.MVC.Controllers
                 try
                 {
                     Crud<Votante>.Create(nuevoVotante);
+                    TempData["Success"] = "Votante creado correctamente.";
                     return RedirectToAction(nameof(ListVotantes));
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("", "Error al crear: " + ex.Message);
+                    TempData["Error"] = "Error al crear: " + ex.Message;
                 }
             }
             ViewBag.Usuarios = GetUsuarios();
@@ -246,7 +248,7 @@ namespace SistemaVotacion.MVC.Controllers
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
+                TempData["Error"] = "Error al conectar con la API: " + ex.Message;
                 return View();
             }
         }
@@ -260,11 +262,12 @@ namespace SistemaVotacion.MVC.Controllers
                 try
                 {
                     Crud<Votante>.Update(id, votante);
+                    TempData["Success"] = "Votante actualizado correctamente.";
                     return RedirectToAction(nameof(ListVotantes));
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("", "Error al actualizar: " + ex.Message);
+                    TempData["Error"] = "Error al actualizar: " + ex.Message;
                 }
             }
 
@@ -284,7 +287,7 @@ namespace SistemaVotacion.MVC.Controllers
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
+                TempData["Error"] = "Error al conectar con la API: " + ex.Message;
                 return View();
             }
         }
@@ -296,224 +299,256 @@ namespace SistemaVotacion.MVC.Controllers
             try
             {
                 Crud<Votante>.Delete(id);
+                TempData["Success"] = "Votante eliminado correctamente.";
                 return RedirectToAction(nameof(ListVotantes));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "Error al eliminar: " + ex.Message);
+                TempData["Error"] = "Error al eliminar: " + ex.Message;
                 return View(votante);
             }
         }
 
-        //// Listas para los select items
-        //private async Task<List<SelectListItem>> GetVotantesAsync()
-        //{
-        //    var client = _httpClientFactory.CreateClient();
-        //    var votantes = await client.GetFromJsonAsync<List<Votante>>("api/votantes");
 
-        //    return votantes
-        //        .Select(v => new SelectListItem
-        //        {
-        //            Value = v.Id.ToString(),
-        //            Text = v.Usuario != null
-        //                ? v.Usuario.Nombres + " " + v.Usuario.Apellidos
-        //                : "Votante sin usuario"
-        //        })
-        //        .ToList();
-        //}
+        // ==========================================
+        // GESTIÓN DE PADRÓN ELECTORAL (Habilitación)
+        // ==========================================
 
-        //private async Task<List<SelectListItem>> GetProcesosAsync()
-        //{
-        //    var client = _httpClientFactory.CreateClient();
-        //    var procesos = await client.GetFromJsonAsync<List<ProcesoElectoral>>("api/procesosElectorales");
+        public IActionResult ListPadron()
+        {
+            try
+            {
+                var padrones = Crud<Padron>.GetAll();
+                return View(padrones);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al obtener padrón: " + ex.Message;
+                return View(new List<Padron>());
+            }
+        }
 
-        //    return procesos
-        //        .Select(p => new SelectListItem
-        //        {
-        //            Value = p.Id.ToString(),
-        //            Text = !string.IsNullOrWhiteSpace(p.NombreProceso) ? p.NombreProceso : $"Proceso {p.Id}"
-        //        })
-        //        .ToList();
-        //}
+        public IActionResult CreatePadron()
+        {
+            CargarCombosPadron();
+            return View();
+        }
 
-        //// GET: List
-        //public async Task<IActionResult> ListPadron()
-        //{
-        //    try
-        //    {
-        //        var client = _httpClientFactory.CreateClient();
-        //        var padrones = await client.GetFromJsonAsync<List<Padron>>("api/padrones");
-        //        return View(padrones);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        ViewBag.Error = "Error al obtener padrones: " + ex.Message;
-        //        return View(new List<Padron>());
-        //    }
-        //}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CreatePadron(Padron padron)
+        {
+            // Validar que se haya seleccionado votante
+            if (padron.IdVotante == 0)
+            {
+                ModelState.AddModelError("", "Debe seleccionar un votante.");
+                CargarCombosPadron();
+                return View(padron);
+            }
 
+            try
+            {
+                // Validación básica de votante
+                var votante = Crud<Votante>.GetById(padron.IdVotante);
+                 // Validar estado (Opcional aquí, pero bueno para consistencia)
+                if (votante != null && !votante.Estado)
+                {
+                     TempData["Error"] = "El votante seleccionado está INACTIVO.";
+                     CargarCombosPadron();
+                     return View(padron);
+                }
 
-        //// GET: Details
-        //// DETALLE PADRON
-        //public async Task<IActionResult> DetailsPadron(int id)
-        //{
-        //    try
-        //    {
-        //        var client = _httpClientFactory.CreateClient();
-        //        var padron = await client.GetFromJsonAsync<Padron>($"api/padrones/{id}");
-        //        if (padron == null) return NotFound();
-        //        return View(padron);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        ViewBag.Error = "Error al obtener detalle: " + ex.Message;
-        //        return View();
-        //    }
-        //}
+                // Usamos el Create estándar que NO genera código (CodigoAcceso será null)
+                // El código se generará SOLO cuando el delegado habilite al votante.
+                Crud<Padron>.Create(padron);
+                
+                TempData["Success"] = "Votante asignado al padrón correctamente (Código pendiente de habilitación).";
+                return RedirectToAction(nameof(ListPadron));
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al habilitar votante: " + ex.Message;
+            }
 
-        //[HttpGet]
-        //public async Task<IActionResult> CreatePadron()
-        //{
-        //    try
-        //    {
-        //        ViewBag.Votantes = await GetVotantesAsync();
-        //        ViewBag.Procesos = await GetProcesosAsync();
-        //        return View();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        ViewBag.Error = "Error al cargar formulario: " + ex.Message;
-        //        return View();
-        //    }
-        //}
+            CargarCombosPadron();
+            return View(padron);
+        }
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> CreatePadron(int votanteId)
-        //{
-        //    try
-        //    {
-        //        var client = _httpClientFactory.CreateClient();
-        //        // Llamada a API para crear padrón + generar código automáticamente
-        //        var response = await client.PostAsync($"api/padrones/crear-o-generar-codigo/{votanteId}", null);
+        public IActionResult EditPadron(int id)
+        {
+            try
+            {
+                var padron = Crud<Padron>.GetById(id);
+                if (padron == null) return NotFound();
 
-        //        if (!response.IsSuccessStatusCode)
-        //        {
-        //            var msg = await response.Content.ReadAsStringAsync();
-        //            ModelState.AddModelError("", string.IsNullOrWhiteSpace(msg) ? "Error al crear padrón." : msg);
-        //            ViewBag.Votantes = await GetVotantesAsync();
-        //            ViewBag.Procesos = await GetProcesosAsync();
-        //            return View();
-        //        }
+                CargarCombosPadron();
+                return View(padron);
+            }
+            catch (Exception ex)
+            {
+                 TempData["Error"] = ex.Message;
+                return View();
+            }
+        }
 
-        //        return RedirectToAction(nameof(ListPadron));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        ModelState.AddModelError("", "Error al crear padrón: " + ex.Message);
-        //        ViewBag.Votantes = await GetVotantesAsync();
-        //        ViewBag.Procesos = await GetProcesosAsync();
-        //        return View();
-        //    }
-        //}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditPadron(int id, Padron padron)
+        {
+            if (id != padron.Id) return BadRequest();
 
+            try
+            {
+                // Mantenemos el código original si no se envía uno nuevo (o lógica de negocio que decidas)
+                // Aquí asumimos que el admin edita estados o asignaciones
+                Crud<Padron>.Update(id, padron);
+                TempData["Success"] = "Padrón actualizado correctamente.";
+                return RedirectToAction(nameof(ListPadron));
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al actualizar: " + ex.Message;
+                CargarCombosPadron();
+                return View(padron);
+            }
+        }
 
+        public IActionResult DeletePadron(int id)
+        {
+            try
+            {
+                var padron = Crud<Padron>.GetById(id);
+                if (padron == null) return NotFound();
+                return View(padron);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                return View();
+            }
+        }
 
-        //// EDITAR PADRON
-        //[HttpGet]
-        //public async Task<IActionResult> EditPadron(int id)
-        //{
-        //    try
-        //    {
-        //        var client = _httpClientFactory.CreateClient();
-        //        var padron = await client.GetFromJsonAsync<Padron>($"api/padrones/{id}");
-        //        if (padron == null) return NotFound();
+        [HttpPost, ActionName("DeletePadron")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeletePadronConfirmed(int id)
+        {
+            try
+            {
+                Crud<Padron>.Delete(id);
+                TempData["Success"] = "Padrón eliminado correctamente.";
+                return RedirectToAction(nameof(ListPadron));
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al eliminar: " + ex.Message;
+                return View(); 
+            }
+        }
 
-        //        ViewBag.Votantes = await GetVotantesAsync();
-        //        ViewBag.Procesos = await GetProcesosAsync();
-        //        return View(padron);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        ViewBag.Error = "Error al cargar padrón: " + ex.Message;
-        //        return View();
-        //    }
-        //}
+        // Helpers para Padron
+        private void CargarCombosPadron()
+        {
+            ViewBag.Votantes = GetVotantesList();
+            ViewBag.Procesos = GetProcesosList();
+        }
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> EditPadron(int id, Padron padron)
-        //{
-        //    if (id != padron.Id) return BadRequest();
+        private List<SelectListItem> GetVotantesList()
+        {
+            var votantes = Crud<Votante>.GetAll() ?? new List<Votante>();
+            return votantes.Select(v => new SelectListItem
+            {
+                Value = v.Id.ToString(),
+                Text = v.Usuario != null ? $"{v.Usuario.Nombres} {v.Usuario.Apellidos} (CI: {v.Usuario.NumeroIdentificacion})" : $"Votante #{v.Id}"
+            }).ToList();
+        }
 
-        //    try
-        //    {
-        //        var client = _httpClientFactory.CreateClient();
-        //        var response = await client.PutAsJsonAsync($"api/padrones/{id}", padron);
-
-        //        if (!response.IsSuccessStatusCode)
-        //        {
-        //            var msg = await response.Content.ReadAsStringAsync();
-        //            ModelState.AddModelError("", string.IsNullOrWhiteSpace(msg) ? "Error al actualizar padrón." : msg);
-        //            ViewBag.Votantes = await GetVotantesAsync();
-        //            ViewBag.Procesos = await GetProcesosAsync();
-        //            return View(padron);
-        //        }
-
-        //        return RedirectToAction(nameof(ListPadron));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        ModelState.AddModelError("", "Error al actualizar padrón: " + ex.Message);
-        //        ViewBag.Votantes = await GetVotantesAsync();
-        //        ViewBag.Procesos = await GetProcesosAsync();
-        //        return View(padron);
-        //    }
-        //}
+        private List<SelectListItem> GetProcesosList()
+        {
+            var procesos = Crud<ProcesoElectoral>.GetAll() ?? new List<ProcesoElectoral>();
+            // Filtramos solo procesos activos si se requiere, por ahora todos
+            return procesos.Select(p => new SelectListItem
+            {
+                Value = p.Id.ToString(),
+                Text = p.NombreProceso
+            }).ToList();
+        }
 
 
-        //[HttpGet]
-        //public async Task<IActionResult> DeletePadron(int id)
-        //{
-        //    try
-        //    {
-        //        var client = _httpClientFactory.CreateClient();
-        //        var padron = await client.GetFromJsonAsync<Padron>($"api/padrones/{id}");
-        //        if (padron == null) return NotFound();
+        // ==========================================
+        // DELEGADO DE MESA - HABILITAR VOTO
+        // ==========================================
 
-        //        return View(padron);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        ViewBag.Error = "Error al obtener padrón: " + ex.Message;
-        //        return View();
-        //    }
-        //}
+        [Authorize(Roles = "DelegadoMesa, SuperAdmin")]
+        [HttpGet]
+        public IActionResult Habilitar()
+        {
+            return View();
+        }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Habilitar(string numeroIdentificacion)
+        {
+            if (string.IsNullOrWhiteSpace(numeroIdentificacion))
+            {
+                // Usamos TempData para feedback visual consistente
+                TempData["Error"] = "Por favor, ingrese un número de identificación.";
+                return View();
+            }
 
-        //[HttpPost, ActionName("DeletePadron")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeletePadronConfirmed(int id)
-        //{
-        //    try
-        //    {
-        //        var client = _httpClientFactory.CreateClient();
-        //        var response = await client.DeleteAsync($"api/padrones/{id}");
+            try
+            {
+                // Llamada a la API: api/Padrones/crear-o-generar-codigo/{cedula}
+                var url = $"{Crud<Padron>.EndPoint}/crear-o-generar-codigo/{numeroIdentificacion}";
 
-        //        if (!response.IsSuccessStatusCode)
-        //        {
-        //            var msg = await response.Content.ReadAsStringAsync();
-        //            ModelState.AddModelError("", string.IsNullOrWhiteSpace(msg) ? "Error al eliminar padrón." : msg);
-        //            return View();
-        //        }
+                using (var client = new HttpClient())
+                {
+                    // POST vacío a la URL específica
+                    var content = new StringContent("", Encoding.UTF8, "application/json");
+                    var response = client.PostAsync(url, content).Result;
 
-        //        return RedirectToAction(nameof(ListPadron));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        ModelState.AddModelError("", "Error al eliminar padrón: " + ex.Message);
-        //        return View();
-        //    }
-        //}
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var json = response.Content.ReadAsStringAsync().Result;
+                        
+                        // Deserializamos la respuesta anónima de la API
+                        dynamic resultado = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+
+                        string codigo = resultado.codigoAcceso;
+                        bool haVotado = resultado.haVotado;
+                        bool procesoActivo = resultado.procesoActivo;
+
+                        if (haVotado)
+                        {
+                            TempData["Error"] = "Este votante YA ha sufragado.";
+                            return View();
+                        }
+
+                        if (!procesoActivo)
+                        {
+                            TempData["Error"] = "No hay un proceso electoral activo o el votante no está asignado al proceso actual.";
+                            return View();
+                        }
+
+                        // Éxito: Mostrar Código
+                        TempData["Success"] = "Votante habilitado correctamente.";
+                        ViewBag.CodigoGenerado = codigo;
+                        ViewBag.Cedula = numeroIdentificacion;
+                        return View("CodigoGenerado");
+                    }
+                    else
+                    {
+                        var msg = response.Content.ReadAsStringAsync().Result;
+                        TempData["Error"] = msg; 
+                        return View();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error de comunicación: " + ex.Message;
+                return View();
+            }
+        }
     }
 }

@@ -1,36 +1,31 @@
-﻿@model SistemaVotacion.Modelos.Dignidad
+@model SistemaVotacion.Modelos.Dignidad
 
 @{
-    ViewData["Title"] = "Crear Nuevo Rol";
+    ViewData["Title"] = "Crear Dignidad";
 }
 
-<div class="container mt-5">
+<div class="elec-page container-fluid">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Registrar Nueva Dignidad</h4>
+            <div class="elec-card">
+                <div class="elec-card-header">
+                    <h4 class="elec-title mb-0">Nueva Dignidad</h4>
                 </div>
-                <div class="card-body">
-                    <form asp-action="CreateDignidad" method="post">
-
-                        @Html.AntiForgeryToken()
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-
+                <div class="elec-card-body">
+                    <form asp-action="CreateDignidad">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                         <div class="mb-3">
-                            <label asp-for="NombreDignidad" class="form-label fw-bold">Nombre Dignidad</label>
-                            <input asp-for="NombreDignidad" class="form-control" placeholder="Ej: Presidente" required />
+                            <label asp-for="NombreDignidad" class="form-label fw-bold">Nombre de la Dignidad</label>
+                            <input asp-for="NombreDignidad" class="form-control elec-form-control" placeholder="Ej: Alcalde" />
                             <span asp-validation-for="NombreDignidad" class="text-danger"></span>
                         </div>
 
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-success">
-                                <i class="bi bi-save"></i> Guardar Dignidad
-                            </button>
-                            <a asp-action="ListDignidades" class="btn btn-outline-secondary">
-                                <i class="bi bi-x-circle"></i> Cancelar
-                            </a>
+
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a asp-action="ListDignidades" class="btn elec-btn elec-btn-secondary me-md-2">Cancelar</a>
+                            <button type="submit" class="btn elec-btn elec-btn-primary">Guardar Dignidad</button>
                         </div>
                     </form>
                 </div>
@@ -38,3 +33,7 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using SistemaVotacion.MVC.Models;
 using System.Diagnostics;
+using SistemaVotacion.ApiConsumer;
+using SistemaVotacion.Modelos;
 
 namespace SistemaVotacion.MVC.Controllers
 {
@@ -15,10 +17,34 @@ namespace SistemaVotacion.MVC.Controllers
 
         public IActionResult Index()
         {
+            try
+            {
+                var procesos = Crud<ProcesoElectoral>.GetAll();
+                bool hayProcesoActivo = false;
+
+                if (procesos != null && procesos.Any())
+                {
+                    var ahora = DateTime.Now;
+                    hayProcesoActivo = procesos.Any(p => ahora >= p.FechaInicio && ahora <= p.FechaFin);
+                }
+
+                ViewBag.ProcesoActivo = hayProcesoActivo;
+            }
+            catch
+            {
+                ViewBag.ProcesoActivo = false;
+            }
+
             return View();
         }
 
         public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult AccessDenied()
         {
             return View();
         }

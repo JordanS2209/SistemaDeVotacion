@@ -27,19 +27,19 @@ namespace SistemaVotacion.Modelos
         public int IdProceso { get; set; }
 
 
-        [Required, ForeignKey(nameof(Lista))]
+        [ForeignKey(nameof(Lista))]
         public int? IdLista { get; set; }
 
 
-        [Required, ForeignKey(nameof(Dignidad))]
+        [ForeignKey(nameof(Dignidad))]
         public int? IdDignidad { get; set; }
 
 
-        [Required, ForeignKey(nameof(Opcion))]
+        [ForeignKey(nameof(Opcion))]
         public int? IdOpcion { get; set; }
 
 
-        [Required, ForeignKey(nameof(Pregunta))]
+        [ForeignKey(nameof(Pregunta))]
         public int? IdPregunta { get; set; }
 
 

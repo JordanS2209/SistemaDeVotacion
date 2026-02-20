@@ -16,7 +16,13 @@
 <link rel="stylesheet" href="~/css/ResultadosConsultaPopular.css" />
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<h2 class="titulo-principal">Resultados Consulta Popular</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="titulo-principal mb-0">Resultados Consulta Popular</h2>
+
+    <a href="@Url.Action("ExportarPDF", "VotoDetalle", new { idProceso = ViewBag.IdProceso, tipo = "consulta" })" class="btn btn-danger">
+        <i class="bi bi-file-pdf me-2"></i>Exportar PDF
+    </a>
+</div>
 
 <!-- =======================
      RESUMEN GENERAL
@@ -36,73 +42,69 @@
 <div class="contenedor-preguntas" id="contenedorPreguntas"></div>
 
 <script>
-    const resumen = @Html.Raw(ViewBag.Resumen ?? "{}");
-    const preguntas = @Html.Raw(ViewBag.Preguntas ?? "[]");
-
     /* =======================
-       GRAFICA GENERAL
+       DATOS API
        ======================= */
-    new Chart(document.getElementById('graficaResumen'), {
-        type: 'doughnut',
-        data: {
-            labels: ['SÍ', 'NO', 'BLANCOS'],
-            datasets: [{
-                data: [
-                    resumen.si ?? 0,
-                    resumen.no ?? 0,
-                    resumen.blancos ?? 0
-                ],
-                backgroundColor: ['#2e7d32', '#c62828', '#9e9e9e']
-            }]
-        },
-        options: {
-            plugins: {
-                legend: { position: 'bottom' }
-            }
-        }
-    });
-
-    /* =======================
-       PREGUNTAS
-       ======================= */
+    let data = [];
+    try {
+        data = JSON.parse('@Html.Raw(ViewBag.Resultado ?? "[]")');
+    } catch (e) {
+        console.error("Error parsing JSON", e);
+        data = [];
+    }
+    
     const contenedor = document.getElementById("contenedorPreguntas");
+    contenedor.innerHTML = "";
 
-    preguntas.forEach(p => {
+    if (data.length === 0) {
+        contenedor.innerHTML = "<p>No hay resultados disponibles.</p>";
+    }
 
+    data.forEach((item, index) => {
+        const idCanvas = `grafica_${index}`;
+        
+        // Crear Card
         const card = document.createElement("div");
         card.className = "pregunta-card";
+        
+        let htmlResultados = `<h4 class="texto-pregunta">${item.Pregunta}</h4><div class="datos">`;
+        
+        const labels = [];
+        const values = [];
+        const backgroundColors = [];
+        const palette = ['#2e7d32', '#c62828', '#1976d2', '#ff9800', '#9c27b0'];
 
-        card.innerHTML = `
-            <h4 class="texto-pregunta">${p.texto}</h4>
-
-            <div class="datos">
-                <span class="si">SÍ: ${p.si}</span>
-                <span class="no">NO: ${p.no}</span>
-                <span class="blanco">BLANCOS: ${p.blancos}</span>
-            </div>
-
-            <canvas id="grafica_${p.id}" height="120"></canvas>
-        `;
-
+        item.Resultados.forEach((r, i) => {
+             htmlResultados += `<span class="badge bg-secondary me-2">${r.Opcion}: ${r.Votos}</span>`;
+             labels.push(r.Opcion);
+             values.push(r.Votos);
+             backgroundColors.push(palette[i % palette.length]);
+        });
+        
+        htmlResultados += `</div><canvas id="${idCanvas}" height="100"></canvas>`;
+        card.innerHTML = htmlResultados;
         contenedor.appendChild(card);
 
-        new Chart(document.getElementById(`grafica_${p.id}`), {
+        // Renderizar Chart
+        new Chart(document.getElementById(idCanvas), {
             type: 'bar',
             data: {
-                labels: ['SÍ', 'NO', 'BLANCOS'],
+                labels: labels,
                 datasets: [{
-                    data: [p.si, p.no, p.blancos],
-                    backgroundColor: ['#2e7d32', '#c62828', '#9e9e9e']
+                    label: 'Votos',
+                    data: values,
+                    backgroundColor: backgroundColors
                 }]
             },
             options: {
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    y: { beginAtZero: true }
-                }
+                indexAxis: 'y',
+                plugins: { legend: { display: false } },
+                scales: { x: { beginAtZero: true } }
             }
         });
     });
+
+    // Ocultar resumen general si no hay datos consolidados
+    document.querySelector('.card-grafica').style.display = 'none'; // ocultamos el resumen hardcoded anterior
+    
 </script>

@@ -11,8 +11,8 @@ namespace SistemaVotacion.Servicios.Interfaces
     public interface IMultimediaService
     {
         Task<List<Multimedia>> GetAllAsync(); 
-        Task<Multimedia> GetByIdAsync(int id); 
-        Task<Multimedia> UploadAsync(IFormFile file, int idCandidato, int idLista, string? descripcion); 
+        Task<Multimedia> GetByIdAsync(int id);
+        Task<Multimedia> UploadAsync(IFormFile file, int? idCandidato, int? idLista, string? descripcion);
         Task<bool> UpdateAsync(int id, Multimedia multimedia); 
         Task<bool> DeleteAsync(int id);
     }

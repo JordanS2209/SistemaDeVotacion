@@ -1,0 +1,70 @@
+﻿@model SistemaVotacion.Modelos.Lista
+
+<div class="container elec-page">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <div class="elec-card">
+
+                <div class="elec-card-header">
+                    <h5>
+                        <i class="bi bi-list-check"></i> Editar Lista
+                    </h5>
+                </div>
+
+                <div class="elec-card-body">
+
+                    <form asp-action="EditLista" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Id"></label>
+                            <input asp-for="Id" class="form-control" readonly />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="NombreLista"></label>
+                            <input asp-for="NombreLista" class="form-control" />
+                            <span asp-validation-for="NombreLista" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="NumeroLista"></label>
+                            <input asp-for="NumeroLista" class="form-control" />
+                            <span asp-validation-for="NumeroLista" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="IdProceso">Proceso Electoral</label>
+                            <select asp-for="IdProceso"
+                                    class="form-select"
+                                    asp-items="ViewBag.Procesos">
+                                <option value="">-- Seleccione un proceso --</option>
+                            </select>
+                            <span asp-validation-for="IdProceso" class="text-danger"></span>
+                        </div>
+
+                        <hr class="elec-hr" />
+
+                        <div class="d-grid gap-2 mt-3">
+                            <button type="submit"
+                                    class="btn elec-btn elec-btn-primary py-2">
+                                <i class="bi bi-save"></i> Guardar Cambios
+                            </button>
+
+                            <a asp-action="ListLista"
+                               class="btn elec-btn elec-btn-secondary py-2">
+                                Volver a la lista
+                            </a>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

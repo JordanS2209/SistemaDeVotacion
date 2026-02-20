@@ -14,11 +14,11 @@ namespace SistemaVotacion.Modelos
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        public string Nombres { get; set; }
+        public string Nombres { get; set; } = string.Empty;
 
-        public string Apellidos { get; set; }
-        public string Email { get; set; }
-        public string ContrasenaHash { get; set; }
+        public string Apellidos { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string ContrasenaHash { get; set; } = string.Empty;
 
         public DateTime FechaNacimiento { get; set; }
 
@@ -33,13 +33,13 @@ namespace SistemaVotacion.Modelos
         [Required, ForeignKey(nameof(TipoIdentificacion))]
         public int IdTipoIdentificacion { get; set; }
 
-        public string NumeroIdentificacion { get; set; }
+        public string NumeroIdentificacion { get; set; } = string.Empty;
 
 
         [Required, ForeignKey(nameof(Genero))]
         public int IdGenero { get; set; }
 
-        public string CodigoDactilar { get; set; }
+        public string CodigoDactilar { get; set; } = string.Empty;
 
         public TipoIdentificacion? TipoIdentificacion { get; set; }
 

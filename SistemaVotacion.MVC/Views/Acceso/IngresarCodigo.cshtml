@@ -20,6 +20,12 @@
                 @TempData["Error"]
             </div>
         }
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger">
+                @ViewBag.Error
+            </div>
+        }
         <form asp-controller="Acceso" asp-action="IngresarCodigo" method="post" class="codigo-form-hero">
             <input type="text" id="codigo" name="codigo" maxlength="6" class="codigo-input" placeholder="Código de 6 dígitos" autocomplete="off" required />
             <button type="submit" class="codigo-btn">CONTINUAR</button>

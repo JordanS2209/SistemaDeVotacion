@@ -1,0 +1,74 @@
+﻿@model SistemaVotacion.Modelos.Candidato
+
+@{
+    ViewData["Title"] = "Eliminar Candidato";
+}
+
+<div class="elec-page">
+    <div class="container-fluid py-3">
+
+        <div class="mb-3">
+            <h2 class="elec-title mb-1">
+                <i class="bi bi-trash"></i> @ViewData["Title"]
+            </h2>
+            <div class="elec-subtitle">
+                Confirma la eliminación del registro seleccionado.
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <div class="elec-card">
+                    <div class="elec-card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-exclamation-triangle"></i> Confirmación
+                        </h5>
+
+                        <a asp-action="ListCandidato" class="btn elec-btn elec-btn-secondary btn-sm">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </a>
+                    </div>
+
+                    <div class="elec-card-body">
+
+                        <div class="elec-alert elec-alert-danger mb-3">
+                            ¿Estás seguro que deseas eliminar este candidato? Esta acción no se puede deshacer.
+                        </div>
+
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4 elec-section-title">Nombre Candidato</dt>
+                            <dd class="col-sm-8">@Model.NombreCandidato</dd>
+
+                            <dt class="col-sm-4 elec-section-title">Lista</dt>
+                            <dd class="col-sm-8">@Model.Lista?.NombreLista ?? "No asignada"</dd>
+
+                            <dt class="col-sm-4 elec-section-title">Dignidad</dt>
+                            <dd class="col-sm-8">@Model.Dignidad?.NombreDignidad ?? "No asignada"</dd>
+                        </dl>
+
+                        <hr class="elec-hr my-4" />
+
+                        <form asp-action="DeleteCandidato" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" asp-for="Id" />
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="submit" class="btn elec-btn elec-btn-danger">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+
+                                <a asp-action="ListCandidato" class="btn elec-btn elec-btn-secondary">
+                                    Cancelar
+                                </a>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,70 @@
+﻿@model IEnumerable<SistemaVotacion.Modelos.OpcionConsulta>
+@{
+    ViewData["Title"] = "Opciones de Consulta";
+}
+
+
+<div class="elec-page">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="elec-title">Opciones de Consulta</h2>
+            <p class="elec-subtitle">Gestione las opciones disponibles para las preguntas de consulta</p>
+        </div>
+        <a asp-action="CreateOpcionConsulta" class="btn elec-btn elec-btn-success">
+            <i class="bi bi-plus-lg"></i> Crear Nueva Opción
+        </a>
+    </div>
+
+    <div class="elec-table-wrap">
+        <div class="table-responsive">
+            <table class="table elec-table mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">@Html.DisplayNameFor(model => model.Id)</th>
+                        <th>@Html.DisplayNameFor(model => model.TextoOpcion)</th>
+                        <th>Pregunta Asociada</th>
+                        <th style="width: 250px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="text-muted">@item.Id</td>
+                            <td class="fw-semibold">@item.TextoOpcion</td>
+                            <td>
+                                @if (item.Pregunta != null)
+                                {
+                                    <span class="elec-badge elec-badge-pendiente text-white">@item.Pregunta.TextoPregunta</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted fst-italic">No asignada</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a asp-action="EditOpcionConsulta" asp-route-id="@item.Id" class="btn elec-btn elec-btn-primary btn-sm">
+                                        <i class="bi bi-pencil-square"></i> Editar
+                                    </a>
+                                    <a asp-action="DetailsOpcionConsulta" asp-route-id="@item.Id" class="btn elec-btn elec-btn-info btn-sm">
+                                        <i class="bi bi-info-circle"></i> Detalles
+                                    </a>
+                                    <a asp-action="DeleteOpcionConsulta" asp-route-id="@item.Id" class="btn elec-btn elec-btn-danger btn-sm">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a asp-action="Index" class="btn elec-btn elec-btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver al Panel
+        </a>
+    </div>
+</div>

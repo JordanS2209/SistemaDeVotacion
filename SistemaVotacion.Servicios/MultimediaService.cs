@@ -33,20 +33,31 @@ namespace SistemaVotacion.Servicios
             return JsonConvert.DeserializeObject<Multimedia>(json)!;
         }
 
-        public async Task<Multimedia> UploadAsync(IFormFile file, int idCandidato, int idLista, string? descripcion)
+        public async Task<Multimedia> UploadAsync(IFormFile file, int? idCandidato, int? idLista, string? descripcion)
         {
             var form = new MultipartFormDataContent();
             form.Add(new StreamContent(file.OpenReadStream()), "file", file.FileName);
 
-            // parámetros en query string
-            var url = $"upload?idCandidato={idCandidato}&idLista={idLista}&descripcion={descripcion}";
+            var qs = new List<string>();
+
+            if (idCandidato.HasValue && idCandidato.Value > 0)
+                qs.Add($"idCandidato={idCandidato.Value}");
+
+            if (idLista.HasValue && idLista.Value > 0)
+                qs.Add($"idLista={idLista.Value}");
+
+            if (!string.IsNullOrWhiteSpace(descripcion))
+                qs.Add($"descripcion={Uri.EscapeDataString(descripcion)}");
+
+            var url = "upload";
+            if (qs.Any()) url += "?" + string.Join("&", qs);
 
             var response = await _httpClient.PostAsync(url, form);
             response.EnsureSuccessStatusCode();
+
             var json = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<Multimedia>(json)!;
         }
-
 
         public async Task<bool> UpdateAsync(int id, Multimedia multimedia)
         {

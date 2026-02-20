@@ -297,19 +297,32 @@ namespace SistemaVotacion.API.Controllers
 
                 var ahora = DateTime.Now;
 
-                // Regla principal: no se puede activar si ya pasó la fecha fin programada
+                // Regla: no se puede activar si ya pasó la fecha fin programada
                 if (ahora > proceso.FechaFin)
                     return BadRequest("No se puede activar: la fecha fin del proceso ya pasó.");
 
-                // Si ya está activo, no repetir
-                if (ahora >= proceso.FechaInicio && ahora <= proceso.FechaFin)
+                // Si ya está activo, no repetir (y además considera el 'pausado')
+                bool estaPausado = proceso.FechaInicio > proceso.FechaFin;
+                bool yaActivo = !estaPausado && ahora >= proceso.FechaInicio && ahora <= proceso.FechaFin;
+                if (yaActivo)
                     return BadRequest("El proceso ya está activo.");
 
-                // Reactivar / Activar:
+                // REGLA CLAVE: Solo un proceso activo a la vez (global)
+                var existeOtroActivo = await _context.ProcesosElectorales
+                    .AsNoTracking()
+                    .AnyAsync(p =>
+                        p.Id != id &&
+                        p.FechaInicio <= p.FechaFin &&              // no pausado
+                        ahora >= p.FechaInicio && ahora <= p.FechaFin
+                    );
+
+                if (existeOtroActivo)
+                    return BadRequest("No se puede activar: ya existe otro proceso electoral activo.");
+
+                // Activar / Reactivar:
                 proceso.FechaInicio = ahora;
 
                 await _context.SaveChangesAsync();
-
                 return Ok("Proceso activado correctamente.");
             }
             catch (Exception ex)
@@ -317,6 +330,7 @@ namespace SistemaVotacion.API.Controllers
                 return StatusCode(500, "Error interno: " + ex.Message);
             }
         }
+
 
         [HttpPut("Cerrar/{id}")]
         public async Task<IActionResult> CerrarProceso(int id)

@@ -1,6 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Inicio - Sistema de Votación";
-    ViewData["HideSidebar"] = true;
+    // Solo ocultar sidebar si NO está autenticado
+    ViewData["HideSidebar"] = !User.Identity.IsAuthenticated;
 }
 
 <main role="main">
@@ -34,6 +35,24 @@
     </div>
 
     <div class="container marketing">
+
+        @if (ViewBag.ProcesoActivo == true)
+        {
+            <div class="row mb-5 text-center">
+                <div class="col-12">
+                    <div class="card shadow-lg border-0 bg-primary bg-gradient text-white rounded-5 overflow-hidden">
+                        <div class="card-body p-5">
+                            <h2 class="display-4 fw-bold mb-3"><i class="bi bi-box-seam me-2"></i>¡Las Votaciones están Abiertas!</h2>
+                            <p class="lead mb-4">El proceso electoral se encuentra activo. Ejerce tu derecho al voto de manera rápida y segura.</p>
+                            <a asp-controller="Acceso" asp-action="IngresarCodigo" class="btn btn-light btn-lg rounded-pill px-5 py-3 fw-bold shadow-sm custom-hover-effect">
+                                <i class="bi bi-hand-index-thumb me-2"></i>Votar Ahora
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        
         <div class="row">
             <div class="col-lg-3">
                 <div class="bg-dark p-4 rounded-circle mx-auto mb-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 140px; height: 140px;">
@@ -45,24 +64,24 @@
 
             <div class="col-lg-3">
                 <div class="bg-dark p-4 rounded-circle mx-auto mb-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 140px; height: 140px;">
-                    <i class="bi bi-shield-lock fs-1 text-primary-custom"></i>
+                    <i class="bi bi-people-fill fs-1 text-primary-custom"></i>
                 </div>
-                <h2>Acceso</h2>
-                <p><a class="btn btn-secondary" asp-controller="Acceso" asp-action="IngresarCodigo">Validar »</a></p>
+                <h2>Padrón</h2>
+                <p><a class="btn btn-secondary" asp-controller="Padrones" asp-action="ListPadron">Gestionar »</a></p>
             </div>
             <div class="col-lg-3">
                 <div class="bg-dark p-4 rounded-circle mx-auto mb-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 140px; height: 140px;">
-                    <i class="bi bi-geo-alt fs-1 text-primary-custom"></i>
+                    <i class="bi bi-ui-checks-grid fs-1 text-primary-custom"></i>
                 </div>
                 <h2>Mesas</h2>
-                <p><a class="btn btn-secondary" asp-controller="Mesa" asp-action="Index">Ir a Mesas »</a></p>
+                <p><a class="btn btn-secondary" asp-controller="Mesa" asp-action="ListJunta">Ir a Mesas »</a></p>
             </div>
             <div class="col-lg-3">
                 <div class="bg-dark p-4 rounded-circle mx-auto mb-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 140px; height: 140px;">
-                    <i class="bi bi-file-earmark-ruled fs-1 text-primary-custom"></i>
+                    <i class="bi bi-file-earmark-check fs-1 text-primary-custom"></i>
                 </div>
-                <h2>Boletas</h2>
-                <p><a class="btn btn-secondary" asp-controller="Boletas" asp-action="ConsultaPopular">Ver Boletas »</a></p>
+                <h2>Elecciones</h2>
+                <p><a class="btn btn-secondary" asp-controller="Elecciones" asp-action="Index">Configurar »</a></p>
 
             </div>
         </div>

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using SistemaVotacion.ApiConsumer;
 using SistemaVotacion.Modelos;
 using SistemaVotacion.Servicios.Interfaces;
@@ -25,9 +27,9 @@ namespace SistemaVotacion.MVC.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(string email, string password)
         {
-            // 1. Buscamos al usuario en la base de datos a través de la API
-            var usuarios = Crud<Usuario>.GetAll();
-            var usuario = usuarios.FirstOrDefault(u => u.Email.ToLower() == email.Trim().ToLower());
+            // Buscamos al usuario en la base de datos
+           
+            var usuario = Crud<Usuario>.GetSingle($"{Crud<Usuario>.EndPoint}/ByEmail/{email}");
 
             // Si el usuario no existe, mensaje estándar por seguridad
             if (usuario == null)
@@ -77,15 +79,16 @@ namespace SistemaVotacion.MVC.Controllers
             }
         }
 
+        
+        [Authorize(Roles = "SuperAdmin")]
         [HttpGet]
         public IActionResult Register()
         {
-            ViewBag.Roles = Crud<Rol>.GetAll();
-            ViewBag.Generos = Crud<Genero>.GetAll();
-            ViewBag.TiposIdentificacion = Crud<TipoIdentificacion>.GetAll();
+            CargarCombosRegister();
             return View();
         }
 
+        [Authorize(Roles = "SuperAdmin")]
         [HttpPost]
         public async Task<IActionResult> Register(
             string email,
@@ -100,16 +103,17 @@ namespace SistemaVotacion.MVC.Controllers
             int idGenero)
         {
             // 1. Limpieza y validaciones básicas
-            email = email.Trim().ToLower();
+            email = (email ?? "").Trim().ToLower();
 
 
             // 2. Verificar si el usuario ya existe (por Email o Cédula)
-            var usuarios = Crud<Usuario>.GetAll();
-            var existe = usuarios.Any(u => u.Email.ToLower() == email || u.NumeroIdentificacion == cedula);
-
-            if (existe)
+            var usuarioEmail = Crud<Usuario>.GetSingle($"{Crud<Usuario>.EndPoint}/ByEmail/{email}");
+            var usuarioCedula = Crud<Usuario>.GetSingle($"{Crud<Usuario>.EndPoint}/ByCedula/{cedula}");
+            
+            if (usuarioEmail != null || usuarioCedula != null)
             {
                 ViewBag.ErrorMessage = "El correo o número de identificación ya están registrados.";
+                CargarCombosRegister();
                 return View();
             }
 
@@ -129,12 +133,21 @@ namespace SistemaVotacion.MVC.Controllers
 
             if (exito)
             {
-                // Al tener éxito, redirigimos al Login (que es el Index de este controlador)
-                return RedirectToAction("Index", "Account");
+                // Al ser SuperAdmin creando usuarios, redirigimos al dashboard o lista de usuarios
+                TempData["Success"] = "Usuario creado correctamente.";
+                return RedirectToAction("Index", "Home");
             }
 
             ViewBag.ErrorMessage = "Ocurrió un error al procesar el registro.";
+            CargarCombosRegister();
             return View();
+        }
+
+        private void CargarCombosRegister()
+        {
+            ViewBag.Roles = Crud<Rol>.GetAll()?.Select(r => new SelectListItem { Value = r.Id.ToString(), Text = r.NombreRol }).ToList() ?? new List<SelectListItem>();
+            ViewBag.Generos = Crud<Genero>.GetAll()?.Select(g => new SelectListItem { Value = g.IdGenero.ToString(), Text = g.DetalleGenero }).ToList() ?? new List<SelectListItem>();
+            ViewBag.TiposIdentificacion = Crud<TipoIdentificacion>.GetAll()?.Select(t => new SelectListItem { Value = t.Id.ToString(), Text = t.DetalleTipIdentifiacion }).ToList() ?? new List<SelectListItem>();
         }
 
         public async Task<IActionResult> Logout()
@@ -147,11 +160,11 @@ namespace SistemaVotacion.MVC.Controllers
         // GET: Account/UsuariosBloqueados
         public IActionResult UsuariosBloqueados()
         {
-            // Obtenemos todos los usuarios desde la API
-            var todosLosUsuarios = Crud<Usuario>.GetAll();
+            // Obtenemos todos los usuarios desde la API usando el DTO correcto para Listas
+            var todosLosUsuarios = Crud<UsuarioListDto>.GetAll();
 
             // Filtramos solo los que tienen la cuenta bloqueada
-            // Usamos '?? false' para manejar el tipo bool? correctamente
+          
             var bloqueados = todosLosUsuarios.Where(u => u.CuentaBloqueada ?? false).ToList();
 
             return View(bloqueados);

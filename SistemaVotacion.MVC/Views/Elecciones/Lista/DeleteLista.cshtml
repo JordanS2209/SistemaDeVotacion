@@ -1,0 +1,64 @@
+﻿@model SistemaVotacion.Modelos.Lista
+
+<div class="container elec-page">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <div class="elec-card">
+
+                <!-- Header -->
+                <div class="elec-card-header bg-transparent">
+                    <h5 class="text-danger mb-0">
+                        <i class="bi bi-trash"></i> Eliminar Lista
+                    </h5>
+                </div>
+
+                <!-- Body -->
+                <div class="elec-card-body">
+
+                    <div class="elec-alert elec-alert-danger mb-4">
+                        <strong>Advertencia:</strong> Esta acción no se puede deshacer.
+                        ¿Estás seguro que deseas eliminar esta lista?
+                    </div>
+
+                    <dl class="row">
+
+                        <dt class="col-sm-4">ID</dt>
+                        <dd class="col-sm-8">@Model.Id</dd>
+
+                        <dt class="col-sm-4">Nombre Lista</dt>
+                        <dd class="col-sm-8">@Model.NombreLista</dd>
+
+                        <dt class="col-sm-4">Número Lista</dt>
+                        <dd class="col-sm-8">@Model.NumeroLista</dd>
+
+                        <dt class="col-sm-4">Proceso Electoral</dt>
+                        <dd class="col-sm-8">
+                            @(Model.Proceso?.NombreProceso ?? "No asignado")
+                        </dd>
+
+                    </dl>
+
+                    <hr class="elec-hr" />
+
+                    <form asp-action="DeleteLista" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="d-grid gap-2 mt-3">
+                            <button type="submit" class="btn elec-btn elec-btn-danger py-2">
+                                <i class="bi bi-trash"></i> Confirmar Eliminación
+                            </button>
+
+                            <a asp-action="ListLista" class="btn elec-btn elec-btn-secondary py-2">
+                                <i class="bi bi-arrow-left"></i> Volver a la lista
+                            </a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

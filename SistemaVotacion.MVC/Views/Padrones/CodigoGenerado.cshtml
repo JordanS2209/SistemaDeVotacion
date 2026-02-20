@@ -1,0 +1,32 @@
+@{
+    ViewData["Title"] = "Código Generado";
+    var codigo = ViewBag.CodigoGenerado as string;
+    var cedula = ViewBag.Cedula as string;
+}
+
+<div class="container mt-5 text-center">
+    <div class="card shadow-lg border-success">
+        <div class="card-header bg-success text-white">
+            <h2><i class="fas fa-lock-open"></i> Acceso Habilitado</h2>
+        </div>
+        <div class="card-body py-5">
+            <h4 class="text-muted mb-4">Entregue el siguiente código al votante con cédula <strong>@cedula</strong>:</h4>
+            
+            <h1 class="display-1 font-weight-bold text-primary mb-4" style="letter-spacing: 10px;">
+                @codigo
+            </h1>
+
+            <div class="alert alert-warning d-inline-block">
+                <i class="fas fa-stopwatch"></i> Este código es de un solo uso y expirará si no se utiliza.
+            </div>
+            
+            <hr class="my-4" />
+
+            <div class="d-grid gap-2 col-6 mx-auto">
+                <a asp-action="Habilitar" class="btn btn-primary btn-lg">
+                    <i class="fas fa-arrow-left"></i> Volver a Habilitar (Siguiente Votante)
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

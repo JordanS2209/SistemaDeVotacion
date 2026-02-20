@@ -71,38 +71,53 @@ namespace SistemaVotacion.API.Controllers
                 return StatusCode(500, $"Error interno: {ex.Message}");
             }
         }
-        // GET: api/Listas/simple
-        [HttpGet("simple")]
-        public async Task<ActionResult<IEnumerable<object>>> GetListasSimple()
-        {
-            var listas = await _context.Listas
-                .Select(l => new { l.Id, l.NombreLista })
-                .ToListAsync();
 
-            return Ok(listas);
-        }
-
-
-        // PUT: api/Listas/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutLista(int id, Lista lista)
         {
-            if (id != lista.Id)
-                return BadRequest("El ID de la URL no coincide con el ID de la lista.");
-
-            _context.Entry(lista).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
-                return NoContent();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ListaExists(id))
+                if (lista == null)
+                    return BadRequest("El cuerpo de la petición está vacío.");
+
+                if (id != lista.Id)
+                    return BadRequest("El ID de la URL no coincide con el ID de la lista.");
+
+                if (string.IsNullOrWhiteSpace(lista.NombreLista))
+                    return BadRequest("NombreLista es obligatorio.");
+
+                if (lista.NumeroLista <= 0)
+                    return BadRequest("NumeroLista debe ser mayor que 0.");
+
+                if (lista.IdProceso <= 0)
+                    return BadRequest("IdProceso es obligatorio.");
+
+                var existente = await _context.Listas
+                    .FirstOrDefaultAsync(l => l.Id == id);
+
+                if (existente == null)
                     return NotFound("La lista no existe.");
-                else
-                    throw;
+
+                // NO permitir mover la lista a otro proceso
+                if (existente.IdProceso != lista.IdProceso)
+                    return BadRequest("No se puede cambiar el proceso de una lista.");
+
+                // Validar duplicado NumeroLista dentro del mismo proceso
+                var existeNumeroEnProceso = await _context.Listas
+                    .AsNoTracking()
+                    .AnyAsync(l =>
+                        l.Id != id &&
+                        l.IdProceso == existente.IdProceso &&
+                        l.NumeroLista == lista.NumeroLista);
+
+                if (existeNumeroEnProceso)
+                    return Conflict("Ya existe una lista con ese Número en este Proceso Electoral.");
+
+                existente.NombreLista = lista.NombreLista.Trim();
+                existente.NumeroLista = lista.NumeroLista;
+
+                await _context.SaveChangesAsync();
+                return Ok("Lista actualizada correctamente.");
             }
             catch (Exception ex)
             {
@@ -110,6 +125,8 @@ namespace SistemaVotacion.API.Controllers
                 return StatusCode(500, $"Error al actualizar: {ex.Message}");
             }
         }
+
+
 
         // POST: api/Listas
         [HttpPost]
@@ -152,14 +169,14 @@ namespace SistemaVotacion.API.Controllers
         [HttpGet("por-proceso/{idProceso}")]
         public async Task<IActionResult> GetListasPorProceso(int idProceso)
         {
-
             var listas = await _context.Listas
-                .Include(l => l.Candidatos)
-                .ThenInclude(c => c.Dignidad)
-                .Include(l => l.Candidatos)
-                .ThenInclude(c => c.GaleriaMultimedia)
+                .Where(l => l.IdProceso == idProceso)
+                .Include(l => l.Candidatos).ThenInclude(c => c.Dignidad)
+                .Include(l => l.Candidatos).ThenInclude(c => c.GaleriaMultimedia)
                 .Include(l => l.RecursosMultimedia)
                 .ToListAsync();
+
+
 
             return Ok(listas);
         }

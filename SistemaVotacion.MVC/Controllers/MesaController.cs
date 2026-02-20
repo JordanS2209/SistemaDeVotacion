@@ -1,100 +1,150 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using System.Net.Http;
+
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using SistemaVotacion.ApiConsumer;
+using SistemaVotacion.Modelos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SistemaVotacion.MVC.Controllers
 {
+    [Authorize(Roles = "Admin,SuperAdmin")]
     public class MesaController : Controller
     {
-        private readonly HttpClient _client;
-
-        public MesaController()
+       
+        public IActionResult ListJunta()
         {
-            _client = new HttpClient
+            try
             {
-                BaseAddress = new Uri("https://localhost:7202/")
-            };
+                var juntas = Crud<JuntaReceptora>.GetAll();
+                return View(juntas);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = "Error al conectar con API: " + ex.Message;
+                return View(new List<JuntaReceptora>());
+            }
         }
 
-        [HttpGet]
-        public IActionResult Index()
+        public IActionResult CreateJunta()
         {
+            CargarCombosJunta();
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> BuscarVotante(string numeroIdentificacion)
+        [ValidateAntiForgeryToken]
+        public IActionResult CreateJunta(JuntaReceptora junta)
         {
-            if (string.IsNullOrWhiteSpace(numeroIdentificacion))
+            if (ModelState.IsValid)
             {
-                ViewBag.Error = "Debe ingresar la cédula.";
-                return View("Index");
+                try
+                {
+                    Crud<JuntaReceptora>.Create(junta);
+                    return RedirectToAction(nameof(ListJunta));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error al crear junta: " + ex.Message);
+                }
             }
+            CargarCombosJunta();
+            return View(junta);
+        }
 
-            var response = await _client.GetAsync(
-                $"api/padrones/estado-votante-identificacion/{numeroIdentificacion}"
-            );
-
-            if (!response.IsSuccessStatusCode)
+        public IActionResult EditJunta(int id)
+        {
+            try
             {
-                ViewBag.Error = "El votante no se encuentra en el padrón.";
-                return View("Index");
+                var junta = Crud<JuntaReceptora>.GetById(id);
+                if (junta == null) return NotFound();
+
+                CargarCombosJunta();
+                return View(junta);
             }
-
-            var json = await response.Content.ReadAsStringAsync();
-            dynamic data = JsonConvert.DeserializeObject(json);
-
-            bool haVotado = data.haVotado;
-            bool procesoActivo = data.procesoActivo;
-            string codigoAcceso = data.codigoAcceso;
-            int padronId = data.padronId;
-
-
-            if (!procesoActivo)
+            catch (Exception ex)
             {
-                ViewBag.Error = "No existe un proceso electoral activo.";
-                return View("Index");
+                ViewBag.Error = ex.Message;
+                return View();
             }
-
-
-            if (haVotado)
-            {
-                ViewBag.YaVoto = true;
-                return View("Index");
-            }
-
-
-            ViewBag.PadronId = padronId;
-            ViewBag.CodigoAcceso = codigoAcceso;
-            ViewBag.MostrarVentanaCodigo = true;
-
-            return View("Index");
         }
 
         [HttpPost]
-        public async Task<IActionResult> Habilitar(int padronId)
+        [ValidateAntiForgeryToken]
+        public IActionResult EditJunta(int id, JuntaReceptora junta)
         {
-            var response = await _client.PostAsync(
-                $"api/padrones/habilitar/{padronId}",
-                null
-            );
+            if (id != junta.Id) return BadRequest();
 
-            if (!response.IsSuccessStatusCode)
+            if (ModelState.IsValid)
             {
-                var msg = await response.Content.ReadAsStringAsync();
-                ViewBag.Error = string.IsNullOrWhiteSpace(msg)
-                    ? "No se pudo habilitar la votación."
-                    : msg;
-
-                return View("Index");
+                try
+                {
+                    Crud<JuntaReceptora>.Update(id, junta);
+                    return RedirectToAction(nameof(ListJunta));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error al actualizar: " + ex.Message);
+                }
             }
+            CargarCombosJunta();
+            return View(junta);
+        }
 
-            var jsonCodigo = await response.Content.ReadAsStringAsync();
-            dynamic codigo = JsonConvert.DeserializeObject(jsonCodigo);
+        public IActionResult DeleteJunta(int id)
+        {
+            try
+            {
+                var junta = Crud<JuntaReceptora>.GetById(id);
+                if (junta == null) return NotFound();
+                return View(junta);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = ex.Message;
+                return View();
+            }
+        }
 
-            ViewBag.Codigo = codigo.codigoAcceso;
+        [HttpPost, ActionName("DeleteJunta")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteJuntaConfirmed(int id)
+        {
+            try
+            {
+                Crud<JuntaReceptora>.Delete(id);
+                return RedirectToAction(nameof(ListJunta));
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = "Error al eliminar: " + ex.Message;
+                return View();
+            }
+        }
 
-            return View("CodigoGenerado");
+        private void CargarCombosJunta()
+        {
+            ViewBag.Generos = GetGenerosList();
+            ViewBag.Recintos = GetRecintosList();
+        }
+
+        private List<SelectListItem> GetGenerosList()
+        {
+            var generos = Crud<Genero>.GetAll() ?? new List<Genero>();
+            return generos.Select(g => new SelectListItem
+            {
+                Value = g.IdGenero.ToString(),
+                Text = g.DetalleGenero
+            }).ToList();
+        }
+
+        private List<SelectListItem> GetRecintosList()
+        {
+            var recintos = Crud<RecintoElectoral>.GetAll() ?? new List<RecintoElectoral>();
+            return recintos.Select(r => new SelectListItem
+            {
+                Value = r.Id.ToString(),
+                Text = r.NombreRecinto
+            }).ToList();
         }
     }
 }

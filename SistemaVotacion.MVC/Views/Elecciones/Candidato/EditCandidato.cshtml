@@ -1,0 +1,84 @@
+﻿@model SistemaVotacion.Modelos.Candidato
+@{
+    ViewData["Title"] = "Editar Candidato";
+}
+
+<div class="elec-page">
+    <div class="container-fluid py-3">
+
+        <div class="mb-3">
+            <h2 class="elec-title mb-1">
+                <i class="bi bi-person-lines-fill"></i> @ViewData["Title"]
+            </h2>
+            <div class="elec-subtitle">
+                Actualiza la información del candidato.
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <div class="elec-card">
+                    <div class="elec-card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-pencil-square"></i> Editar
+                        </h5>
+
+                        <a asp-action="ListCandidato" class="btn elec-btn elec-btn-secondary btn-sm">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </a>
+                    </div>
+
+                    <div class="elec-card-body">
+                        <form asp-action="EditCandidato" method="post">
+                            @Html.AntiForgeryToken()
+
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                            <input type="hidden" asp-for="Id" />
+
+                            <div class="mb-3">
+                                <label asp-for="NombreCandidato" class="form-label"></label>
+                                <input asp-for="NombreCandidato" class="form-control" />
+                                <span asp-validation-for="NombreCandidato" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="IdLista" class="form-label">Lista</label>
+                                <select asp-for="IdLista" class="form-select" asp-items="ViewBag.Listas">
+                                    <option value="">-- Seleccione Lista --</option>
+                                </select>
+                                <span asp-validation-for="IdLista" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="IdDignidad" class="form-label">Dignidad</label>
+                                <select asp-for="IdDignidad" class="form-select" asp-items="ViewBag.Dignidades">
+                                    <option value="">-- Seleccione Dignidad --</option>
+                                </select>
+                                <span asp-validation-for="IdDignidad" class="text-danger small"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2 mt-3">
+                                <button type="submit" class="btn elec-btn elec-btn-primary">
+                                    <i class="bi bi-check-circle"></i> Guardar cambios
+                                </button>
+
+                                <a asp-action="ListCandidato" class="btn elec-btn elec-btn-secondary">
+                                    Cancelar
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

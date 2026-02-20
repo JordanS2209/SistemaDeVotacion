@@ -1,0 +1,48 @@
+﻿@model SistemaVotacion.Modelos.OpcionConsulta
+
+@{
+    ViewData["Title"] = "Crear Opción de Consulta";
+}
+
+
+<div class="row justify-content-center elec-page">
+    <div class="col-md-6">
+        <div class="elec-card">
+            <div class="elec-card-header">
+                <h5 class="mb-0 text-white">
+                    <i class="bi bi-list-check me-2"></i>Crear Opción de Consulta
+                </h5>
+            </div>
+            <div class="elec-card-body">
+                <form asp-action="CreateOpcionConsulta" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert elec-alert elec-alert-danger text-danger mb-4"></div>
+
+                    <div class="mb-4">
+                        <label asp-for="TextoOpcion" class="form-label control-label">Texto de la Opción</label>
+                        <input asp-for="TextoOpcion" class="form-control" placeholder="Ej: Sí, No, Nulo" />
+                        <span asp-validation-for="TextoOpcion" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="IdPregunta" class="form-label control-label">Pregunta Asociada</label>
+                        <select asp-for="IdPregunta" class="form-select" asp-items="ViewBag.Preguntas">
+                            <option value="">-- Seleccione una pregunta --</option>
+                        </select>
+                        <span asp-validation-for="IdPregunta" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between pt-3">
+                        <a asp-action="ListOpcionConsulta" class="btn elec-btn elec-btn-secondary">Cancelar</a>
+                        <input type="submit" value="Crear Opción" class="btn elec-btn elec-btn-success px-4" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

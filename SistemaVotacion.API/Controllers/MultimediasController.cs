@@ -70,28 +70,29 @@ namespace SistemaVotacion.API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutMultimedia(int id, Multimedia multimedia)
         {
-            if (id != multimedia.Id)
-            {
-                return BadRequest("El ID de la URL no coincide con el ID del recurso.");
-            }
-
-            _context.Entry(multimedia).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
-                return NoContent(); 
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!MultimediaExists(id))
-                {
+                if (multimedia == null)
+                    return BadRequest("El cuerpo de la petición está vacío.");
+
+                if (id != multimedia.Id)
+                    return BadRequest("El ID de la URL no coincide con el ID del recurso.");
+
+                if (string.IsNullOrWhiteSpace(multimedia.UrlFoto))
+                    return BadRequest("UrlFoto es obligatorio.");
+
+                var existente = await _context.Multimedias.FirstOrDefaultAsync(m => m.Id == id);
+                if (existente == null)
                     return NotFound("El recurso multimedia no existe.");
-                }
-                else
-                {
-                    throw;
-                }
+
+              
+                existente.UrlFoto = multimedia.UrlFoto.Trim();
+                existente.Descripcion = string.IsNullOrWhiteSpace(multimedia.Descripcion)
+                    ? null
+                    : multimedia.Descripcion.Trim();
+
+                await _context.SaveChangesAsync();
+                return Ok("Multimedia actualizada correctamente.");
             }
             catch (Exception ex)
             {
@@ -100,44 +101,80 @@ namespace SistemaVotacion.API.Controllers
             }
         }
 
-        // POST: api/Multimedias
+
+        // POST: api/Multimedias/upload
         [HttpPost("upload")]
-        public async Task<ActionResult<Multimedia>> Upload(IFormFile file, int idCandidato, int idLista, string descripcion)
+        public async Task<ActionResult<Multimedia>> Upload(IFormFile file, int? idCandidato, int? idLista, string? descripcion)
         {
-            if (file == null || file.Length == 0)
-                return BadRequest("Archivo no válido.");
-
-            // Nombre único para el archivo
-            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-
-            // Contenedor en Azure Blob
-            var container = _blobServiceClient.GetBlobContainerClient("multimedia");
-            await container.CreateIfNotExistsAsync();
-
-            var blobClient = container.GetBlobClient(fileName);
-
-            // Subir archivo
-            using (var stream = file.OpenReadStream())
+            try
             {
-                await blobClient.UploadAsync(stream, overwrite: true);
+                if (file == null || file.Length == 0)
+                    return BadRequest("Archivo no válido.");
+
+                // exactamente uno debe venir
+                var tieneCandidato = idCandidato.HasValue && idCandidato.Value > 0;
+                var tieneLista = idLista.HasValue && idLista.Value > 0;
+
+                if (tieneCandidato == tieneLista) // ambos true o ambos false
+                    return BadRequest("Debe enviar IdCandidato o IdLista (solo uno).");
+
+                // Validar 
+                if (tieneCandidato)
+                {
+                    var existeCandidato = await _context.Candidatos
+                        .AsNoTracking()
+                        .AnyAsync(c => c.Id == idCandidato!.Value);
+
+                    if (!existeCandidato)
+                        return BadRequest("IdCandidato no existe.");
+                }
+
+                if (tieneLista)
+                {
+                    var existeLista = await _context.Listas
+                        .AsNoTracking()
+                        .AnyAsync(l => l.Id == idLista!.Value);
+
+                    if (!existeLista)
+                        return BadRequest("IdLista no existe.");
+                }
+
+                // Nombre único para el archivo
+                var fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+
+                // Contenedor en Azure Blob
+                var container = _blobServiceClient.GetBlobContainerClient("multimedia");
+                await container.CreateIfNotExistsAsync();
+
+                var blobClient = container.GetBlobClient(fileName);
+
+                using (var stream = file.OpenReadStream())
+                {
+                    await blobClient.UploadAsync(stream, overwrite: true);
+                }
+
+                var urlFoto = blobClient.Uri.ToString();
+
+                var multimedia = new Multimedia
+                {
+                    UrlFoto = urlFoto,
+                    Descripcion = string.IsNullOrWhiteSpace(descripcion) ? null : descripcion.Trim(),
+                    IdCandidato = tieneCandidato ? idCandidato : null,
+                    IdLista = tieneLista ? idLista : null
+                };
+
+                _context.Multimedias.Add(multimedia);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction(nameof(GetMultimedia), new { id = multimedia.Id }, multimedia);
             }
-
-            // URL pública del archivo
-            var urlFoto = blobClient.Uri.ToString();
-
-            var multimedia = new Multimedia
+            catch (Exception ex)
             {
-                UrlFoto = urlFoto,
-                Descripcion = descripcion,
-                IdCandidato = idCandidato,
-                IdLista = idLista
-            };
-
-            _context.Multimedias.Add(multimedia);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetMultimedia), new { id = multimedia.Id }, multimedia);
+                Console.WriteLine($"Error al subir multimedia: {ex.Message}");
+                return StatusCode(500, $"Error al subir multimedia: {ex.Message}");
+            }
         }
+
 
 
 

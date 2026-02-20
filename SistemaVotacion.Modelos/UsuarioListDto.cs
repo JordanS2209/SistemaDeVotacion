@@ -17,6 +17,8 @@ namespace SistemaVotacion.Modelos
         public string Email { get; set; }
 
         public string Rol { get; set; }
+        
+        public string NumeroIdentificacion { get; set; }
 
         public bool? CuentaBloqueada { get; set; }
     }

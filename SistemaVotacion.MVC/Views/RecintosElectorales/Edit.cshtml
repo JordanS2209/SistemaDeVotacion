@@ -1,0 +1,58 @@
+@model SistemaVotacion.Modelos.RecintoElectoral
+
+@{
+    ViewData["Title"] = "Editar Recinto Electoral";
+}
+
+<div class="elec-page container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="elec-card">
+                <div class="elec-card-header">
+                    <h4 class="elec-title mb-0">Editar Recinto Electoral</h4>
+                </div>
+                <div class="elec-card-body">
+                    <form asp-action="Edit">
+                        <input type="hidden" asp-for="Id" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="NombreRecinto" class="form-label fw-bold">Nombre del Recinto</label>
+                            <input asp-for="NombreRecinto" class="form-control elec-form-control" />
+                            <span asp-validation-for="NombreRecinto" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="DireccionRecinto" class="form-label fw-bold">Dirección</label>
+                            <input asp-for="DireccionRecinto" class="form-control elec-form-control" />
+                            <span asp-validation-for="DireccionRecinto" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="DetalleRecinto" class="form-label fw-bold">Detalle / Referencia</label>
+                            <textarea asp-for="DetalleRecinto" class="form-control elec-form-control" rows="2"></textarea>
+                            <span asp-validation-for="DetalleRecinto" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="IdParroquia" class="form-label fw-bold">Parroquia</label>
+                            <select asp-for="IdParroquia" class="form-select elec-form-control" asp-items="ViewBag.Parroquias">
+                                <option value="">-- Seleccione Parroquia --</option>
+                            </select>
+                            <span asp-validation-for="IdParroquia" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a asp-action="Index" class="btn elec-btn elec-btn-secondary me-md-2">Cancelar</a>
+                            <button type="submit" class="btn elec-btn elec-btn-primary">Actualizar Recinto</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

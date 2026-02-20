@@ -10,6 +10,8 @@ namespace SistemaVotacion.API.DTOs
     {
         public int IdProceso { get; set; }
         public int IdPadron { get; set; }
+        public string CodigoAcceso { get; set; }
         public List<RespuestaConsultaDto> Respuestas { get; set; } = new();
+        public bool EsVotoBlanco { get; set; }
     }
 }

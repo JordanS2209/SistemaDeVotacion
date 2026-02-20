@@ -24,7 +24,7 @@ namespace SistemaVotacion.MVC.Controllers
 
                 if (usuario == null)
                 {
-                    ViewBag.Error = "Cédula no encontrada.";
+                    TempData["Error"] = "Cédula no encontrada.";
                     return View("Index");
                 }
 
@@ -32,7 +32,7 @@ namespace SistemaVotacion.MVC.Controllers
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error de conexión: " + ex.Message;
+                TempData["Error"] = "Error de conexión: " + ex.Message;
                 return View("Index");
             }
         }

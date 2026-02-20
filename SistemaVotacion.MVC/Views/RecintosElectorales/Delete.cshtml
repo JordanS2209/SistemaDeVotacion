@@ -1,0 +1,43 @@
+@model SistemaVotacion.Modelos.RecintoElectoral
+
+@{
+    ViewData["Title"] = "Eliminar Recinto";
+}
+
+<div class="elec-page container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="elec-card border-danger">
+                <div class="elec-card-header bg-danger text-white">
+                    <h4 class="mb-0">Eliminar Recinto Electoral</h4>
+                </div>
+                <div class="elec-card-body">
+                    <div class="alert alert-warning text-center">
+                        <i class="bi bi-exclamation-triangle-fill fs-1 text-warning d-block mb-3"></i>
+                        <h5 class="alert-heading">¿Está seguro de eliminar este recinto?</h5>
+                        <p class="mb-0">Esta acción no se puede deshacer.</p>
+                    </div>
+
+                    <dl class="row mb-4">
+                        <dt class="col-sm-4 text-end">Nombre:</dt>
+                        <dd class="col-sm-8 fw-bold">@Model.NombreRecinto</dd>
+
+                        <dt class="col-sm-4 text-end">Dirección:</dt>
+                        <dd class="col-sm-8">@Model.DireccionRecinto</dd>
+
+                         <dt class="col-sm-4 text-end">Parroquia ID:</dt>
+                        <dd class="col-sm-8">@Model.IdParroquia</dd>
+                    </dl>
+
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                            <a asp-action="Index" class="btn elec-btn elec-btn-secondary me-md-2">Cancelar</a>
+                            <button type="submit" class="btn btn-danger">Eliminar Definitivamente</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

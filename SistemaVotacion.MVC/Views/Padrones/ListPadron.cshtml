@@ -1,59 +1,112 @@
-﻿@model IEnumerable<SistemaVotacion.Modelos.Padron>
+﻿
+@model IEnumerable<SistemaVotacion.Modelos.Padron>
 
 @{
-    ViewData["Title"] = "ListPadron";
+    ViewData["Title"] = "Padrón Electoral";
 }
 
-<h1>ListPadron</h1>
+<div class="elec-page container-fluid">
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h1 class="elec-title mb-0">
+                <i class="bi bi-people-fill me-2"></i>Padrón Electoral (Habilitación)
+            </h1>
+            <p class="text-muted mt-2">Gestione los votantes habilitados para cada proceso.</p>
+        </div>
+        <div class="col-auto">
+            <a asp-action="CreatePadron" class="btn elec-btn elec-btn-primary">
+                <i class="bi bi-plus-lg me-2"></i>Habilitar Nuevo Votante
+            </a>
+        </div>
+    </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Id)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.HaVotado)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CodigoAcceso)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdProceso)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdVotante)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.HaVotado)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CodigoAcceso)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdProceso)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdVotante)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert elec-alert elec-alert-danger mb-4">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>@ViewBag.Error
+        </div>
+    }
+
+    <div class="elec-card">
+        <div class="elec-card-body p-0">
+            <div class="elec-table-wrap">
+                <table class="table elec-table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Votante</th>
+                            <th>Proceso Electoral</th>
+                            <th>Código Acceso</th>
+                            <th>Estado</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+                                <td>
+                                    @if (item.Votante != null && item.Votante.Usuario != null)
+                                    {
+                                        <div class="d-flex align-items-center">
+                                            <div class="elec-avatar me-2">@item.Votante.Usuario.Nombres.Substring(0, 1)</div>
+                                            <div>
+                                                <div class="fw-bold">@item.Votante.Usuario.Nombres @item.Votante.Usuario.Apellidos</div>
+                                                <small class="text-muted">CI: @item.Votante.Usuario.NumeroIdentificacion</small>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Votante #@item.IdVotante</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if(item.Proceso != null)
+                                    {
+                                        <span class="badge bg-info text-dark">@item.Proceso.NombreProceso</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Proceso #@item.IdProceso</span>
+                                    }
+                                </td>
+                                <td>
+                                    <code class="fs-5 fw-bold text-primary">@item.CodigoAcceso</code>
+                                </td>
+                                <td>
+                                    @if (item.HaVotado)
+                                    {
+                                        <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>YA VOTÓ</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark"><i class="bi bi-hourglass me-1"></i>HABILITADO</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group">
+                                        <a asp-action="EditPadron" asp-route-id="@item.Id" class="btn elec-btn-sm elec-btn-outline-primary" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a asp-action="DeletePadron" asp-route-id="@item.Id" class="btn elec-btn-sm elec-btn-outline-danger" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @if (!Model.Any())
+            {
+                <div class="p-5 text-center text-muted">
+                    <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                    <p class="mb-0">No hay registros en el padrón electoral.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

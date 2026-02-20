@@ -1,26 +1,52 @@
 ﻿@model SistemaVotacion.Modelos.Dignidad
 
-<div class="container mt-5">
-    <div class="card border-danger mx-auto" style="max-width: 500px;">
-        <div class="card-header bg-danger text-white text-center">
-            <h4>¿Eliminar esta Dignidad?</h4>
-        </div>
-        <div class="card-body">
-            <p><strong>Nombre:</strong> @Model.NombreDignidad</p>
+@{
+    ViewData["Title"] = "Eliminar Dignidad";
+}
 
-            <form asp-action="DeleteDignidad" method="post">
-                <input type="hidden" asp-for="Id" />
-
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-danger text-white">Confirmar Eliminación</button>
-                    <a asp-action="ListDignidades" class="btn btn-light">Cancelar</a>
+<div class="elec-page container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="elec-card border-danger">
+                <div class="elec-card-header bg-danger text-white text-center">
+                    <h4 class="mb-0 text-white"><i class="bi bi-trash3-fill me-2"></i>Eliminar Dignidad</h4>
                 </div>
-            </form>
+                <div class="elec-card-body text-center">
+                    <div class="mb-4">
+                        <i class="bi bi-award-fill text-danger display-1 opacity-25"></i>
+                    </div>
 
-            @if (ViewBag.Error != null)
-            {
-                <div class="alert alert-warning mt-3 small">@ViewBag.Error</div>
-            }
+                    <p class="lead mb-1">Estás a punto de eliminar:</p>
+                    <h3 class="fw-bold mb-3">@Model.NombreDignidad</h3>
+
+                    <div class="alert alert-warning d-flex align-items-center mb-4" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2 fs-4"></i>
+                        <div class="text-start small">
+                            <strong>Advertencia:</strong> Si eliminas esta dignidad, se afectarán los procesos y candidatos asociados.
+                        </div>
+                    </div>
+
+                    <form asp-action="DeleteDignidad" method="post">
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger btn-lg shadow-sm">
+                                <i class="bi bi-x-circle me-2"></i>Confirmar Eliminación
+                            </button>
+                            <a asp-action="ListDignidades" class="btn elec-btn elec-btn-secondary">
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger mt-3 small">
+                            <i class="bi bi-x-octagon me-1"></i> @ViewBag.Error
+                        </div>
+                    }
+                </div>
+            </div>
         </div>
     </div>
 </div>

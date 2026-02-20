@@ -1,0 +1,97 @@
+﻿@model SistemaVotacion.Modelos.Multimedia
+
+@{
+    ViewData["Title"] = "Detalles Multimedia";
+}
+
+<div class="elec-page">
+    <div class="container-fluid py-3">
+
+        <div class="mb-3">
+            <h2 class="elec-title mb-1">
+                <i class="bi bi-file-earmark-image"></i> @ViewData["Title"]
+            </h2>
+            <div class="elec-subtitle">
+                Información del recurso multimedia seleccionado.
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <div class="elec-card">
+
+                    <div class="elec-card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-eye"></i> Detalle
+                        </h5>
+
+                        <a asp-action="ListMultimedia" class="btn elec-btn elec-btn-secondary btn-sm">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </a>
+                    </div>
+
+                    <div class="elec-card-body">
+
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4 elec-section-title">ID</dt>
+                            <dd class="col-sm-8">@Model.Id</dd>
+
+                            <dt class="col-sm-4 elec-section-title">Archivo</dt>
+                            <dd class="col-sm-8">
+                                @if (!string.IsNullOrWhiteSpace(Model.UrlFoto))
+                                {
+                                    <a href="@Model.UrlFoto" target="_blank" class="text-decoration-none">
+                                        @Html.DisplayFor(model => model.UrlFoto)
+                                    </a>
+
+                                    <div class="mt-2">
+                                        <img src="@Model.UrlFoto"
+                                             alt="Vista previa"
+                                             class="img-thumbnail"
+                                             style="max-width:400px; max-height:400px;" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="opacity-75">Sin archivo</span>
+                                }
+                            </dd>
+
+                            <dt class="col-sm-4 elec-section-title">Descripción</dt>
+                            <dd class="col-sm-8">@Html.DisplayFor(model => model.Descripcion)</dd>
+
+                            <dt class="col-sm-4 elec-section-title">Candidato</dt>
+                            <dd class="col-sm-8">
+                                @(Model.Candidato != null ? Model.Candidato.NombreCandidato : (Model.IdCandidato?.ToString() ?? "No asignado"))
+                            </dd>
+
+                            <dt class="col-sm-4 elec-section-title">Lista</dt>
+                            <dd class="col-sm-8">
+                                @(Model.Lista != null ? Model.Lista.NombreLista : (Model.IdLista?.ToString() ?? "No asignada"))
+                            </dd>
+                        </dl>
+
+                        <hr class="elec-hr my-4" />
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a asp-action="EditMultimedia"
+                               asp-route-id="@Model.Id"
+                               class="btn elec-btn elec-btn-warn">
+                                <i class="bi bi-pencil-square"></i> Editar
+                            </a>
+
+                            <a asp-action="ListMultimedia"
+                               class="btn elec-btn elec-btn-secondary">
+                                Cancelar
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>

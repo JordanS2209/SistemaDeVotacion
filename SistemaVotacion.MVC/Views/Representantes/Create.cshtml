@@ -1,0 +1,65 @@
+@model SistemaVotacion.Modelos.RepresentanteJunta
+
+@{
+    ViewData["Title"] = "Asignar Representante";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Asignar Nuevo Representante</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="IdProceso" class="form-label fw-bold">Proceso Electoral</label>
+                            <select asp-for="IdProceso" class="form-select" asp-items="ViewBag.Procesos">
+                                <option value="">-- Seleccione un Proceso --</option>
+                            </select>
+                            <span asp-validation-for="IdProceso" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="IdJunta" class="form-label fw-bold">Junta Receptora</label>
+                            <select asp-for="IdJunta" class="form-select" asp-items="ViewBag.Juntas">
+                                <option value="">-- Seleccione una Junta --</option>
+                            </select>
+                            <span asp-validation-for="IdJunta" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="IdUsuario" class="form-label fw-bold">Usuario (Representante)</label>
+                            <select asp-for="IdUsuario" class="form-select" asp-items="ViewBag.Usuarios">
+                                <option value="">-- Seleccione un Usuario --</option>
+                            </select>
+                            <span asp-validation-for="IdUsuario" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="IdRol" class="form-label fw-bold">Cargo / Rol</label>
+                            <select asp-for="IdRol" class="form-select" asp-items="ViewBag.Roles">
+                                <option value="">-- Seleccione un Rol --</option>
+                            </select>
+                            <span asp-validation-for="IdRol" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save me-2"></i>Guardar Asignación
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

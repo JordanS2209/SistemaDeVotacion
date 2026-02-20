@@ -5,7 +5,7 @@ using SistemaVotacion.Modelos;
 
 namespace SistemaVotacion.MVC.Controllers
 {
-    //[Authorize(Roles = "Admin,SuperAdmin")]
+    [Authorize(Roles = "Admin,SuperAdmin")]
     public class CreationController : Controller
     {
         // NIVEL 1: Dashboard Principal
@@ -32,13 +32,13 @@ namespace SistemaVotacion.MVC.Controllers
             
         }
 
-        // NIVEL 3: Formulario para crear (Vista)
+        // NIVEL 3: Formulario para crear 
         public IActionResult CreateRol()
         {
             return View();
         }
 
-        // ACCIÓN: Procesar Creación (POST)
+        // ACCIÓN: Procesar Creación 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult CreateRol(Rol nuevoRol)
@@ -53,7 +53,7 @@ namespace SistemaVotacion.MVC.Controllers
                 }
                 catch (Exception ex)
                 {
-                    // Si la API falla, agregamos el error al modelo
+                   
                     // El primer parámetro vacío "" significa que es un error de todo el formulario
                     ModelState.AddModelError("", "Error al conectar con la API: " + ex.Message);
                 }
@@ -63,7 +63,7 @@ namespace SistemaVotacion.MVC.Controllers
             return View(nuevoRol);
         }
 
-        // NIVEL 4: Confirmación de Borrado (GET)
+        // NIVEL 4: Confirmación de Borrado
         public IActionResult DeleteRol(int id)
         {
             try

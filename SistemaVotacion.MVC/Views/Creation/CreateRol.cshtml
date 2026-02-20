@@ -4,40 +4,39 @@
     ViewData["Title"] = "Crear Nuevo Rol";
 }
 
-<div class="container mt-5">
+<div class="elec-page container-fluid">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Registrar Nuevo Rol</h4>
+            <div class="elec-card">
+                <div class="elec-card-header">
+                     <h4 class="elec-title mb-0">Registrar Nuevo Rol</h4>
                 </div>
-                <div class="card-body">
+                <div class="elec-card-body">
                     <form asp-action="CreateRol" method="post">
                         
                         @Html.AntiForgeryToken()
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
 
                         <div class="mb-3">
                             <label asp-for="NombreRol" class="form-label fw-bold">Nombre del Rol</label>
-                            <input asp-for="NombreRol" class="form-control" placeholder="Ej: SuperAdmin" required />
+                            <input asp-for="NombreRol" class="form-control elec-form-control" placeholder="Ej: SuperAdmin" required />
                             <span asp-validation-for="NombreRol" class="text-danger"></span>
                         </div>
 
                         <div class="mb-4">
                             <label asp-for="DescripcionRol" class="form-label fw-bold">Descripción</label>
-                            <textarea asp-for="DescripcionRol" class="form-control" rows="3"
+                            <textarea asp-for="DescripcionRol" class="form-control elec-form-control" rows="3"
                                       placeholder="Describa brevemente las funciones de este rol..." required></textarea>
                             <span asp-validation-for="DescripcionRol" class="text-danger"></span>
                         </div>
 
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-success">
-                                <i class="bi bi-save"></i> Guardar Rol
-                            </button>
-                            <a asp-action="ListRoles" class="btn btn-outline-secondary">
-                                <i class="bi bi-x-circle"></i> Cancelar
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                             <a asp-action="ListRoles" class="btn elec-btn elec-btn-secondary me-md-2">
+                                <i class="bi bi-x-circle me-2"></i>Cancelar
                             </a>
+                            <button type="submit" class="btn elec-btn elec-btn-primary">
+                                <i class="bi bi-save me-2"></i>Guardar Rol
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -45,3 +44,7 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

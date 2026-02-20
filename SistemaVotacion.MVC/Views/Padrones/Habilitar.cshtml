@@ -1,0 +1,45 @@
+@model dynamic
+
+@{
+    ViewData["Title"] = "Habilitar Votante";
+    var error = ViewBag.Error as string;
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3><i class="fas fa-user-check"></i> Habilitar Votante</h3>
+                </div>
+                <div class="card-body">
+                    
+                    @if (!string.IsNullOrEmpty(error))
+                    {
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle"></i> @error
+                        </div>
+                    }
+
+                    <div class="alert alert-info text-center">
+                        Ingrese el número de cédula del ciudadano para verificar si está habilitado y generar su código de acceso.
+                    </div>
+
+                    <form asp-action="Habilitar" method="post">
+                        <div class="form-group mb-4">
+                            <label for="numeroIdentificacion" class="form-label control-label">Número de Identificación (Cédula)</label>
+                            <input type="text" name="numeroIdentificacion" class="form-control form-control-lg text-center" placeholder="Ej: 1712345678" required autofocus />
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-check-circle"></i> Verificar y Generar Código
+                            </button>
+                            <a asp-action="Index" asp-controller="Home" class="btn btn-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,15 @@
+@{
+    ViewData["Title"] = "Acceso Denegado";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex align-items-center justify-content-center vh-100">
+    <div class="text-center">
+        <h1 class="display-1 fw-bold text-danger">403</h1>
+        <p class="fs-3"> <span class="text-danger">Opps!</span> Acceso Denegado.</p>
+        <p class="lead">
+            No tienes permisos para ver esta página.
+        </p>
+        <a asp-action="Index" asp-controller="Home" class="btn btn-primary">Volver al Inicio</a>
+    </div>
+</div>

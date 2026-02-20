@@ -81,7 +81,7 @@ namespace SistemaVotacion.API.Controllers
                 if (string.IsNullOrWhiteSpace(nuevoTipo.NombreTipoProceso))
                     return BadRequest("NombreTipoProceso es obligatorio.");
 
-                // Opcional: evitar duplicados por nombre (si quieres)
+                // evitar duplicados por nombre 
                 var existe = await _context.TipoProcesos
                     .AnyAsync(tp => tp.NombreTipoProceso.ToLower() == nuevoTipo.NombreTipoProceso.Trim().ToLower());
 
@@ -171,7 +171,7 @@ namespace SistemaVotacion.API.Controllers
                 if (id <= 0)
                     return BadRequest("ID inválido.");
 
-                // Importante: incluir procesos asociados para validar FK antes de borrar
+                // incluir procesos asociados para validar FK antes de borrar
                 var tipo = await _context.TipoProcesos
                     .Include(tp => tp.ProcesosAsociados)
                     .FirstOrDefaultAsync(tp => tp.Id == id);
@@ -181,7 +181,7 @@ namespace SistemaVotacion.API.Controllers
                     return NotFound("Tipo de proceso no encontrado.");
                 }
 
-                // Si tiene procesos asociados, NO borrar (evita romper FK)
+                // Si tiene procesos asociados
                 if (tipo.ProcesosAsociados != null && tipo.ProcesosAsociados.Any())
                 {
                     return Conflict("No se puede eliminar: este Tipo de Proceso tiene procesos electorales asociados.");

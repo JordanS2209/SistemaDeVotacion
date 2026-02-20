@@ -1,0 +1,82 @@
+﻿@model IEnumerable<SistemaVotacion.Modelos.Lista>
+@{
+    ViewData["Title"] = "Lista de Listas";
+}
+
+<div class="elec-page container-fluid">
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h1 class="elec-title mb-0">
+                <i class="bi bi-list-check me-2"></i>Lista de Listas
+            </h1>
+            <p class="text-muted mt-2">Gestión de listas y organizaciones políticas.</p>
+        </div>
+        <div class="col-auto">
+            <a asp-action="CreateLista" class="btn elec-btn elec-btn-primary">
+                <i class="bi bi-plus-lg me-2"></i>Crear nueva lista
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert elec-alert elec-alert-success mb-4">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert elec-alert elec-alert-danger mb-4">@TempData["Error"]</div>
+    }
+
+    <div class="elec-card">
+        <div class="elec-card-body p-0">
+            <div class="elec-table-wrap">
+                <table class="table elec-table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>@Html.DisplayNameFor(model => model.Id)</th>
+                            <th>@Html.DisplayNameFor(model => model.NombreLista)</th>
+                            <th>@Html.DisplayNameFor(model => model.NumeroLista)</th>
+                            <th>Proceso Electoral</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null)
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.Id</td>
+                                    <td class="fw-bold text-primary">@item.NombreLista</td>
+                                    <td>
+                                        <span class="badge bg-secondary rounded-pill">List @item.NumeroLista</span>
+                                    </td>
+                                    <td>@item.Proceso?.NombreProceso</td>
+                                    <td class="text-end">
+                                        <div class="btn-group">
+                                            <a asp-action="EditLista" asp-route-id="@item.Id" class="btn elec-btn-sm elec-btn-outline-primary" title="Editar">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a asp-action="DetailsLista" asp-route-id="@item.Id" class="btn elec-btn-sm elec-btn-outline-info" title="Detalles">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a asp-action="DeleteLista" asp-route-id="@item.Id" class="btn elec-btn-sm elec-btn-outline-danger" title="Eliminar">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @if (Model == null || !Model.Any())
+            {
+                <div class="p-5 text-center text-muted">
+                    <p>No hay listas registradas.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

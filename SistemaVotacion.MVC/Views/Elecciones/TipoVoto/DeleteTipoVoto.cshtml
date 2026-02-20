@@ -1,0 +1,48 @@
+@model SistemaVotacion.Modelos.TipoVoto
+
+@{
+    ViewData["Title"] = "Eliminar Tipo de Voto";
+}
+
+
+<div class="row justify-content-center elec-page">
+    <div class="col-md-6">
+        <div class="elec-card border-danger">
+            <div class="elec-card-header bg-danger bg-opacity-25">
+                <h5 class="mb-0 text-white">Eliminar Tipo de Voto</h5>
+            </div>
+            <div class="elec-card-body text-center">
+                <div class="mb-4">
+                    <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+                    <h3 class="text-danger fw-bold mt-2">¿Está seguro?</h3>
+                    <p class="text-muted">Esta acción eliminará el registro permanentemente.</p>
+                </div>
+                
+                <div class="bg-dark bg-opacity-25 rounded p-3 mb-4 text-start border border-secondary">
+                    <dl class="row mb-0">
+                        <dt class = "col-sm-4 text-white-50">
+                            @Html.DisplayNameFor(model => model.Id)
+                        </dt>
+                        <dd class = "col-sm-8 fw-bold">
+                            @Html.DisplayFor(model => model.Id)
+                        </dd>
+                        <dt class = "col-sm-4 text-white-50">
+                            @Html.DisplayNameFor(model => model.NombreTipo)
+                        </dt>
+                        <dd class = "col-sm-8 fw-bold text-white">
+                            @Html.DisplayFor(model => model.NombreTipo)
+                        </dd>
+                    </dl>
+                </div>
+                
+                <form asp-action="DeleteTipoVoto">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="ListTipoVoto" class="btn elec-btn elec-btn-secondary">Cancelar</a>
+                        <input type="submit" value="Confirmar Eliminación" class="btn elec-btn elec-btn-danger px-4" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,6 +1,8 @@
 ﻿using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using SistemaVotacion.ApiConsumer;
+using SistemaVotacion.Modelos;
 
 namespace SistemaVotacion.MVC.Controllers
 {
@@ -19,6 +21,26 @@ namespace SistemaVotacion.MVC.Controllers
         [HttpGet]
         public IActionResult IngresarCodigo()
         {
+            // Validar si hay proceso activo antes de mostrar la vista
+            try
+            {
+                var procesos = Crud<ProcesoElectoral>.GetAll();
+                var ahora = DateTime.Now;
+                bool hayProcesoActivo = procesos != null && procesos.Any(p => ahora >= p.FechaInicio && ahora <= p.FechaFin);
+
+                if (!hayProcesoActivo)
+                {
+                    TempData["Error"] = "No hay procesos electorales activos en este momento.";
+                    return RedirectToAction("Index", "Home");
+                }
+            }
+            catch
+            {
+                // Si falla la API
+                TempData["Error"] = "Error al verificar procesos electorales.";
+                return RedirectToAction("Index", "Home");
+            }
+
             if (TempData["Error"] is string tempError && !string.IsNullOrWhiteSpace(tempError))
             {
                 ViewBag.Error = tempError;
@@ -55,7 +77,8 @@ namespace SistemaVotacion.MVC.Controllers
             int padronId = data.padronId;
 
             
-            return RedirectToAction("Index", "Boletas", new { codigo });
+           
+            return RedirectToAction("Index", "Boletas", new { codigo = codigo });
         }
     }
 }

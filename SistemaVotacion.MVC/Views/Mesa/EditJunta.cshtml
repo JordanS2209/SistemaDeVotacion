@@ -1,0 +1,52 @@
+
+@model SistemaVotacion.Modelos.JuntaReceptora
+
+@{
+    ViewData["Title"] = "Editar Junta";
+}
+
+<div class="row justify-content-center elec-page">
+    <div class="col-md-6">
+        <div class="elec-card">
+            <div class="elec-card-header">
+                <h5 class="mb-0 text-white">
+                    <i class="bi bi-pencil-square me-2"></i>Editar Junta Receptora
+                </h5>
+            </div>
+            <div class="elec-card-body">
+                <form asp-action="EditJunta" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert elec-alert elec-alert-danger text-danger mb-4"></div>
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="mb-4">
+                        <label asp-for="IdRecinto" class="form-label control-label">Recinto Electoral</label>
+                        <select asp-for="IdRecinto" class="form-select" asp-items="ViewBag.Recintos"></select>
+                        <span asp-validation-for="IdRecinto" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label asp-for="NumeroJunta" class="form-label control-label">Número de Junta</label>
+                            <input asp-for="NumeroJunta" type="number" class="form-control" />
+                            <span asp-validation-for="NumeroJunta" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="IdGenero" class="form-label control-label">Género Asignado</label>
+                            <select asp-for="IdGenero" class="form-select" asp-items="ViewBag.Generos"></select>
+                            <span asp-validation-for="IdGenero" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between pt-3">
+                        <a asp-action="ListJunta" class="btn elec-btn elec-btn-secondary">Cancelar</a>
+                        <input type="submit" value="Guardar Cambios" class="btn elec-btn elec-btn-primary px-4" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

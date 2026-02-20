@@ -7,12 +7,16 @@ using SistemaVotacion.Servicios.Interfaces;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SistemaVotacion.MVC.Controllers
 {
+    [Authorize(Roles = "SuperAdmin")]
     public class EleccionesController : Controller
     {
         private readonly IMultimediaService _multimediaService;
+
+
         public EleccionesController(IMultimediaService multimediaService)
         {
             _multimediaService = multimediaService;
@@ -22,9 +26,73 @@ namespace SistemaVotacion.MVC.Controllers
             return View();
         }
         // tipo electoral - crud 
+        private List<SelectListItem> GetProcesosElectorales()
+        {
+            try
+            {
+                var procesos = Crud<ProcesoElectoral>.GetAll() ?? new List<ProcesoElectoral>();
+                return procesos
+                    .OrderByDescending(p => p.FechaInicio)
+                    .Select(p => new SelectListItem { Value = p.Id.ToString(), Text = p.NombreProceso })
+                    .ToList();
+            }
+            catch
+            {
+                return new List<SelectListItem>();
+            }
+        }
+
+        private List<SelectListItem> GetListasSelect()
+        {
+            try
+            {
+                var listas = Crud<Lista>.GetAll() ?? new List<Lista>();
+                return listas
+                    .OrderBy(l => l.NumeroLista)
+                    .ThenBy(l => l.NombreLista)
+                    .Select(l => new SelectListItem { Value = l.Id.ToString(), Text = $"{l.NumeroLista} - {l.NombreLista}" })
+                    .ToList();
+            }
+            catch
+            {
+                return new List<SelectListItem>();
+            }
+        }
+
+        private List<SelectListItem> GetDignidades()
+        {
+            try
+            {
+                var dignidades = Crud<Dignidad>.GetAll() ?? new List<Dignidad>();
+                return dignidades
+                    .OrderBy(d => d.NombreDignidad)
+                    .Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.NombreDignidad })
+                    .ToList();
+            }
+            catch
+            {
+                return new List<SelectListItem>();
+            }
+        }
+
+        private List<SelectListItem> GetCandidatos()
+        {
+            try
+            {
+                var candidatos = Crud<Candidato>.GetAll() ?? new List<Candidato>();
+                return candidatos
+                    .OrderBy(c => c.NombreCandidato)
+                    .Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.NombreCandidato })
+                    .ToList();
+            }
+            catch
+            {
+                return new List<SelectListItem>();
+            }
+        }
         private List<SelectListItem> GetTipoProceso()
         {
-            
+
             try
             {
                 var tipos = Crud<TipoProceso>.GetAll();
@@ -93,9 +161,17 @@ namespace SistemaVotacion.MVC.Controllers
         {
             try
             {
+                // 1) Obtener el proceso
                 var procesoElectoral = Crud<ProcesoElectoral>.GetById(id);
                 if (procesoElectoral == null)
                     return NotFound();
+
+                // 2) Obtener listas por proceso
+                var url = $"{Crud<Lista>.EndPoint}/por-proceso/{id}";
+                var listas = Crud<Lista>.GetCustom(url) ?? new List<Lista>();
+
+                // 3) Pasar listas a la vista LISTAS PRO PROCESO
+                ViewBag.ListasDelProceso = listas;
 
                 return View("ProcesoElectoral/DetailsProcesoElectoral", procesoElectoral);
             }
@@ -105,6 +181,7 @@ namespace SistemaVotacion.MVC.Controllers
                 return RedirectToAction(nameof(CreateProcesoElectoral));
             }
         }
+
 
         public IActionResult CreateProcesoElectoral()
         {
@@ -343,16 +420,9 @@ namespace SistemaVotacion.MVC.Controllers
             return RedirectToAction(nameof(CreateProcesoElectoral));
         }
 
-
-
-
-
-
-
-
         // TIPO DE PROCESOS - CRUD
         //index
-       
+
 
         public IActionResult DetailsTipoProceso(int id)
         {
@@ -501,62 +571,72 @@ namespace SistemaVotacion.MVC.Controllers
         }
 
 
-        // CADIDATOS - CRUD
+        // =======================
+        // CANDIDATOS - CRUD
+        // =======================
+
+
+
         // Helper para obtener las listas
         private List<SelectListItem> GetListas()
         {
-            Crud<Lista>.EndPoint = "https://localhost:7202/api/Listas";
-            return Crud<Lista>.GetAll()
-                .Select(l => new SelectListItem
-                {
-                    Value = l.Id.ToString(),
-                    Text = l.NombreLista
-                })
-                .ToList();
-        }
+            try
+            {
 
-        // Helper para obtener las dignidades
-        private List<SelectListItem> GetDignidades()
-        {
-            return Crud<Dignidad>.GetAll()
-               .Select(d => new SelectListItem
-               {
-                   Value = d.Id.ToString(),
-                   Text = d.NombreDignidad
-               })
-               .ToList();
-        }
+                var listas = Crud<Lista>.GetAll() ?? new List<Lista>();
 
+                return listas
+                    .OrderBy(l => l.NumeroLista)
+                    .ThenBy(l => l.NombreLista)
+                    .Select(l => new SelectListItem
+                    {
+                        Value = l.Id.ToString(),
+                        Text = $"{l.NumeroLista} - {l.NombreLista}"
+                    })
+                    .ToList();
+            }
+            catch
+            {
+                return new List<SelectListItem>();
+            }
+        }
 
         public IActionResult ListCandidato()
         {
             try
             {
-                var candidatos = Crud<Candidato>.GetAll();
+
+
+                var candidatos = Crud<Candidato>.GetAll() ?? new List<Candidato>();
+
                 ViewBag.Listas = GetListas();
                 ViewBag.Dignidades = GetDignidades();
-                return View(candidatos);
+
+                return View("Candidato/ListCandidato", candidatos);
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
+                TempData["Error"] = "Error al conectar con la API: " + ex.Message;
+
                 ViewBag.Listas = GetListas();
                 ViewBag.Dignidades = GetDignidades();
-                return View(new List<Candidato>());
+
+                return View("Candidato/ListCandidato", new List<Candidato>());
             }
         }
-
 
         public IActionResult FiltrarCandidatos(string nombre, int? lista, int? dignidad)
         {
             try
             {
-                var candidatos = Crud<Candidato>.GetAll();
+
+
+                var candidatos = Crud<Candidato>.GetAll() ?? new List<Candidato>();
 
                 // Filtrado en memoria
-                if (!string.IsNullOrEmpty(nombre))
+                if (!string.IsNullOrWhiteSpace(nombre))
                     candidatos = candidatos
-                        .Where(c => c.NombreCandidato.Contains(nombre, StringComparison.OrdinalIgnoreCase))
+                        .Where(c => (c.NombreCandidato ?? "").Contains(nombre, StringComparison.OrdinalIgnoreCase))
                         .ToList();
 
                 if (lista.HasValue)
@@ -568,30 +648,34 @@ namespace SistemaVotacion.MVC.Controllers
                 ViewBag.Listas = GetListas();
                 ViewBag.Dignidades = GetDignidades();
 
-                return View("ListCandidato", candidatos);
+                return View("Candidato/ListCandidato", candidatos);
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al filtrar candidatos: " + ex.Message;
+                TempData["Error"] = "Error al filtrar candidatos: " + ex.Message;
+
                 ViewBag.Listas = GetListas();
                 ViewBag.Dignidades = GetDignidades();
-                return View("ListCandidato", new List<Candidato>());
+
+                return View("Candidato/ListCandidato", new List<Candidato>());
             }
         }
-
 
         public IActionResult DetailsCandidato(int id)
         {
             try
             {
+
+
                 var candidato = Crud<Candidato>.GetById(id);
                 if (candidato == null) return NotFound();
-                return View(candidato);
+
+                return View("Candidato/DetailsCandidato", candidato);
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View();
+                TempData["Error"] = "Error al obtener el candidato: " + ex.Message;
+                return RedirectToAction(nameof(ListCandidato));
             }
         }
 
@@ -599,51 +683,68 @@ namespace SistemaVotacion.MVC.Controllers
         {
             ViewBag.Listas = GetListas();
             ViewBag.Dignidades = GetDignidades();
-            return View();
+            return View("Candidato/CreateCandidato");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult CreateCandidato(Candidato nuevoCandidato)
         {
+            // Validaciones mínimas
+            if (nuevoCandidato == null)
+                ModelState.AddModelError("", "Datos inválidos.");
 
-            if (string.IsNullOrEmpty(nuevoCandidato.NombreCandidato))
-                ModelState.AddModelError("", "El nombre del candidato es obligatorio.");
+            if (nuevoCandidato != null && string.IsNullOrWhiteSpace(nuevoCandidato.NombreCandidato))
+                ModelState.AddModelError(nameof(Candidato.NombreCandidato), "El nombre del candidato es obligatorio.");
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    Crud<Candidato>.Create(nuevoCandidato);
-                    return RedirectToAction(nameof(ListCandidato));
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", "Error al crear: " + ex.Message);
-                }
+                TempData["Error"] = "Revisa los datos del candidato.";
+                ViewBag.Listas = GetListas();
+                ViewBag.Dignidades = GetDignidades();
+                return View("Candidato/CreateCandidato", nuevoCandidato);
             }
 
-            ViewBag.Listas = GetListas();
-            ViewBag.Dignidades = GetDignidades();
-            return View(nuevoCandidato);
-        }
+            try
+            {
 
+
+                nuevoCandidato.NombreCandidato = nuevoCandidato.NombreCandidato.Trim();
+
+                Crud<Candidato>.Create(nuevoCandidato);
+
+                TempData["Success"] = "Candidato creado correctamente.";
+                return RedirectToAction(nameof(ListCandidato));
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al crear candidato: " + ex.Message;
+
+                ViewBag.Listas = GetListas();
+                ViewBag.Dignidades = GetDignidades();
+
+                return View("Candidato/CreateCandidato", nuevoCandidato);
+            }
+        }
 
         public IActionResult EditCandidato(int id)
         {
             try
             {
+
+
                 var candidato = Crud<Candidato>.GetById(id);
                 if (candidato == null) return NotFound();
 
                 ViewBag.Listas = GetListas();
                 ViewBag.Dignidades = GetDignidades();
-                return View(candidato);
+
+                return View("Candidato/EditCandidato", candidato);
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View();
+                TempData["Error"] = "Error al obtener candidato: " + ex.Message;
+                return RedirectToAction(nameof(ListCandidato));
             }
         }
 
@@ -651,41 +752,55 @@ namespace SistemaVotacion.MVC.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult EditCandidato(int id, Candidato candidatoData)
         {
+            if (candidatoData == null)
+                ModelState.AddModelError("", "Datos inválidos.");
 
-            if (string.IsNullOrEmpty(candidatoData.NombreCandidato))
-                ModelState.AddModelError("", "El nombre del candidato es obligatorio.");
+            if (candidatoData != null && string.IsNullOrWhiteSpace(candidatoData.NombreCandidato))
+                ModelState.AddModelError(nameof(Candidato.NombreCandidato), "El nombre del candidato es obligatorio.");
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    Crud<Candidato>.Update(id, candidatoData);
-                    return RedirectToAction(nameof(ListCandidato));
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", "Error al actualizar: " + ex.Message);
-                }
+                TempData["Error"] = "Revisa los datos del candidato.";
+                ViewBag.Listas = GetListas();
+                ViewBag.Dignidades = GetDignidades();
+                return View("Candidato/EditCandidato", candidatoData);
             }
 
-            ViewBag.Listas = GetListas();
-            ViewBag.Dignidades = GetDignidades();
-            return View(candidatoData);
-        }
+            try
+            {
 
+                candidatoData.NombreCandidato = candidatoData.NombreCandidato.Trim();
+
+                Crud<Candidato>.Update(id, candidatoData);
+
+                TempData["Success"] = "Candidato actualizado correctamente.";
+                return RedirectToAction(nameof(ListCandidato));
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al actualizar candidato: " + ex.Message;
+
+                ViewBag.Listas = GetListas();
+                ViewBag.Dignidades = GetDignidades();
+
+                return View("Candidato/EditCandidato", candidatoData);
+            }
+        }
 
         public IActionResult DeleteCandidato(int id)
         {
             try
             {
+
                 var candidato = Crud<Candidato>.GetById(id);
                 if (candidato == null) return NotFound();
-                return View(candidato);
+
+                return View("Candidato/DeleteCandidato", candidato);
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View();
+                TempData["Error"] = "Error al obtener candidato: " + ex.Message;
+                return RedirectToAction(nameof(ListCandidato));
             }
         }
 
@@ -695,567 +810,313 @@ namespace SistemaVotacion.MVC.Controllers
         {
             try
             {
+
                 Crud<Candidato>.Delete(id);
+
+                TempData["Success"] = "Candidato eliminado correctamente.";
                 return RedirectToAction(nameof(ListCandidato));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "Error al eliminar: " + ex.Message);
-                return View(candidatoData);
+                TempData["Error"] = "Error al eliminar candidato: " + ex.Message;
+                return View("Candidato/DeleteCandidato", candidatoData);
             }
         }
 
-        //OPCION CONSULTA - CRUD
-        // LISTAR
 
-        // Helper para opciones Sí/No
-        private List<SelectListItem> GetOpcionesConsulta()
-        {
-            return new List<SelectListItem>
-        {
-            new SelectListItem { Value = "Sí", Text = "Sí" },
-            new SelectListItem { Value = "No", Text = "No" }
-        };
-        }
-
-        // Helper para preguntas
-        private List<SelectListItem> GetPreguntasConsulta()
-        {
-            return Crud<PreguntaConsulta>.GetAll()
-                .Select(p => new SelectListItem
-                {
-                    Value = p.Id.ToString(),
-                    Text = p.TextoPregunta
-                })
-                .ToList();
-        }
-        public IActionResult ListOpcionConsulta()
-        {
-            try
-            {
-                var opcionConsultaData = Crud<OpcionConsulta>.GetAll();
-                return View(opcionConsultaData);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View(new List<OpcionConsulta>());
-            }
-        }
-
-        // DETALLES
-        public IActionResult DetailsOpcionConsulta(int id)
-        {
-            try
-            {
-                var opcion = Crud<OpcionConsulta>.GetById(id);
-                if (opcion == null)
-                    return NotFound();
-
-                return View(opcion);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View();
-            }
-        }
-
-        
-
-        // CREAR (GET)
-        public IActionResult CreateOpcionConsulta()
-        {
-            ViewBag.Valores = GetOpcionesConsulta();
-            ViewBag.Preguntas = GetPreguntasConsulta();
-            return View();
-        }
-
-        // CREAR (POST)
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult CreateOpcionConsulta(OpcionConsulta nuevaOpcion)
-        {
-            if (string.IsNullOrWhiteSpace(nuevaOpcion.TextoOpcion))
-                ModelState.AddModelError("", "El texto de la opción es obligatorio.");
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    Crud<OpcionConsulta>.Create(nuevaOpcion);
-                    return RedirectToAction(nameof(ListOpcionConsulta));
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", "Error al crear: " + ex.Message);
-                }
-            }
-
-            ViewBag.Pregunta = GetPreguntasConsulta();
-            ViewBag.Valores = GetOpcionesConsulta();
-            return View(nuevaOpcion);
-        }
-
-        // EDITAR (GET)
-        public IActionResult EditOpcionConsulta(int id)
-        {
-            try
-            {
-                var opcion = Crud<OpcionConsulta>.GetById(id);
-                if (opcion == null)
-                    return NotFound();
-
-                ViewBag.Pregunta = GetPreguntasConsulta();
-                ViewBag.Valores = GetOpcionesConsulta();
-                return View(opcion);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View();
-            }
-        }
-
-        // EDITAR (POST)
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult EditOpcionConsulta(int id, OpcionConsulta opcionConsultaData)
-        {
-            if (string.IsNullOrWhiteSpace(opcionConsultaData.TextoOpcion))
-                ModelState.AddModelError("", "El texto de la opción es obligatorio.");
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    Crud<OpcionConsulta>.Update(id, opcionConsultaData);
-                    return RedirectToAction(nameof(ListOpcionConsulta));
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", "Error al actualizar: " + ex.Message);
-                }
-            }
-
-            ViewBag.Pregunta = GetPreguntasConsulta();
-            ViewBag.Valores = GetOpcionesConsulta();
-            return View(opcionConsultaData);
-        }
-
-        // ELIMINAR (GET)
-        public IActionResult DeleteOpcionConsulta(int id)
-        {
-            try
-            {
-                var opcion = Crud<OpcionConsulta>.GetById(id);
-                if (opcion == null)
-                    return NotFound();
-
-                return View(opcion);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View();
-            }
-        }
-
-        // ELIMINAR (POST)
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult DeleteOpcionConsulta(int id, OpcionConsulta opcionConsultaData)
-        {
-            try
-            {
-                Crud<OpcionConsulta>.Delete(id);
-                return RedirectToAction(nameof(ListOpcionConsulta));
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", "Error al eliminar: " + ex.Message);
-                return View(opcionConsultaData);
-            }
-        }
-
-        //PREGUNTA CONSULTA - CRUD
-        public IActionResult ListPreguntaConsulta()
-        {
-            try
-            {
-                var preguntas = Crud<PreguntaConsulta>.GetAll();
-                return View(preguntas);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View(new List<PreguntaConsulta>());
-            }
-
-        }
-        public IActionResult DetailsPreguntaConsulta(int id)
-        {
-            try
-            {
-                var pregunta = Crud<PreguntaConsulta>.GetById(id);
-                if (pregunta == null) return NotFound();
-
-                return View(pregunta);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View();
-            }
-        }
-        public IActionResult CreatePreguntaConsulta()
-        {
-            ViewBag.ProcesosElectorales = GetProcesosElectorales();
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult CreatePreguntaConsulta(PreguntaConsulta nuevoPreguntaConsulta)
-        {
-            // Validación mínima
-            if (nuevoPreguntaConsulta.NumeroPregunta <= 0)
-                ModelState.AddModelError("", "El número de la pregunta debe ser mayor que 0.");
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    Crud<PreguntaConsulta>.Create(nuevoPreguntaConsulta);
-                    return RedirectToAction(nameof(ListPreguntaConsulta));
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", "Error al crear: " + ex.Message);
-                }
-            }
-
-            ViewBag.ProcesosElectorales = GetProcesosElectorales();
-            return View(nuevoPreguntaConsulta);
-
-        }
-        public IActionResult EditPreguntaConsulta(int id)
-        {
-            try
-            {
-                var pregunta = Crud<PreguntaConsulta>.GetById(id);
-                if (pregunta == null) return NotFound();
-
-                ViewBag.ProcesosElectorales = GetProcesosElectorales();
-                return View(pregunta);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View();
-            }
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult EditPreguntaConsulta(int id, PreguntaConsulta preguntaConsultaData)
-        {
-            if (preguntaConsultaData.NumeroPregunta <= 0)
-                ModelState.AddModelError("", "El número de la pregunta debe ser mayor que 0.");
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    Crud<PreguntaConsulta>.Update(id, preguntaConsultaData);
-                    return RedirectToAction(nameof(ListPreguntaConsulta));
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", "Error al actualizar: " + ex.Message);
-                }
-            }
-
-            ViewBag.ProcesosElectorales = GetProcesosElectorales();
-            return View(preguntaConsultaData);
-        }
-
-        public IActionResult DeletePreguntaConsulta(int id)
-        {
-            try
-            {
-                var pregunta = Crud<PreguntaConsulta>.GetById(id);
-                if (pregunta == null) return NotFound();
-
-                return View(pregunta);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View();
-            }
-        }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult DeletePreguntaConsulta(int id, PreguntaConsulta preguntaConsultaData)
-        {
-            try
-            {
-                Crud<PreguntaConsulta>.Delete(id);
-                return RedirectToAction(nameof(ListPreguntaConsulta));
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", "Error al eliminar: " + ex.Message);
-                return View(preguntaConsultaData);
-            }
-        }
-
-        // Lista-Crud
-        private List<SelectListItem> GetProcesosElectorales()
-        {
-
-            return Crud<ProcesoElectoral>.GetAll()
-                .Select(p => new SelectListItem
-                {
-                    Value = p.Id.ToString(),
-                    Text = p.NombreProceso
-                })
-                .ToList();
-        }
         public IActionResult ListLista()
         {
             try
             {
-                Crud<Lista>.EndPoint = "https://localhost:7202/api/Listas";
-                var ListaData = Crud<Lista>.GetAll();
-                return View(ListaData);
-
+                var listaData = Crud<Lista>.GetAll() ?? new List<Lista>();
+                return View("Lista/ListLista", listaData);
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View(new List<object>());
+                TempData["Error"] = "Error al conectar con la API: " + ex.Message;
+                return View("Lista/ListLista", new List<Lista>());
             }
-
         }
+
         public IActionResult DetailsLista(int id)
         {
             try
             {
-                Crud<Lista>.EndPoint = "https://localhost:7202/api/Listas";
-                var lista = Crud<Lista>.GetById(id);
-                if (lista == null)
-                    return NotFound();
+                // Traer la lista
 
-                return View(lista);
+                var lista = Crud<Lista>.GetById(id);
+                if (lista == null) return NotFound();
+
+                // Traer candidatos de esa lista
+
+                var url = $"{Crud<Candidato>.EndPoint}/por-lista/{id}";
+                var candidatos = Crud<Candidato>.GetCustom(url) ?? new List<Candidato>();
+
+                // 3) Mandar candidatos a la vista (sin modificar modelos)
+                ViewBag.CandidatosDeLaLista = candidatos;
+
+                return View("Lista/DetailsLista", lista);
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al obtener la lista: " + ex.Message;
-                return View();
+                TempData["Error"] = "Error al obtener la lista: " + ex.Message;
+                return RedirectToAction(nameof(ListLista));
             }
         }
+
+
+
         public IActionResult CreateLista()
         {
-            Crud<Lista>.EndPoint = "https://localhost:7202/api/Listas";
             ViewBag.Procesos = GetProcesosElectorales();
-            return View();
+            return View("Lista/CreateLista");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult CreateLista(Lista nuevaLista)
         {
-            if (string.IsNullOrWhiteSpace(nuevaLista.NombreLista))
+            if (nuevaLista == null)
             {
-                ModelState.AddModelError("", "El nombre de la lista es obligatorio.");
+                TempData["Error"] = "Datos inválidos.";
+                return RedirectToAction(nameof(ListLista));
             }
+
+            if (string.IsNullOrWhiteSpace(nuevaLista.NombreLista))
+                ModelState.AddModelError(nameof(Lista.NombreLista), "El nombre de la lista es obligatorio.");
+
+            if (nuevaLista.NumeroLista <= 0)
+                ModelState.AddModelError(nameof(Lista.NumeroLista), "El número de lista debe ser mayor que 0.");
+
+            if (nuevaLista.IdProceso <= 0)
+                ModelState.AddModelError(nameof(Lista.IdProceso), "Debe seleccionar un proceso electoral.");
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    Crud<Lista>.EndPoint = "https://localhost:7202/api/Listas";
                     Crud<Lista>.Create(nuevaLista);
+                    TempData["Success"] = "Lista creada correctamente.";
                     return RedirectToAction(nameof(ListLista));
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("", "Error al crear lista: " + ex.Message);
+                    TempData["Error"] = "Error al crear lista: " + ex.Message;
                 }
+            }
+            else
+            {
+                TempData["Error"] = "Revisa los datos de la lista.";
             }
 
             ViewBag.Procesos = GetProcesosElectorales();
-            return View(nuevaLista);
+            return View("Lista/CreateLista", nuevaLista);
         }
+
         public IActionResult EditLista(int id)
         {
             try
             {
-                Crud<Lista>.EndPoint = "https://localhost:7202/api/Listas";
                 var lista = Crud<Lista>.GetById(id);
-                if (lista == null)
-                    return NotFound();
+                if (lista == null) return NotFound();
 
                 ViewBag.Procesos = GetProcesosElectorales();
-                return View(lista);
+                return View("Lista/EditLista", lista);
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al obtener lista: " + ex.Message;
-                return View();
+                TempData["Error"] = "Error al obtener lista: " + ex.Message;
+                return RedirectToAction(nameof(ListLista));
             }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult EditLista(int id, Lista ListaData)
+        public IActionResult EditLista(int id, Lista listaData)
         {
-            if (string.IsNullOrWhiteSpace(ListaData.NombreLista))
+            if (listaData == null)
             {
-                ModelState.AddModelError("", "El nombre de la lista es obligatorio.");
+                TempData["Error"] = "Datos inválidos.";
+                return RedirectToAction(nameof(ListLista));
             }
+
+            if (string.IsNullOrWhiteSpace(listaData.NombreLista))
+                ModelState.AddModelError(nameof(Lista.NombreLista), "El nombre de la lista es obligatorio.");
+
+            if (listaData.NumeroLista <= 0)
+                ModelState.AddModelError(nameof(Lista.NumeroLista), "El número de lista debe ser mayor que 0.");
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    Crud<Lista>.EndPoint = "https://localhost:7202/api/Listas";
-                    Crud<Lista>.Update(id, ListaData);
+                    Crud<Lista>.Update(id, listaData);
+                    TempData["Success"] = "Lista actualizada correctamente.";
                     return RedirectToAction(nameof(ListLista));
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("", "Error al actualizar lista: " + ex.Message);
+                    TempData["Error"] = "Error al actualizar lista: " + ex.Message;
                 }
+            }
+            else
+            {
+                TempData["Error"] = "Revisa los datos de la lista.";
             }
 
             ViewBag.Procesos = GetProcesosElectorales();
-            return View(ListaData);
+            return View("Lista/EditLista", listaData);
         }
 
         public IActionResult DeleteLista(int id)
         {
             try
             {
-                Crud<Lista>.EndPoint = "https://localhost:7202/api/Listas";
                 var lista = Crud<Lista>.GetById(id);
-                if (lista == null)
-                    return NotFound();
+                if (lista == null) return NotFound();
 
-                return View(lista);
+                return View("Lista/DeleteLista", lista);
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al obtener lista: " + ex.Message;
-                return View();
+                TempData["Error"] = "Error al obtener lista: " + ex.Message;
+                return RedirectToAction(nameof(ListLista));
             }
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteLista(int id, Lista ListaData)
+        public IActionResult DeleteLista(int id, Lista listaData)
         {
             try
             {
-                Crud<Lista>.EndPoint = "https://localhost:7202/api/Listas";
                 Crud<Lista>.Delete(id);
+                TempData["Success"] = "Lista eliminada correctamente.";
                 return RedirectToAction(nameof(ListLista));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "Error: " + ex.Message);
-                return View(ListaData);
+                TempData["Error"] = "Error al eliminar: " + ex.Message;
+                return View("Lista/DeleteLista", listaData);
             }
         }
-        // Multimedia-Crud
-        private List<SelectListItem> GetCandidatos()
-        {
-            return Crud<Candidato>.GetAll()
-                .Select(c => new SelectListItem
-                {
-                    Value = c.Id.ToString(),
-                    Text = c.NombreCandidato // Cambia según tu propiedad de nombre
-                })
-                .ToList();
-        }
 
-       
+
+
+
+        // =======================
+        // MULTIMEDIA - CRUD
+        // Views/Elecciones/Multimedia
+        // =======================
+
         public async Task<IActionResult> ListMultimedia()
         {
             try
             {
-
                 var multimediaData = await _multimediaService.GetAllAsync();
-                return View(multimediaData);
-
+                return View("Multimedia/ListMultimedia", multimediaData);
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View(new List<Multimedia>());
+                TempData["Error"] = "Error al conectar con la API: " + ex.Message;
+                return View("Multimedia/ListMultimedia", new List<Multimedia>());
             }
-
         }
+
         public async Task<IActionResult> DetailsMultimedia(int id)
         {
             try
             {
                 var multimediaData = await _multimediaService.GetByIdAsync(id);
-                return View(multimediaData);
+                if (multimediaData == null) return NotFound();
+
+                return View("Multimedia/DetailsMultimedia", multimediaData);
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View();
+                TempData["Error"] = "Error al conectar con la API: " + ex.Message;
+                return RedirectToAction(nameof(ListMultimedia));
             }
         }
+
         public IActionResult CreateMultimedia()
         {
             ViewBag.Candidatos = GetCandidatos();
             ViewBag.Listas = GetListas();
-            return View();
+            return View("Multimedia/CreateMultimedia");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateMultimedia(IFormFile file, int idCandidato, int idLista, string? descripcion)
+        public async Task<IActionResult> CreateMultimedia(IFormFile file, int? idCandidato, int? idLista, string? descripcion)
         {
-            if (file == null || idCandidato == 0 || idLista == 0)
+            // Archivo obligatorio
+            if (file == null || file.Length == 0)
+                ModelState.AddModelError("file", "El archivo es obligatorio.");
+
+            // exactamente uno
+            var tieneCandidato = idCandidato.HasValue && idCandidato.Value > 0;
+            var tieneLista = idLista.HasValue && idLista.Value > 0;
+
+            if (tieneCandidato == tieneLista)
             {
-                ModelState.AddModelError("", "Archivo, Candidato y Lista son obligatorios.");
+                ModelState.AddModelError("idCandidato", "Selecciona solo uno: Candidato o Lista.");
+                ModelState.AddModelError("idLista", "Selecciona solo uno: Candidato o Lista.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Revisa los datos del archivo multimedia.";
+
                 ViewBag.Candidatos = GetCandidatos();
                 ViewBag.Listas = GetListas();
-                return View();
+
+                // Para repintar lo que el usuario ya eligió (opcional pero recomendado)
+                ViewData["SelectedCandidato"] = idCandidato;
+                ViewData["SelectedLista"] = idLista;
+                ViewData["DescripcionValue"] = descripcion;
+
+                return View("Multimedia/CreateMultimedia");
             }
 
             try
             {
-                await _multimediaService.UploadAsync(file, idCandidato, idLista, descripcion);
+                await _multimediaService.UploadAsync(
+                    file,
+                    tieneCandidato ? idCandidato : null,
+                    tieneLista ? idLista : null,
+                    descripcion
+                );
+
+                TempData["Success"] = "Multimedia subida correctamente.";
                 return RedirectToAction(nameof(ListMultimedia));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "Error: " + ex.Message);
+                TempData["Error"] = "Error al subir multimedia: " + ex.Message;
+
                 ViewBag.Candidatos = GetCandidatos();
                 ViewBag.Listas = GetListas();
-                return View();
+                return View("Multimedia/CreateMultimedia");
             }
         }
+
 
         public async Task<IActionResult> EditMultimedia(int id)
         {
             try
             {
                 var multimediaData = await _multimediaService.GetByIdAsync(id);
+                if (multimediaData == null) return NotFound();
+
                 ViewBag.Candidatos = GetCandidatos();
                 ViewBag.Listas = GetListas();
-                return View(multimediaData);
+                return View("Multimedia/EditMultimedia", multimediaData);
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View();
+                TempData["Error"] = "Error al conectar con la API: " + ex.Message;
+                return RedirectToAction(nameof(ListMultimedia));
             }
         }
 
@@ -1266,12 +1127,16 @@ namespace SistemaVotacion.MVC.Controllers
             try
             {
                 await _multimediaService.UpdateAsync(id, multimediaData);
+                TempData["Success"] = "Multimedia actualizada correctamente.";
                 return RedirectToAction(nameof(ListMultimedia));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "Error: " + ex.Message);
-                return View(multimediaData);
+                TempData["Error"] = "Error al actualizar multimedia: " + ex.Message;
+
+                ViewBag.Candidatos = GetCandidatos();
+                ViewBag.Listas = GetListas();
+                return View("Multimedia/EditMultimedia", multimediaData);
             }
         }
 
@@ -1280,14 +1145,14 @@ namespace SistemaVotacion.MVC.Controllers
             try
             {
                 var multimediaData = await _multimediaService.GetByIdAsync(id);
-                if (multimediaData == null)
-                    return NotFound();
-                return View(multimediaData);
+                if (multimediaData == null) return NotFound();
+
+                return View("Multimedia/DeleteMultimedia", multimediaData);
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error al conectar con la API: " + ex.Message;
-                return View();
+                TempData["Error"] = "Error al conectar con la API: " + ex.Message;
+                return RedirectToAction(nameof(ListMultimedia));
             }
         }
 
@@ -1298,12 +1163,502 @@ namespace SistemaVotacion.MVC.Controllers
             try
             {
                 await _multimediaService.DeleteAsync(id);
+                TempData["Success"] = "Multimedia eliminada correctamente.";
                 return RedirectToAction(nameof(ListMultimedia));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "Error: " + ex.Message);
-                return View(multimediaData);
+                TempData["Error"] = "Error al eliminar multimedia: " + ex.Message;
+                return View("Multimedia/DeleteMultimedia", multimediaData);
+            }
+        }
+
+        // =======================
+        // PREGUNTA CONSULTA - CRUD
+        // =======================
+
+        public IActionResult ListPreguntaConsulta()
+        {
+            try
+            {
+                var preguntas = Crud<PreguntaConsulta>.GetAll() ?? new List<PreguntaConsulta>();
+                return View("PreguntaConsulta/ListPreguntaConsulta", preguntas);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al conectar con la API: " + ex.Message;
+                return View("PreguntaConsulta/ListPreguntaConsulta", new List<PreguntaConsulta>());
+            }
+        }
+
+        public IActionResult DetailsPreguntaConsulta(int id)
+        {
+            try
+            {
+                var pregunta = Crud<PreguntaConsulta>.GetById(id);
+                if (pregunta == null) return NotFound();
+
+                // Cargar opciones asociadas
+                 var url = $"{Crud<OpcionConsulta>.EndPoint}/por-pregunta/{id}";
+                 var opciones = Crud<OpcionConsulta>.GetCustom(url) ?? new List<OpcionConsulta>();
+                 ViewBag.OpcionesDeLaPregunta = opciones;
+
+                return View("PreguntaConsulta/DetailsPreguntaConsulta", pregunta);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al obtener pregunta: " + ex.Message;
+                return RedirectToAction(nameof(ListPreguntaConsulta));
+            }
+        }
+
+        public IActionResult CreatePreguntaConsulta()
+        {
+            ViewBag.Procesos = GetProcesosElectorales();
+            return View("PreguntaConsulta/CreatePreguntaConsulta");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CreatePreguntaConsulta(PreguntaConsulta nuevaPregunta)
+        {
+            if (nuevaPregunta == null)
+            {
+                TempData["Error"] = "Datos inválidos.";
+                return RedirectToAction(nameof(ListPreguntaConsulta));
+            }
+
+            if (string.IsNullOrWhiteSpace(nuevaPregunta.TextoPregunta))
+                ModelState.AddModelError(nameof(PreguntaConsulta.TextoPregunta), "El texto de la pregunta es obligatorio.");
+
+            if (nuevaPregunta.IdProceso <= 0)
+                ModelState.AddModelError(nameof(PreguntaConsulta.IdProceso), "Debe seleccionar un proceso electoral.");
+            
+             if (nuevaPregunta.NumeroPregunta <= 0)
+                ModelState.AddModelError(nameof(PreguntaConsulta.NumeroPregunta), "El número de pregunta debe ser mayor a 0.");
+
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    Crud<PreguntaConsulta>.Create(nuevaPregunta);
+                    TempData["Success"] = "Pregunta de consulta creada correctamente.";
+                    return RedirectToAction(nameof(ListPreguntaConsulta));
+                }
+                catch (Exception ex)
+                {
+                    TempData["Error"] = "Error al crear pregunta: " + ex.Message;
+                }
+            }
+            else
+            {
+                TempData["Error"] = "Revisa los datos de la pregunta.";
+            }
+
+            ViewBag.Procesos = GetProcesosElectorales();
+            return View("PreguntaConsulta/CreatePreguntaConsulta", nuevaPregunta);
+        }
+
+        public IActionResult EditPreguntaConsulta(int id)
+        {
+            try
+            {
+                var pregunta = Crud<PreguntaConsulta>.GetById(id);
+                if (pregunta == null) return NotFound();
+
+                ViewBag.Procesos = GetProcesosElectorales();
+                return View("PreguntaConsulta/EditPreguntaConsulta", pregunta);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al obtener pregunta: " + ex.Message;
+                return RedirectToAction(nameof(ListPreguntaConsulta));
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditPreguntaConsulta(int id, PreguntaConsulta preguntaData)
+        {
+            if (preguntaData == null)
+            {
+                TempData["Error"] = "Datos inválidos.";
+                return RedirectToAction(nameof(ListPreguntaConsulta));
+            }
+
+            if (string.IsNullOrWhiteSpace(preguntaData.TextoPregunta))
+                ModelState.AddModelError(nameof(PreguntaConsulta.TextoPregunta), "El texto de la pregunta es obligatorio.");
+
+            if (preguntaData.IdProceso <= 0)
+                ModelState.AddModelError(nameof(PreguntaConsulta.IdProceso), "Debe seleccionar un proceso electoral.");
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    Crud<PreguntaConsulta>.Update(id, preguntaData);
+                    TempData["Success"] = "Pregunta actualizada correctamente.";
+                    return RedirectToAction(nameof(ListPreguntaConsulta));
+                }
+                catch (Exception ex)
+                {
+                    TempData["Error"] = "Error al actualizar pregunta: " + ex.Message;
+                }
+            }
+            else
+            {
+                TempData["Error"] = "Revisa los datos de la pregunta.";
+            }
+
+            ViewBag.Procesos = GetProcesosElectorales();
+            return View("PreguntaConsulta/EditPreguntaConsulta", preguntaData);
+        }
+
+        public IActionResult DeletePreguntaConsulta(int id)
+        {
+            try
+            {
+                var pregunta = Crud<PreguntaConsulta>.GetById(id);
+                if (pregunta == null) return NotFound();
+
+                return View("PreguntaConsulta/DeletePreguntaConsulta", pregunta);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al conectar con la API: " + ex.Message;
+                return RedirectToAction(nameof(ListPreguntaConsulta));
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeletePreguntaConsulta(int id, PreguntaConsulta preguntaData)
+        {
+            try
+            {
+                Crud<PreguntaConsulta>.Delete(id);
+                TempData["Success"] = "Pregunta eliminada correctamente.";
+                return RedirectToAction(nameof(ListPreguntaConsulta));
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al eliminar pregunta: " + ex.Message;
+                return View("PreguntaConsulta/DeletePreguntaConsulta", preguntaData);
+            }
+        }
+    
+        // =======================
+        // TIPO VOTO - CRUD
+        // =======================
+
+        public IActionResult ListTipoVoto()
+        {
+            try
+            {
+                var tipos = Crud<TipoVoto>.GetAll() ?? new List<TipoVoto>();
+                return View("TipoVoto/ListTipoVoto", tipos);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al conectar con la API: " + ex.Message;
+                return View("TipoVoto/ListTipoVoto", new List<TipoVoto>());
+            }
+        }
+
+        public IActionResult CreateTipoVoto()
+        {
+            return View("TipoVoto/CreateTipoVoto");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CreateTipoVoto(TipoVoto nuevoTipo)
+        {
+            if (nuevoTipo == null)
+            {
+                TempData["Error"] = "Datos inválidos.";
+                return RedirectToAction(nameof(ListTipoVoto));
+            }
+
+            if (string.IsNullOrWhiteSpace(nuevoTipo.NombreTipo))
+                ModelState.AddModelError(nameof(TipoVoto.NombreTipo), "El nombre del tipo de voto es obligatorio.");
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    Crud<TipoVoto>.Create(nuevoTipo);
+                    TempData["Success"] = "Tipo de voto creado correctamente.";
+                    return RedirectToAction(nameof(ListTipoVoto));
+                }
+                catch (Exception ex)
+                {
+                    TempData["Error"] = "Error al crear tipo de voto: " + ex.Message;
+                }
+            }
+
+            return View("TipoVoto/CreateTipoVoto", nuevoTipo);
+        }
+
+        public IActionResult EditTipoVoto(int id)
+        {
+            try
+            {
+                var tipo = Crud<TipoVoto>.GetById(id);
+                if (tipo == null) return NotFound();
+
+                return View("TipoVoto/EditTipoVoto", tipo);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al obtener tipo de voto: " + ex.Message;
+                return RedirectToAction(nameof(ListTipoVoto));
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditTipoVoto(int id, TipoVoto tipoData)
+        {
+            if (tipoData == null)
+            {
+                TempData["Error"] = "Datos inválidos.";
+                return RedirectToAction(nameof(ListTipoVoto));
+            }
+
+            if (string.IsNullOrWhiteSpace(tipoData.NombreTipo))
+                ModelState.AddModelError(nameof(TipoVoto.NombreTipo), "El nombre del tipo de voto es obligatorio.");
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    Crud<TipoVoto>.Update(id, tipoData);
+                    TempData["Success"] = "Tipo de voto actualizado correctamente.";
+                    return RedirectToAction(nameof(ListTipoVoto));
+                }
+                catch (Exception ex)
+                {
+                    TempData["Error"] = "Error al actualizar tipo de voto: " + ex.Message;
+                }
+            }
+
+            return View("TipoVoto/EditTipoVoto", tipoData);
+        }
+
+        public IActionResult DeleteTipoVoto(int id)
+        {
+            try
+            {
+                var tipo = Crud<TipoVoto>.GetById(id);
+                if (tipo == null) return NotFound();
+
+                return View("TipoVoto/DeleteTipoVoto", tipo);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al conectar con la API: " + ex.Message;
+                return RedirectToAction(nameof(ListTipoVoto));
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteTipoVoto(int id, TipoVoto tipoData)
+        {
+            try
+            {
+                Crud<TipoVoto>.Delete(id);
+                TempData["Success"] = "Tipo de voto eliminado correctamente.";
+                return RedirectToAction(nameof(ListTipoVoto));
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al eliminar tipo de voto: " + ex.Message;
+                return View("TipoVoto/DeleteTipoVoto", tipoData);
+            }
+        }
+
+        // =======================
+        // OPCIÓN CONSULTA - CRUD
+        // =======================
+
+        private List<SelectListItem> GetPreguntasSelect()
+        {
+            try
+            {
+                var preguntas = Crud<PreguntaConsulta>.GetAll() ?? new List<PreguntaConsulta>();
+                return preguntas
+                    .OrderBy(p => p.NumeroPregunta)
+                    .Select(p => new SelectListItem { Value = p.Id.ToString(), Text = $"P{p.NumeroPregunta}: {p.TextoPregunta}" })
+                    .ToList();
+            }
+            catch
+            {
+                return new List<SelectListItem>();
+            }
+        }
+
+        public IActionResult ListOpcionConsulta()
+        {
+            try
+            {
+                var opciones = Crud<OpcionConsulta>.GetAll() ?? new List<OpcionConsulta>();
+                return View("OpcionConsulta/ListOpcionConsulta", opciones);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al conectar con la API: " + ex.Message;
+                return View("OpcionConsulta/ListOpcionConsulta", new List<OpcionConsulta>());
+            }
+        }
+
+        public IActionResult DetailsOpcionConsulta(int id)
+        {
+            try
+            {
+                var opcion = Crud<OpcionConsulta>.GetById(id);
+                if (opcion == null) return NotFound();
+
+                return View("OpcionConsulta/DetailsOpcionConsulta", opcion);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al obtener opción: " + ex.Message;
+                return RedirectToAction(nameof(ListOpcionConsulta));
+            }
+        }
+
+        public IActionResult CreateOpcionConsulta()
+        {
+            ViewBag.Preguntas = GetPreguntasSelect();
+            return View("OpcionConsulta/CreateOpcionConsulta");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CreateOpcionConsulta(OpcionConsulta nuevaOpcion)
+        {
+            if (nuevaOpcion == null)
+            {
+                TempData["Error"] = "Datos inválidos.";
+                return RedirectToAction(nameof(ListOpcionConsulta));
+            }
+
+            if (string.IsNullOrWhiteSpace(nuevaOpcion.TextoOpcion))
+                ModelState.AddModelError(nameof(OpcionConsulta.TextoOpcion), "El texto de la opción es obligatorio.");
+
+            if (nuevaOpcion.IdPregunta <= 0)
+                ModelState.AddModelError(nameof(OpcionConsulta.IdPregunta), "Debe seleccionar una pregunta.");
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    Crud<OpcionConsulta>.Create(nuevaOpcion);
+                    TempData["Success"] = "Opción de consulta creada correctamente.";
+                    return RedirectToAction(nameof(ListOpcionConsulta));
+                }
+                catch (Exception ex)
+                {
+                    TempData["Error"] = "Error al crear opción: " + ex.Message;
+                }
+            }
+            else
+            {
+                TempData["Error"] = "Revisa los datos de la opción.";
+            }
+
+            ViewBag.Preguntas = GetPreguntasSelect();
+            return View("OpcionConsulta/CreateOpcionConsulta", nuevaOpcion);
+        }
+
+        public IActionResult EditOpcionConsulta(int id)
+        {
+            try
+            {
+                var opcion = Crud<OpcionConsulta>.GetById(id);
+                if (opcion == null) return NotFound();
+
+                ViewBag.Preguntas = GetPreguntasSelect();
+                return View("OpcionConsulta/EditOpcionConsulta", opcion);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al obtener opción: " + ex.Message;
+                return RedirectToAction(nameof(ListOpcionConsulta));
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditOpcionConsulta(int id, OpcionConsulta opcionData)
+        {
+            if (opcionData == null)
+            {
+                TempData["Error"] = "Datos inválidos.";
+                return RedirectToAction(nameof(ListOpcionConsulta));
+            }
+
+            if (string.IsNullOrWhiteSpace(opcionData.TextoOpcion))
+                ModelState.AddModelError(nameof(OpcionConsulta.TextoOpcion), "El texto de la opción es obligatorio.");
+
+            if (opcionData.IdPregunta <= 0)
+                ModelState.AddModelError(nameof(OpcionConsulta.IdPregunta), "Debe seleccionar una pregunta.");
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    Crud<OpcionConsulta>.Update(id, opcionData);
+                    TempData["Success"] = "Opción actualizada correctamente.";
+                    return RedirectToAction(nameof(ListOpcionConsulta));
+                }
+                catch (Exception ex)
+                {
+                    TempData["Error"] = "Error al actualizar opción: " + ex.Message;
+                }
+            }
+            else
+            {
+                TempData["Error"] = "Revisa los datos de la opción.";
+            }
+
+            ViewBag.Preguntas = GetPreguntasSelect();
+            return View("OpcionConsulta/EditOpcionConsulta", opcionData);
+        }
+
+        public IActionResult DeleteOpcionConsulta(int id)
+        {
+            try
+            {
+                var opcion = Crud<OpcionConsulta>.GetById(id);
+                if (opcion == null) return NotFound();
+
+                return View("OpcionConsulta/DeleteOpcionConsulta", opcion);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al conectar con la API: " + ex.Message;
+                return RedirectToAction(nameof(ListOpcionConsulta));
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteOpcionConsulta(int id, OpcionConsulta opcionData)
+        {
+            try
+            {
+                Crud<OpcionConsulta>.Delete(id);
+                TempData["Success"] = "Opción eliminada correctamente.";
+                return RedirectToAction(nameof(ListOpcionConsulta));
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al eliminar opción: " + ex.Message;
+                return View("OpcionConsulta/DeleteOpcionConsulta", opcionData);
             }
         }
     }

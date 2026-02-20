@@ -3,42 +3,37 @@
 @{
     ViewData["Title"] = "Crear Parroquia";
 }
-<br /><br /><br />
 
-<div class="container mt-5">
+<div class="elec-page container-fluid">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card shadow border-0">
-                <div class="card-header bg-success text-white py-3">
-                    <h4 class="mb-0"><i class="bi bi-building-add"></i> Nueva Parroquia</h4>
+            <div class="elec-card">
+                <div class="elec-card-header">
+                    <h4 class="elec-title mb-0">Nueva Parroquia</h4>
                 </div>
-                <div class="card-body p-4">
+                <div class="elec-card-body">
                     <form asp-action="CreateParroquia" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Ciudad a la que pertenece</label>
-                            <select asp-for="IdCiudad" class="form-select"
-                                    asp-items="@(new SelectList(ViewBag.Ciudad, "Id", "NombreCiudad"))"
+                            <label class="form-label fw-bold">Ciudad (Cantón)</label>
+                            <select asp-for="IdCiudad" class="form-select elec-form-control"
+                                    asp-items="ViewBag.Ciudades"
                                     required>
-                                <option value="">-- Seleccione una Ciudad --</option>
+                                <option value="">-- Seleccione Ciudad --</option>
                             </select>
-                            <span asp-validation-for="IdCiudad" class="text-danger small"></span>
+                            <span asp-validation-for="IdCiudad" class="text-danger"></span>
                         </div>
 
-                        <div class="mb-4">
-                            <label asp-for="NombreParroquia" class="form-label fw-bold">Nombre de la Parroquia </label>
-                            <input asp-for="NombreParroquia" class="form-control" placeholder="Ej: San Luis" required />
-                            <span asp-validation-for="NombreParroquia" class="text-danger small"></span>
+                        <div class="mb-3">
+                            <label asp-for="NombreParroquia" class="form-label fw-bold">Nombre de la Parroquia</label>
+                            <input asp-for="NombreParroquia" class="form-control elec-form-control" placeholder="Ej: San Jordán" required />
+                            <span asp-validation-for="NombreParroquia" class="text-danger"></span>
                         </div>
 
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-success py-2">
-                                <i class="bi bi-save"></i> Guardar Parroquia
-                            </button>
-                            <a asp-action="ListParroquias" class="btn btn-outline-secondary">
-                                Cancelar
-                            </a>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a asp-action="ListParroquias" class="btn elec-btn elec-btn-secondary me-md-2">Cancelar</a>
+                            <button type="submit" class="btn elec-btn elec-btn-primary">Guardar Parroquia</button>
                         </div>
                     </form>
                 </div>
@@ -46,3 +41,7 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

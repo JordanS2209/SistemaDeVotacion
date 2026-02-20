@@ -1,0 +1,79 @@
+@{
+    ViewData["Title"] = "Panel de Padrón Electoral";
+}
+<br />
+<br />
+<br />
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary">Gestión del Padrón Electoral</h1>
+        <p class="lead text-muted">Administre usuarios, votantes y el padrón electoral habilitado.</p>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+
+        <div class="col-md-4 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 dashboard-card">
+                <div class="card-body text-center p-4">
+                    <div class="icon-box mb-3 mx-auto bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-people fs-1"></i>
+                    </div>
+                    <h4 class="card-title fw-bold">Gestión de Usuarios</h4>
+                    <p class="card-text small">Administrar todos los usuarios del sistema.</p>
+                    <a asp-action="ListUsuarios" class="btn btn-primary w-100 mt-3 stretched-link">
+                        Entrar a Usuarios
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 dashboard-card">
+                <div class="card-body text-center p-4">
+                    <div class="icon-box mb-3 mx-auto bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-person-vcard fs-1"></i>
+                    </div>
+                    <h4 class="card-title fw-bold">Registro de Votantes</h4>
+                    <p class="card-text small">Registrar y gestionar la información de los votantes.</p>
+                    <a asp-action="ListVotantes" class="btn btn-success w-100 mt-3 stretched-link">
+                        Entrar a Votantes
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 dashboard-card">
+                <div class="card-body text-center p-4">
+                    <div class="icon-box mb-3 mx-auto bg-warning bg-opacity-10 text-warning">
+                        <i class="bi bi-card-checklist fs-1"></i>
+                    </div>
+                    <h4 class="card-title fw-bold">Padrón Electoral</h4>
+                    <p class="card-text small">Habilitar votantes en el padrón y gestionar su estado.</p>
+                    <a asp-action="ListPadron" class="btn btn-warning w-100 mt-3 stretched-link">
+                        Entrar al Padrón
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin") || User.IsInRole("DelegadoMesa"))
+        {
+            <div class="col-md-4 col-sm-6">
+                <div class="card h-100 shadow-sm border-0 dashboard-card">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-box mb-3 mx-auto bg-danger bg-opacity-10 text-danger">
+                            <i class="bi bi-fingerprint fs-1"></i>
+                        </div>
+                        <h4 class="card-title fw-bold">Habilitar Voto</h4>
+                        <p class="card-text small">Panel para delegados de mesa: habilitar votantes el día de la elección.</p>
+                        <a asp-action="Habilitar" class="btn btn-danger w-100 mt-3 stretched-link">
+                            Entrar a Habilitación
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>

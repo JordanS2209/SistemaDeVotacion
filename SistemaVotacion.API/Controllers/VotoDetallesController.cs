@@ -239,7 +239,7 @@ namespace SistemaVotacion.API.Controllers
         [HttpPost("votar-general")]
         public async Task<IActionResult> RegistrarVotoGeneral([FromBody] VotoGeneralDto votoDto)
         {
-            if (string.IsNullOrWhiteSpace(votoDto.CodigoAcceso) || votoDto.IdLista <= 0)
+            if (string.IsNullOrWhiteSpace(votoDto.CodigoAcceso))
             {
                 return BadRequest("Datos inválidos.");
             }
@@ -259,29 +259,54 @@ namespace SistemaVotacion.API.Controllers
                 return BadRequest("Este usuario ya ha ejercido su voto.");
             }
 
-            // 2. Obtener datos necesarios (Junta, Proceso, Dignidad)
+            // 2. Obtener datos necesarios (Junta, Proceso)
             var idJunta = padron.Votante?.IdJunta ?? 0;
             if (idJunta == 0) return BadRequest("Error en datos del votante (Sin Junta Asignada).");
 
-            // Asumimos Dignidad = 1 (Presidente) por defecto para este flujo simplificado
-            // O buscamos la primera dignidad disponible
-            var dignidad = await _context.Dignidades.FirstOrDefaultAsync(d => d.NombreDignidad != null && d.NombreDignidad.ToLower().Contains("presidente"));
-            int idDignidad = dignidad?.Id ?? 1; 
+            // 3. Identificar Dignidades del Proceso
+            // Buscamos todas las dignidades que tienen candidatos en este proceso
+            //
+            var dignidadesIds = await _context.Listas
+                .Where(l => l.IdProceso == padron.IdProceso)
+                .SelectMany(l => l.Candidatos)
+                .Select(c => c.IdDignidad)
+                .Distinct()
+                .ToListAsync();
 
-            // 3. Crear el Voto
-            var nuevoVoto = new VotoDetalle
+            if (!dignidadesIds.Any())
             {
-                IdProceso = padron.IdProceso,
-                IdJunta = idJunta,
-                IdLista = votoDto.IdLista,
-                IdDignidad = idDignidad,
-                IdTipoVoto = 1, // Voto válido
-                // Otros campos pueden ser nulos si no aplican
-             };
+                // Usar Presidente (1)
+                dignidadesIds.Add(1);
+            }
 
-            _context.VotoDetalles.Add(nuevoVoto);
+            // 4. Crear los Votos(Uno por cada dignidad
+            var nuevosVotos = new List<VotoDetalle>();
+            
+            int? finalIdLista = votoDto.IdLista;
+            int tipoVoto = 1; // Válido
 
-            // 4. Marcar que ya votó
+            // Lógica de Voto en Blanco 
+            if (votoDto.IdLista <= 0) 
+            {
+                tipoVoto = 2; // Blanco
+                finalIdLista = null;
+            }
+
+            foreach (var idDignidad in dignidadesIds)
+            {
+                nuevosVotos.Add(new VotoDetalle
+                {
+                    IdProceso = padron.IdProceso,
+                    IdJunta = idJunta,
+                    IdLista = finalIdLista,
+                    IdDignidad = idDignidad,
+                    IdTipoVoto = tipoVoto
+                });
+            }
+
+            _context.VotoDetalles.AddRange(nuevosVotos);
+
+            // 5. Marcar que ya votó
             padron.HaVotado = true;
             _context.Entry(padron).State = EntityState.Modified;
 
@@ -292,22 +317,30 @@ namespace SistemaVotacion.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error interno al guardar voto: {ex.Message}");
+                var inner = ex.InnerException != null ? $" Inner: {ex.InnerException.Message}" : "";
+                return StatusCode(500, $"Error interno al guardar voto: {ex.Message}{inner}");
             }
         }
 
         [HttpPost("registrar-consulta")]
         public async Task<IActionResult> RegistrarConsulta([FromBody] RegistroConsultaDto dto)
         {
-            if (dto.IdProceso <= 0 || dto.IdPadron <= 0 || dto.Respuestas.Count == 0)
+            if (dto.IdProceso <= 0 || string.IsNullOrWhiteSpace(dto.CodigoAcceso))
                 return BadRequest("Datos incompletos.");
+            
+            if (!dto.EsVotoBlanco && dto.Respuestas.Count == 0)
+                return BadRequest("Debe responder las preguntas.");
 
             var padron = await _context.Padrones
                 .Include(p => p.Votante)
-                .FirstOrDefaultAsync(p => p.Id == dto.IdPadron && p.IdProceso == dto.IdProceso);
+                .FirstOrDefaultAsync(p => p.CodigoAcceso == dto.CodigoAcceso);
+
+            if (padron == null) return NotFound("Código de acceso no válido.");
+            
+            if (padron.IdProceso != dto.IdProceso) return BadRequest("El código no corresponde al proceso electoral actual.");
 
             if (padron == null || padron.HaVotado)
-                return BadRequest("Padrón inválido.");
+                return BadRequest("Padrón inválido o ya votó.");
 
             var idJunta = padron.Votante?.IdJunta ?? 0;
             if (idJunta <= 0)
@@ -325,25 +358,57 @@ namespace SistemaVotacion.API.Controllers
             if (idLista <= 0 || idDignidad <= 0)
                 return BadRequest("Faltan Lista o Dignidad base.");
 
-            var votos = dto.Respuestas.Select(r => new VotoDetalle
+            List<VotoDetalle> votos;
+
+            if (dto.EsVotoBlanco)
             {
-                IdProceso = dto.IdProceso,
-                IdPregunta = r.IdPregunta,
-                IdOpcion = r.IdOpcion,
-                IdJunta = idJunta,
-                IdTipoVoto = 1,
-                IdLista = idLista,
-                IdDignidad = idDignidad
-            }).ToList();
+                // Generar votos en blanco para TODAS las preguntas
+                var preguntas = await _context.PreguntasConsultas
+                    .Where(p => p.IdProceso == dto.IdProceso)
+                    .Select(p => p.Id)
+                    .ToListAsync();
+                
+                votos = preguntas.Select(idPreg => new VotoDetalle
+                {
+                    IdProceso = dto.IdProceso,
+                    IdPregunta = idPreg,
+                    IdOpcion = null, // Blanco no tiene opción seleccionada 
+                    IdJunta = idJunta,
+                    IdTipoVoto = 2, // Blanco
+                    IdLista = idLista,
+                    IdDignidad = idDignidad
+                }).ToList();
+            }
+            else
+            {
+                // Votos normales
+                votos = dto.Respuestas.Select(r => new VotoDetalle
+                {
+                    IdProceso = dto.IdProceso,
+                    IdPregunta = r.IdPregunta,
+                    IdOpcion = r.IdOpcion,
+                    IdJunta = idJunta,
+                    IdTipoVoto = 1, // Válido
+                    IdLista = idLista,
+                    IdDignidad = idDignidad
+                }).ToList();
+            }
 
             _context.VotoDetalles.AddRange(votos);
 
             padron.HaVotado = true;
             _context.Entry(padron).State = EntityState.Modified;
 
-            await _context.SaveChangesAsync();
-
-            return Ok(new { mensaje = "Voto registrado correctamente" });
+            try
+            {
+                await _context.SaveChangesAsync();
+                return Ok(new { mensaje = "Voto registrado correctamente" });
+            }
+            catch (Exception ex)
+            {
+                 var inner = ex.InnerException != null ? $" Inner: {ex.InnerException.Message}" : "";
+                 return StatusCode(500, $"Error al guardar consulta: {ex.Message}{inner}");
+            }
         }
 
         private bool VotoDetalleExists(int id)

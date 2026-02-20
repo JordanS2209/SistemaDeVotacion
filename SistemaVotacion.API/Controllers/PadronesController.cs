@@ -114,6 +114,12 @@ namespace SistemaVotacion.API.Controllers
                     p.Votante.Usuario.NumeroIdentificacion == numeroIdentificacion
                 );
 
+            // Validar estado del votante si existe el padrón
+            if (padron != null && !padron.Votante.Estado)
+            {
+                 return BadRequest("El votante se encuentra INACTIVO (Impedimento legal o administrativo).");
+            }
+
             if (padron == null)
             {
                 // Buscar votante por cédula
@@ -124,6 +130,11 @@ namespace SistemaVotacion.API.Controllers
                 if (votante == null)
                 {
                     return NotFound("No existe un votante con esa identificación.");
+                }
+
+                if (!votante.Estado)
+                {
+                    return BadRequest("El votante se encuentra INACTIVO (Impedimento legal o administrativo).");
                 }
 
                 // Buscar ÚNICO proceso activo
@@ -209,11 +220,17 @@ namespace SistemaVotacion.API.Controllers
         {
             var padron = await _context.Padrones
                 .Include(p => p.Proceso)
+                .Include(p => p.Votante) // Incluir votante para verificar estado
                 .FirstOrDefaultAsync(p => p.Id == padronId);
 
             if (padron == null)
             {
                 return NotFound("Padrón no encontrado.");
+            }
+
+            if (!padron.Votante.Estado)
+            {
+                 return BadRequest("El votante se encuentra INACTIVO.");
             }
 
             if (padron.HaVotado)
@@ -246,8 +263,7 @@ namespace SistemaVotacion.API.Controllers
             });
         }
 
-        // ==================================================
-
+       
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPadron(int id, Padron padron)
         {
@@ -279,6 +295,13 @@ namespace SistemaVotacion.API.Controllers
         [HttpPost]
         public async Task<ActionResult<Padron>> PostPadron(Padron padron)
         {
+            // Validar existencia previa
+            var exists = await _context.Padrones.AnyAsync(p => p.IdVotante == padron.IdVotante && p.IdProceso == padron.IdProceso);
+            if (exists)
+            {
+                return BadRequest("El votante ya está registrado en este proceso electoral.");
+            }
+
             try
             {
                 _context.Padrones.Add(padron);
@@ -321,11 +344,17 @@ namespace SistemaVotacion.API.Controllers
 
             var padron = await _context.Padrones
                 .Include(p => p.Proceso)
+                .Include(p => p.Votante) // Incluir votante
                 .FirstOrDefaultAsync(p => p.CodigoAcceso == codigoAcceso);
 
             if (padron == null)
             {
                 return NotFound("Código no válido.");
+            }
+
+            if (!padron.Votante.Estado)
+            {
+                 return BadRequest("El votante se encuentra INACTIVO.");
             }
 
             if (padron.HaVotado)

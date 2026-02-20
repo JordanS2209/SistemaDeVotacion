@@ -1,0 +1,57 @@
+@model IEnumerable<SistemaVotacion.Modelos.TipoVoto>
+
+@{
+    ViewData["Title"] = "Tipos de Voto";
+}
+
+
+<div class="elec-page">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="elec-title">Tipos de Voto</h2>
+            <p class="elec-subtitle">Gestione las clasificaciones de votos del sistema</p>
+        </div>
+        <a asp-action="CreateTipoVoto" class="btn elec-btn elec-btn-success">
+            <i class="bi bi-plus-lg"></i> Crear Nuevo Tipo
+        </a>
+    </div>
+
+    <div class="elec-table-wrap">
+        <div class="table-responsive">
+            <table class="table elec-table mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.Id)</th>
+                        <th>@Html.DisplayNameFor(model => model.NombreTipo)</th>
+                        <th style="width: 200px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="text-muted">@item.Id</td>
+                            <td class="fw-semibold">@item.NombreTipo</td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a asp-action="EditTipoVoto" asp-route-id="@item.Id" class="btn elec-btn elec-btn-primary btn-sm">
+                                        <i class="bi bi-pencil-square"></i> Editar
+                                    </a>
+                                    <a asp-action="DeleteTipoVoto" asp-route-id="@item.Id" class="btn elec-btn elec-btn-danger btn-sm">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a asp-action="Index" class="btn elec-btn elec-btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver al Panel
+        </a>
+    </div>
+</div>

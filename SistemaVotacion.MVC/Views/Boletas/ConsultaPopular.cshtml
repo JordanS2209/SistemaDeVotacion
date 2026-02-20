@@ -15,6 +15,7 @@
 <form method="post" asp-action="Votar">
     <input type="hidden" name="IdProceso" value="@idProceso" />
     <input type="hidden" name="IdPadron" value="@idPadron" />
+    <input type="hidden" name="codigo" value="@ViewBag.Codigo" />
 
     @foreach (var pregunta in preguntas)
     {
@@ -36,7 +37,77 @@
         </div>
     }
 
-    <button type="submit" class="btn-votar">
-        VOTAR
-    </button>
+    <!-- Floating Action Bar -->
+    <div class="floating-bar">
+        <button type="button" onclick="confirmarVotoBlanco()" class="btn-blanco">
+            VOTO EN BLANCO
+        </button>
+        <button type="button" onclick="confirmarVoto()" class="btn-votar-floating">
+            VOTAR
+        </button>
+    </div>
 </form>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function confirmarVoto() {
+        // En consulta popular, verificar si todas las preguntas tienen respuesta
+        // O al menos advertir. Por ahora, validamos que el form sea válido (HTML5 required).
+        const form = document.querySelector('form');
+        if (!form.checkValidity()) {
+             Swal.fire({
+                icon: 'warning',
+                title: 'Atención',
+                text: 'Por favor, responda todas las preguntas.',
+                confirmButtonText: 'Entendido'
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: '¿Confirmar Voto?',
+            text: "Sus respuestas serán registradas.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#1d4ed8',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Sí, Votar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    }
+
+    function confirmarVotoBlanco() {
+        Swal.fire({
+            title: '¿Voto en Blanco?',
+            text: "Se registrará un voto nulo/blanco para todas las preguntas. ¿Continuar?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#6b7280',
+            cancelButtonColor: '#1d4ed8',
+            confirmButtonText: 'Sí, Votar en Blanco',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = document.querySelector('form');
+                
+                // Remover requeridos para permitir envío vacío
+                const inputs = form.querySelectorAll('input[required]');
+                inputs.forEach(i => i.removeAttribute('required'));
+                
+                // Agregar flag de voto blanco
+                let input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'EsVotoBlanco';
+                input.value = 'true';
+                form.appendChild(input);
+
+                form.submit();
+            }
+        });
+    }
+</script>

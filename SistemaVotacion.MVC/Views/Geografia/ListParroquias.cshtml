@@ -1,41 +1,75 @@
 ﻿@model IEnumerable<SistemaVotacion.Modelos.Parroquia>
-<br /><br /><br />
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3>Gestión de Parroquias</h3>
-        <a asp-action="CreateParroquia" class="btn btn-success">Nueva Parroquia</a>
+@{
+    ViewData["Title"] = "Gestión de Parroquias";
+}
+
+<div class="elec-page container-fluid">
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h1 class="elec-title mb-0">
+                <i class="bi bi-geo-alt-fill me-2"></i>Gestión de Parroquias
+            </h1>
+            <p class="text-muted mt-2">Administrar las parroquias y divisiones territoriales.</p>
+        </div>
+        <div class="col-auto">
+            <a asp-action="CreateParroquia" class="btn elec-btn elec-btn-primary">
+                <i class="bi bi-plus-lg me-2"></i>Nueva Parroquia
+            </a>
+        </div>
     </div>
 
-    <table class="table table-hover shadow-sm">
-        <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Nombre de Parroquia</th>
-                <th>Ciudades</th>
-                <th class="text-center">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model != null)
+    @if (TempData["Success"] != null) 
+    {
+        <div class="alert elec-alert elec-alert-success mb-4">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert elec-alert elec-alert-danger mb-4">@TempData["Error"]</div>
+    }
+
+    <div class="elec-card">
+        <div class="elec-card-body p-0">
+            <div class="elec-table-wrap">
+                <table class="table elec-table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre Parroquia</th>
+                            <th>Ciudad (Cantón)</th>
+                             <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null)
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.Id</td>
+                                    <td class="fw-bold">@item.NombreParroquia</td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">
+                                            @item.Ciudad?.NombreCiudad
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a asp-action="DeleteParroquia" asp-route-id="@item.Id" class="btn elec-btn-sm elec-btn-outline-danger" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+             @if (Model == null || !Model.Any())
             {
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>@item.Id</td>
-                        <td>@item.NombreParroquia</td>
-                        <td>
-                            @(item.Ciudad?.NombreCiudad ?? "Sin Ciudad")
-                        </td>
-                        
-                        <td class="text-center">
-                            <a asp-action="DeleteParroquia" asp-route-id="@item.Id" class="btn btn-sm btn-danger">
-                                <i class="bi bi-trash"></i> Eliminar
-                            </a>
-                        </td>
-                    </tr>
-                }
+                <div class="p-5 text-center text-muted">
+                    <p>No hay parroquias registradas.</p>
+                </div>
             }
-        </tbody>
-    </table>
+        </div>
+    </div>
 </div>

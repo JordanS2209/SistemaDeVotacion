@@ -1,89 +1,59 @@
-﻿@model IEnumerable<SistemaVotacion.Modelos.Usuario>
-
-@{
-    ViewData["Title"] = "Index";
+﻿@{
+    ViewData["Title"] = "Panel de Usuarios";
 }
+<br /><br /><br />
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary">Gestión de Usuarios</h1>
+        <p class="lead text-muted">Administre cuentas, accesos y seguridad del sistema</p>
+    </div>
 
-<h1>Index</h1>
+    <div class="row g-4 justify-content-center">
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Id)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Nombres)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Apellidos)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FechaNacimiento)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdRol)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdTipoIdentificacion)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NumeroIdentificacion)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdGenero)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CodigoDactilar)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nombres)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Apellidos)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FechaNacimiento)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdRol)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdTipoIdentificacion)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NumeroIdentificacion)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdGenero)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CodigoDactilar)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+        <div class="col-md-4 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 dashboard-card">
+                <div class="card-body text-center p-4">
+                    <div class="icon-box mb-3 mx-auto bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-person-plus fs-1"></i>
+                    </div>
+                    <h4 class="card-title fw-bold">Registrar Usuario</h4>
+                    <p class="card-text text-muted small">Crear nuevas cuentas para administradores o delegados.</p>
+                    <a asp-controller="Account" asp-action="Register" class="btn btn-primary w-100 mt-3 stretched-link">
+                        Nuevo Usuario
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 dashboard-card">
+                <div class="card-body text-center p-4">
+                    <div class="icon-box mb-3 mx-auto bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-people fs-1"></i>
+                    </div>
+                    <h4 class="card-title fw-bold">Lista de Usuarios</h4>
+                    <p class="card-text text-muted small">Ver y editar todos los usuarios registrados en el sistema.</p>
+                    <a asp-controller="Padrones" asp-action="ListUsuarios" class="btn btn-success w-100 mt-3 stretched-link">
+                        Ver Usuarios
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 dashboard-card">
+                <div class="card-body text-center p-4">
+                    <div class="icon-box mb-3 mx-auto bg-danger bg-opacity-10 text-danger">
+                        <i class="bi bi-shield-lock fs-1"></i>
+                    </div>
+                    <h4 class="card-title fw-bold">Usuarios Bloqueados</h4>
+                    <p class="card-text text-muted small">Gestionar cuentas bloqueadas por intentos fallidos.</p>
+                    <a asp-controller="Account" asp-action="UsuariosBloqueados" class="btn btn-danger w-100 mt-3 stretched-link">
+                        Ver Bloqueos
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

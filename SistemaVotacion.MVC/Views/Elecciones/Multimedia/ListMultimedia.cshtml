@@ -1,0 +1,114 @@
+﻿@model IEnumerable<SistemaVotacion.Modelos.Multimedia>
+@{
+    ViewData["Title"] = "Lista de Multimedia";
+}
+
+<div class="elec-page">
+    <div class="container-fluid py-3">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="elec-title mb-1">
+                    <i class="bi bi-images"></i> @ViewData["Title"]
+                </h2>
+                <div class="elec-subtitle">
+                    Gestión de recursos multimedia asociados a candidatos o listas.
+                </div>
+            </div>
+
+            <a asp-action="CreateMultimedia"
+               class="btn elec-btn elec-btn-primary">
+                <i class="bi bi-upload"></i> Subir Multimedia
+            </a>
+        </div>
+
+        <div class="elec-table-wrap">
+
+            <div class="table-responsive">
+                <table class="table elec-table mb-0">
+
+                    <thead>
+                        <tr>
+                            <th>@Html.DisplayNameFor(model => model.Id)</th>
+                            <th>@Html.DisplayNameFor(model => model.UrlFoto)</th>
+                            <th>@Html.DisplayNameFor(model => model.Descripcion)</th>
+                            <th>Candidato</th>
+                            <th>Lista</th>
+                            <th>Vista previa</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(item.UrlFoto))
+                                    {
+                                        <a href="@item.UrlFoto" target="_blank" class="text-decoration-none">
+                                            @item.UrlFoto
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="opacity-75">Sin archivo</span>
+                                    }
+                                </td>
+
+                                <td>@item.Descripcion</td>
+
+                                <td>
+                                    @(item.Candidato?.NombreCandidato ?? "-")
+                                </td>
+
+                                <td>
+                                    @(item.Lista?.NombreLista ?? "-")
+                                </td>
+
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(item.UrlFoto))
+                                    {
+                                        <img src="@item.UrlFoto"
+                                             alt="Vista previa"
+                                             class="img-thumbnail"
+                                             style="max-width:120px; max-height:120px;" />
+                                    }
+                                </td>
+
+                                <td>
+                                    <div class="d-flex gap-2">
+
+                                        <a asp-action="EditMultimedia"
+                                           asp-route-id="@item.Id"
+                                           class="btn elec-btn elec-btn-warn btn-sm">
+                                            Editar
+                                        </a>
+
+                                        <a asp-action="DetailsMultimedia"
+                                           asp-route-id="@item.Id"
+                                           class="btn elec-btn elec-btn-info btn-sm">
+                                            Detalles
+                                        </a>
+
+                                        <a asp-action="DeleteMultimedia"
+                                           asp-route-id="@item.Id"
+                                           class="btn elec-btn elec-btn-danger btn-sm">
+                                            Eliminar
+                                        </a>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+</div>

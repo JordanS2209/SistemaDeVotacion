@@ -11,6 +11,7 @@ namespace SistemaVotacion.MVC
         public static void Main(string[] args)
         {
             Crud<Usuario>.EndPoint = "https://localhost:7202/api/Usuarios";
+            Crud<UsuarioListDto>.EndPoint = "https://localhost:7202/api/Usuarios";
             Crud<Rol>.EndPoint = "https://localhost:7202/api/Roles";
             Crud<TipoIdentificacion>.EndPoint = "https://localhost:7202/api/TiposIdentificaciones";
             Crud<Genero>.EndPoint = "https://localhost:7202/api/Generos";
@@ -24,31 +25,48 @@ namespace SistemaVotacion.MVC
             Crud<OpcionConsulta>.EndPoint = "https://localhost:7202/api/OpcionesConsultas";
             Crud<PreguntaConsulta>.EndPoint = "https://localhost:7202/api/PreguntasConsultas";
             Crud<ProcesoElectoral>.EndPoint = "https://localhost:7202/api/ProcesosElectorales";
-            Crud<Lista>.EndPoint = "https://localhost:7202/api/Boletas/activas";
+            Crud<Lista>.EndPoint = "https://localhost:7202/api/Listas";
             Crud<Padron>.EndPoint = "https://localhost:7202/api/Padrones";
 
             Crud<Votante>.EndPoint = "https://localhost:7202/api/Votantes";
             
             Crud<JuntaReceptora>.EndPoint = "https://localhost:7202/api/JuntasReceptoras";
-            Crud<VotoDetalle>.EndPoint = "https://localhost:7202/api/VotosDetalles";
-
+            Crud<VotoDetalle>.EndPoint = "https://localhost:7202/api/VotoDetalles";
+            Crud<ActaAuditoria>.EndPoint = "https://localhost:7202/api/ActaAuditorias";
+            Crud<RecintoElectoral>.EndPoint = "https://localhost:7202/api/RecintosElectorales";
+            Crud<RepresentanteJunta>.EndPoint = "https://localhost:7202/api/RepresentantesJuntas";
+            Crud<ResultadoDetalleAuditoria>.EndPoint = "https://localhost:7202/api/ResultadosDetallesAuditorias";
+            Crud<TipoVoto>.EndPoint = "https://localhost:7202/api/TipoVotos";
+          
+    
 
 
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddControllersWithViews();
-
+            builder.Services.AddControllersWithViews()
+                .AddNewtonsoftJson(options =>
+                {
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                    options.SerializerSettings.Converters.Add(new SistemaVotacion.MVC.Converters.RolJsonConverter());
+                });
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddHttpClient<IMultimediaService, MultimediaService>(client => 
             { 
                 client.BaseAddress = new Uri("https://localhost:7202/api/Multimedias/"); 
             });
+            builder.Services.AddHttpClient("SistemaVotacionAPI", client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:7202/");
+            });
+            builder.Services.AddScoped<IPdfService, PdfService>();
+            builder.Services.AddScoped<IChartService, ChartService>();
 
             builder.Services.AddAuthentication("Cookies") //cokies
                             .AddCookie("Cookies", options =>
                             {
                                 options.LoginPath = "/Account/Index"; // Ruta de inicio de sesión
+                                options.AccessDeniedPath = "/Home/AccessDenied"; // Ruta de acceso denegado
                             });
             builder.Services.AddHttpContextAccessor();
 

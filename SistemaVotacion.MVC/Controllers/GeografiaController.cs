@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SistemaVotacion.ApiConsumer;
 using SistemaVotacion.Modelos;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace SistemaVotacion.MVC.Controllers
 {
-    // [Authorize(Roles = "Admin,SuperAdmin")]
+   
+    [Authorize(Roles = "Admin,SuperAdmin")]
     public class GeografiaController : Controller
     {
         // NIVEL 1: Dashboard de Geografía (Los "cuadritos")
@@ -71,7 +74,7 @@ namespace SistemaVotacion.MVC.Controllers
             catch (Exception ex)
             {
 
-                // Si hay error de conexión con la API
+                
                 TempData["Error"] = "Error al obtener el rol: " + ex.Message;
                 return RedirectToAction(nameof(ListProvincias));
             }
@@ -114,8 +117,12 @@ namespace SistemaVotacion.MVC.Controllers
             try
             {
                 // Obtenemos la lista de provincias para el dropdown
-                var provincias = Crud<Provincia>.GetAll();
-                ViewBag.Provincias = provincias;
+                var provincias = Crud<Provincia>.GetAll() ?? new List<Provincia>();
+                ViewBag.Provincias = provincias.Select(p => new SelectListItem
+                {
+                    Value = p.Id.ToString(),
+                    Text = p.NombreProvincia
+                }).ToList();
 
                 return View();
             }
@@ -145,7 +152,12 @@ namespace SistemaVotacion.MVC.Controllers
             }
 
             // Si hubo un error, RECARGAMOS las provincias antes de devolver la vista
-            ViewBag.Provincias = Crud<Provincia>.GetAll();
+            var provincias = Crud<Provincia>.GetAll() ?? new List<Provincia>();
+            ViewBag.Provincias = provincias.Select(p => new SelectListItem
+            {
+                Value = p.Id.ToString(),
+                Text = p.NombreProvincia
+            }).ToList();
             return View(nuevaCiudad);
         }
 
@@ -165,7 +177,6 @@ namespace SistemaVotacion.MVC.Controllers
             catch (Exception ex)
             {
 
-                // Si hay error de conexión con la API
                 TempData["Error"] = "Error al obtener el rol: " + ex.Message;
                 return RedirectToAction(nameof(ListCiudades));
             }
@@ -208,8 +219,12 @@ namespace SistemaVotacion.MVC.Controllers
             try
             {
                 // Obtenemos la lista de provincias para el dropdown
-                var ciudad = Crud<Ciudad>.GetAll();
-                ViewBag.Ciudad = ciudad;
+                var ciudades = Crud<Ciudad>.GetAll() ?? new List<Ciudad>();
+                ViewBag.Ciudades = ciudades.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.NombreCiudad
+                }).ToList();
 
                 return View();
             }
@@ -235,7 +250,12 @@ namespace SistemaVotacion.MVC.Controllers
                     ModelState.AddModelError("", "Error: " + ex.Message);
                 }
             }
-            ViewBag.Ciudad = Crud<Ciudad>.GetAll();
+            var ciudades = Crud<Ciudad>.GetAll() ?? new List<Ciudad>();
+            ViewBag.Ciudades = ciudades.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.NombreCiudad
+            }).ToList();
             return View(nuevaParroquia);
         }
 

@@ -124,6 +124,26 @@ namespace SistemaVotacion.ApiConsumer
                 return default;
             }
         }
+        public static List<T> GetCustom(string customUrl)
+        {
+            using (var client = new HttpClient())
+            {
+                var response = client.GetAsync(customUrl).Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = response.Content.ReadAsStringAsync().Result;
+                    return JsonConvert.DeserializeObject<List<T>>(json) ?? new List<T>();
+                }
+                else
+                {
+                    throw new Exception($"Error: {response.StatusCode}");
+                }
+            }
+        }
+
+
+
         public static bool PutCustom(string customUrl)
         {
             using (var client = new HttpClient())

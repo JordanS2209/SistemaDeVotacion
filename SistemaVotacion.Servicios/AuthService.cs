@@ -20,7 +20,8 @@ namespace SistemaVotacion.Servicios
         public async Task<bool> Login(string email, string password)
         {
             // Nota: Es más eficiente buscar solo el usuario por email que traer todos
-            var usuario = Crud<Usuario>.GetAll().FirstOrDefault(u => u.Email == email);
+            // Usamos el nuevo endpoint específico
+            var usuario = Crud<Usuario>.GetSingle($"{Crud<Usuario>.EndPoint}/ByEmail/{email}");
 
             if (usuario != null)
             {
@@ -61,10 +62,11 @@ namespace SistemaVotacion.Servicios
             int idTipoIdentificacion,
             int idGenero)
         {
-            var usuarioExistente = Crud<Usuario>.GetAll()
-                .FirstOrDefault(u => u.Email == email || u.NumeroIdentificacion == numeroIdentificacion);
+            // Verificamos duplicados con endpoints específicos
+            var usuarioPorEmail = Crud<Usuario>.GetSingle($"{Crud<Usuario>.EndPoint}/ByEmail/{email}");
+            var usuarioPorCedula = Crud<Usuario>.GetSingle($"{Crud<Usuario>.EndPoint}/ByCedula/{numeroIdentificacion}");
 
-            if (usuarioExistente != null) return false;
+            if (usuarioPorEmail != null || usuarioPorCedula != null) return false;
 
             try
             {
@@ -88,9 +90,18 @@ namespace SistemaVotacion.Servicios
 
                 Crud<Usuario>.Create(nuevoUsuario);
 
-                //SERVICIO CORREO
-                var emailService = new EmailService();
-                await emailService.EnviarCorreoRegistro(email, nombre);
+                //SERVICIO CORREO (No bloqueante)
+                try 
+                {
+                    var emailService = new EmailService();
+                    await emailService.EnviarCorreoRegistro(email, nombre);
+                }
+                catch (Exception exEmail)
+                {
+                    // Si falla el correo, solo lo logueamos, pero NO fallamos el registro
+                    Console.WriteLine($"Advertencia: No se pudo enviar el correo de registro. Error: {exEmail.Message}");
+                }
+
                 return true;
             }
             catch (Exception ex)

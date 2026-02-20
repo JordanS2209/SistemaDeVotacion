@@ -21,7 +21,7 @@
     padding: 15px;
     border-radius: 12px;
     width: 340px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 .leyenda-listas {
@@ -80,12 +80,13 @@
     cursor: pointer;
 }
 
-    .btn-prov:hover {
-        background: #1e88e5;
-    }
+.btn-prov:hover {
+    background: #1e88e5;
+}
 
 .mapa-centro img {
-    width: 600px; /* 👈 más grande */
+    width: 600px;
+    /* 👈 más grande */
     max-width: 100%;
     height: auto;
     border-radius: 12px;
@@ -112,4 +113,11 @@
 #totalesProvincia p {
     margin: 4px 0;
     font-size: 14px;
+}
+
+/* =======================
+   RESULTADOS GENERALES
+   ======================= */
+.grafica-general-canvas {
+    max-height: 400px;
 }

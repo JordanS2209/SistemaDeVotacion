@@ -3,28 +3,27 @@
 @{
     ViewData["Title"] = "Crear Provincia";
 }
-<br /><br /><br />
 
-<div class="container mt-5">
+<div class="elec-page container-fluid">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-success text-white">
-                    <h4 class="mb-0">Nueva Provincia</h4>
+            <div class="elec-card">
+                <div class="elec-card-header">
+                    <h4 class="elec-title mb-0">Nueva Provincia</h4>
                 </div>
-                <div class="card-body">
+                <div class="elec-card-body">
                     <form asp-action="CreateProvincia" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                         <div class="mb-3">
-                            <label asp-for="NombreProvincia" class="form-label">Nombre de la Provincia</label>
-                            <input asp-for="NombreProvincia" class="form-control" placeholder="Ej: Imbabura" required />
+                            <label asp-for="NombreProvincia" class="form-label fw-bold">Nombre de la Provincia</label>
+                            <input asp-for="NombreProvincia" class="form-control elec-form-control" placeholder="Ej: Imbabura" required />
                             <span asp-validation-for="NombreProvincia" class="text-danger"></span>
                         </div>
 
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-success">Guardar Provincia</button>
-                            <a asp-action="ListProvincias" class="btn btn-outline-secondary">Cancelar</a>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a asp-action="ListProvincias" class="btn elec-btn elec-btn-secondary me-md-2">Cancelar</a>
+                            <button type="submit" class="btn elec-btn elec-btn-primary">Guardar Provincia</button>
                         </div>
                     </form>
                 </div>
@@ -32,3 +31,7 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

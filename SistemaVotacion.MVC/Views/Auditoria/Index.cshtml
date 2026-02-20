@@ -1,0 +1,63 @@
+@model IEnumerable<SistemaVotacion.Modelos.ActaAuditoria>
+
+@{
+    ViewData["Title"] = "Actas de Auditoría";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>@ViewData["Title"]</h2>
+        <a asp-action="Generar" class="btn btn-warning text-dark">
+            <i class="bi bi-file-earmark-lock me-2"></i>Generar Nueva Acta
+        </a>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.Error
+        </div>
+    }
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <div class="col">
+                    <div class="card elec-card h-100 shadow-sm border-warning">
+                        <div class="card-header bg-warning-subtle d-flex justify-content-between align-items-center">
+                            <strong class="text-dark">Acta #@item.Id</strong>
+                            <span class="badge bg-dark">Junta @item.IdJunta</span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">Proceso: @item.IdProceso</h5>
+                            <p class="card-text text-muted small">
+                                <i class="bi bi-clock me-1"></i> @item.FechaCierre
+                            </p>
+                            <p class="mb-1"><strong>Sufragantes:</strong> @item.TotalSufragantesPadron</p>
+                            <p class="mb-1"><strong>Votos Urna:</strong> @item.VotosEnUrna</p>
+                            
+                            <hr>
+                            <div class="alert elec-alert border p-2 mb-0 small text-break">
+                                <strong>Hash:</strong> @item.HashSeguridad
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent text-end">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye me-1"></i>Ver Detalle
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center py-5 text-muted">
+                <i class="bi bi-file-earmark-x fs-1 d-block mb-3"></i>
+                No hay actas de auditoría generadas.
+            </div>
+        }
+    </div>
+</div>

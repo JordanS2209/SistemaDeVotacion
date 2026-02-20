@@ -20,7 +20,7 @@
                     </div>
                     <h4 class="card-title fw-bold">Procesos Electorales</h4>
                     <p class="card-text text-muted small">Crear y gestionar procesos electorales y fechas importantes.</p>
-                    <a asp-action="ListProcesoElectoral" class="btn btn-primary w-100 mt-3 stretched-link">
+                    <a asp-action="CreateProcesoElectoral" class="btn btn-primary w-100 mt-3 stretched-link">
                         Entrar a Procesos
                     </a>
                 </div>
@@ -35,7 +35,7 @@
                     </div>
                     <h4 class="card-title fw-bold">Tipos de Proceso</h4>
                     <p class="card-text text-muted small">Definir el tipo de elecciones: ordinarias, extraordinarias, consultas, etc.</p>
-                    <a asp-action="ListTipoProceso" class="btn btn-success w-100 mt-3 stretched-link">
+                    <a asp-action="CreateProcesoElectoral" class="btn btn-success w-100 mt-3 stretched-link">
                         Entrar a Tipos
                     </a>
                 </div>
@@ -52,6 +52,21 @@
                     <p class="card-text text-muted small">Administrar listas de candidatos vinculadas a cada dignidad.</p>
                     <a asp-action="ListLista" class="btn btn-warning w-100 mt-3 stretched-link">
                         Entrar a Listas
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 dashboard-card">
+                <div class="card-body text-center p-4">
+                    <div class="icon-box mb-3 mx-auto bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-person-badge fs-1"></i>
+                    </div>
+                    <h4 class="card-title fw-bold">Dignidades</h4>
+                    <p class="card-text text-muted small">Gestionar cargos a elegir (Alcalde, Prefecto, etc).</p>
+                    <a asp-controller="Creation" asp-action="ListDignidades" class="btn btn-primary w-100 mt-3 stretched-link">
+                        Entrar a Dignidades
                     </a>
                 </div>
             </div>

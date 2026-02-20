@@ -4,55 +4,55 @@
     ViewData["Title"] = "EditVotante";
 }
 
-<h1>EditVotante</h1>
-
-<h4>Votante</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="EditVotante">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-            <div class="form-group">
-                <label asp-for="Id" class="control-label"></label>
-                <input asp-for="Id" class="form-control" readonly />
+<div class="row justify-content-center elec-page">
+    <div class="col-md-6">
+        <div class="elec-card">
+            <div class="elec-card-header">
+                <h5 class="mb-0 text-white">
+                    <i class="bi bi-pencil-square me-2"></i>Editar Votante
+                </h5>
             </div>
+            <div class="elec-card-body">
+                <form asp-action="EditVotante">
+                    <div asp-validation-summary="ModelOnly" class="alert elec-alert elec-alert-danger mb-4"></div>
+                    <input type="hidden" asp-for="Id" />
 
-            <div class="form-group form-check">
-                <input class="form-check-input" asp-for="Estado" />
-                <label class="form-check-label" asp-for="Estado"></label>
-                <span asp-validation-for="Estado" class="text-danger"></span>
-            </div>
+                    <div class="mb-4">
+                        <label asp-for="IdUsuario" class="form-label control-label">Usuario</label>
+                        <select asp-for="IdUsuario" class="form-select" asp-items="ViewBag.Usuarios">
+                            <option value="">-- Selecciona un usuario --</option>
+                        </select>
+                        <span asp-validation-for="IdUsuario" class="text-danger small"></span>
+                    </div>
 
-            <div class="form-group">
-                <label asp-for="Usuario" class="control-label"></label>
-                <select asp-for="IdUsuario" class="form-control" asp-items="ViewBag.Usuarios">
-                    <option value="">-- Selecciona un usuario --</option>
-                </select>
-                <span asp-validation-for="IdUsuario" class="text-danger"></span>
-            </div>
+                    <div class="mb-4">
+                        <label asp-for="IdJunta" class="form-label control-label">Junta Receptora</label>
+                        <select asp-for="IdJunta" class="form-select" asp-items="ViewBag.Juntas">
+                            <option value="">-- Selecciona una junta --</option>
+                        </select>
+                        <span asp-validation-for="IdJunta" class="text-danger small"></span>
+                    </div>
 
-            <div class="form-group">
-                <label asp-for="Junta" class="control-label"></label>
-                <select asp-for="IdJunta" class="form-control" asp-items="ViewBag.Juntas">
-                    <option value="">-- Selecciona una junta --</option>
-                </select>
-                <span asp-validation-for="IdJunta" class="text-danger"></span>
-            </div>
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" asp-for="Estado" />
+                        <label class="form-check-label text-white" asp-for="Estado">
+                            Votante Activo
+                        </label>
+                        <span asp-validation-for="Estado" class="text-danger small d-block"></span>
+                    </div>
 
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                    <div class="d-flex justify-content-between pt-3">
+                        <a asp-action="ListVotantes" class="btn elec-btn elec-btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn elec-btn elec-btn-primary px-4">
+                            <i class="bi bi-save me-2"></i>Guardar Cambios
+                        </button>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="ListVotantes">Back to List</a>
-</div>
-
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

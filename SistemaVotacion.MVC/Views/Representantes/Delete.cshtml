@@ -1,0 +1,35 @@
+@model SistemaVotacion.Modelos.RepresentanteJunta
+
+@{
+    ViewData["Title"] = "Eliminar Representante";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Confirmar Eliminación</h4>
+                </div>
+                <div class="card-body p-4 text-center">
+                    <i class="bi bi-exclamation-triangle text-danger display-1 mb-3"></i>
+                    <h5 class="card-title">¿Está seguro de eliminar esta asignación?</h5>
+                    <p class="card-text text-muted">
+                        Se eliminará la asignación del usuario <strong>@($"{Model.Usuario?.Nombres} {Model.Usuario?.Apellidos}")</strong>
+                        de la Junta <strong>@(Model.Junta?.NumeroJunta ?? "0")</strong>.
+                    </p>
+
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-flex justify-content-center gap-2 mt-4">
+                            <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash me-2"></i>Eliminar Definitivamente
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

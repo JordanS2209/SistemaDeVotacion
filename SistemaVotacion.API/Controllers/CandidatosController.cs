@@ -103,24 +103,69 @@ namespace SistemaVotacion.API.Controllers
 
         // PUT: api/Candidatos/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<Candidato>> PutCandidato(int id, Candidato candidato)
+        public async Task<ActionResult> PutCandidato(int id, Candidato candidato)
         {
-            if (id != candidato.Id)
-                return BadRequest("El ID de la URL no coincide con el ID del candidato.");
-
-            _context.Entry(candidato).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
-                return NoContent();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CandidatoExists(id))
+                if (candidato == null)
+                    return BadRequest("El cuerpo de la petición está vacío.");
+
+                if (id != candidato.Id)
+                    return BadRequest("El ID de la URL no coincide con el ID del candidato.");
+
+                if (string.IsNullOrWhiteSpace(candidato.NombreCandidato))
+                    return BadRequest("NombreCandidato es obligatorio.");
+
+                if (candidato.IdLista <= 0)
+                    return BadRequest("IdLista es obligatorio.");
+
+                if (candidato.IdDignidad <= 0)
+                    return BadRequest("IdDignidad es obligatorio.");
+
+                var existente = await _context.Candidatos
+                    .FirstOrDefaultAsync(c => c.Id == id);
+
+                if (existente == null)
                     return NotFound("El candidato no existe.");
-                else
-                    throw;
+
+                // NO permitir mover el candidato a otra lista
+                if (existente.IdLista != candidato.IdLista)
+                    return BadRequest("No se puede cambiar la lista de un candidato.");
+
+                // Validar FK Lista
+                var existeLista = await _context.Listas
+                    .AsNoTracking()
+                    .AnyAsync(l => l.Id == candidato.IdLista);
+
+                if (!existeLista)
+                    return BadRequest("IdLista no existe.");
+
+                // Validar FK Dignidad
+                var existeDignidad = await _context.Dignidades
+                    .AsNoTracking()
+                    .AnyAsync(d => d.Id == candidato.IdDignidad);
+
+                if (!existeDignidad)
+                    return BadRequest("IdDignidad no existe.");
+
+                // evitar duplicar candidato por dignidad en la misma lista
+                var existeDuplicado = await _context.Candidatos
+                    .AsNoTracking()
+                    .AnyAsync(c =>
+                        c.Id != id &&
+                        c.IdLista == existente.IdLista &&
+                        c.IdDignidad == candidato.IdDignidad &&
+                        c.NombreCandidato.ToLower() == candidato.NombreCandidato.Trim().ToLower()
+                    );
+
+                if (existeDuplicado)
+                    return Conflict("Ya existe un candidato igual para esa dignidad en esta lista.");
+
+                existente.NombreCandidato = candidato.NombreCandidato.Trim();
+                existente.IdDignidad = candidato.IdDignidad;
+
+                await _context.SaveChangesAsync();
+                return Ok("Candidato actualizado correctamente.");
             }
             catch (Exception ex)
             {
@@ -129,12 +174,32 @@ namespace SistemaVotacion.API.Controllers
             }
         }
 
-        // POST: api/Candidatos
+
         [HttpPost]
         public async Task<ActionResult<Candidato>> PostCandidato(Candidato candidato)
         {
             try
             {
+                if (candidato == null)
+                    return BadRequest("Datos inválidos.");
+
+                if (string.IsNullOrWhiteSpace(candidato.NombreCandidato))
+                    return BadRequest("NombreCandidato es obligatorio.");
+
+                if (candidato.IdLista <= 0)
+                    return BadRequest("IdLista es obligatorio.");
+
+                if (candidato.IdDignidad <= 0)
+                    return BadRequest("IdDignidad es obligatorio.");
+
+                var existeLista = await _context.Listas.AsNoTracking().AnyAsync(l => l.Id == candidato.IdLista);
+                if (!existeLista) return BadRequest("IdLista no existe.");
+
+                var existeDignidad = await _context.Dignidades.AsNoTracking().AnyAsync(d => d.Id == candidato.IdDignidad);
+                if (!existeDignidad) return BadRequest("IdDignidad no existe.");
+
+                candidato.NombreCandidato = candidato.NombreCandidato.Trim();
+
                 _context.Candidatos.Add(candidato);
                 await _context.SaveChangesAsync();
 
@@ -146,6 +211,7 @@ namespace SistemaVotacion.API.Controllers
                 return StatusCode(500, $"Error al guardar el candidato: {ex.Message}");
             }
         }
+
 
 
 
@@ -175,5 +241,39 @@ namespace SistemaVotacion.API.Controllers
         {
             return _context.Candidatos.Any(e => e.Id == id);
         }
+        // GET: api/Candidatos/por-lista/5
+        [HttpGet("por-lista/{idLista}")]
+        public async Task<ActionResult<List<Candidato>>> GetCandidatosPorLista(int idLista)
+        {
+            try
+            {
+                if (idLista <= 0)
+                    return BadRequest("IdLista inválido.");
+
+                var existeLista = await _context.Listas
+                    .AsNoTracking()
+                    .AnyAsync(l => l.Id == idLista);
+
+                if (!existeLista)
+                    return NotFound("La lista no existe.");
+
+                var data = await _context.Candidatos
+                    .AsNoTracking()
+                    .Where(c => c.IdLista == idLista)
+                    .Include(c => c.Dignidad)
+                    .Include(c => c.GaleriaMultimedia)
+                    .OrderBy(c => c.NombreCandidato)
+                    .ToListAsync();
+
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener candidatos por lista: {ex.Message}");
+                return StatusCode(500, $"Error interno: {ex.Message}");
+            }
+        }
+
     }
+
 }

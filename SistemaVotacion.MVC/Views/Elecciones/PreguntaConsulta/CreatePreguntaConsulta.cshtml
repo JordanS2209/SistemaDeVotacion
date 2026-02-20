@@ -1,0 +1,54 @@
+﻿@model SistemaVotacion.Modelos.PreguntaConsulta
+
+@{
+    ViewData["Title"] = "Crear Pregunta de Consulta";
+}
+
+
+<div class="row justify-content-center elec-page">
+    <div class="col-md-6">
+        <div class="elec-card">
+            <div class="elec-card-header">
+                <h5 class="mb-0 text-white">
+                    <i class="bi bi-question-circle me-2"></i>Crear Pregunta de Consulta
+                </h5>
+            </div>
+            <div class="elec-card-body">
+                <form asp-action="CreatePreguntaConsulta" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert elec-alert elec-alert-danger text-danger mb-4"></div>
+
+                    <div class="mb-4">
+                        <label asp-for="TextoPregunta" class="form-label control-label">Texto de la Pregunta</label>
+                        <textarea asp-for="TextoPregunta" class="form-control" rows="3" placeholder="Ej: ¿Está usted de acuerdo con...?"></textarea>
+                        <span asp-validation-for="TextoPregunta" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="NumeroPregunta" class="form-label control-label">Número de Pregunta</label>
+                        <input asp-for="NumeroPregunta" type="number" class="form-control" placeholder="Ej: 1" />
+                        <span asp-validation-for="NumeroPregunta" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="IdProceso" class="form-label control-label">Proceso Electoral</label>
+                        <select asp-for="IdProceso" class="form-select" asp-items="ViewBag.ProcesosElectorales">
+                            <option value="">-- Seleccione un proceso electoral --</option>
+                        </select>
+                        <span asp-validation-for="IdProceso" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between pt-3">
+                        <a asp-action="ListPreguntaConsulta" class="btn elec-btn elec-btn-secondary">Cancelar</a>
+                        <input type="submit" value="Crear Pregunta" class="btn elec-btn elec-btn-success px-4" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

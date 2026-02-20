@@ -27,11 +27,38 @@ namespace SistemaVotacion.API.Controllers
                     Apellidos = u.Apellidos,
                     Email = u.Email,
                     Rol = u.Rol.NombreRol,
+                    NumeroIdentificacion = u.NumeroIdentificacion,
                     CuentaBloqueada = u.CuentaBloqueada
                 })
                 .ToListAsync();
 
             return Ok(usuarios);
+        }
+
+       
+        [HttpGet("ByEmail/{email}")]
+        public async Task<ActionResult<Usuario>> GetUsuarioByEmail(string email)
+        {
+            var usuario = await _context.Usuarios
+                .Include(u => u.Rol) // Incluimos el Rol completo
+                .FirstOrDefaultAsync(u => u.Email == email);
+
+            if (usuario == null) return NotFound();
+
+            return Ok(usuario);
+        }
+
+        // Nuevo endpoint para Validación Registro
+        [HttpGet("ByCedula/{cedula}")]
+        public async Task<ActionResult<Usuario>> GetUsuarioByCedula(string cedula)
+        {
+            var usuario = await _context.Usuarios
+                .Include(u => u.Rol) 
+                .FirstOrDefaultAsync(u => u.NumeroIdentificacion == cedula);
+
+            if (usuario == null) return NotFound();
+
+            return Ok(usuario);
         }
 
  

@@ -21,7 +21,7 @@
     <title>Boleta Electoral</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link rel="stylesheet" href="~/css/Boleta.css" />
+    <link rel="stylesheet" href="~/css/Boleta.css" asp-append-version="true" />
 </head>
 <body>
 
@@ -53,20 +53,29 @@
                 {
                     foreach (var lista in Model)
                     {
-                        var presidente = lista.Candidatos?
-                        .FirstOrDefault(c => NormalizarDignidad(c.Dignidad?.NombreDignidad) == "presidente");
+                        // Lógica de candidatos
+                        var candidatos = lista.Candidatos ?? new List<Candidato>();
+                        
+                        var presidente = candidatos.FirstOrDefault(c => NormalizarDignidad(c.Dignidad?.NombreDignidad).Contains("presidente") && !NormalizarDignidad(c.Dignidad?.NombreDignidad).Contains("vice"));
+                        var vicepresidente = candidatos.FirstOrDefault(c => NormalizarDignidad(c.Dignidad?.NombreDignidad).Contains("vicepresidente"));
+                        
+                        // Otros candidatos (Asambleistas, etc.)
+                        var otrosCandidatos = candidatos
+                            .Where(c => c != presidente && c != vicepresidente)
+                            .OrderBy(c => c.Dignidad?.NombreDignidad)
+                            .ToList();
 
-                        var vicepresidente = lista.Candidatos?
-                        .FirstOrDefault(c => NormalizarDignidad(c.Dignidad?.NombreDignidad) == "vicepresidente");
+                        // Lógica de imágenes (Soporte para Azure Blob Storage u otras URLs absolutas)
+                        string ResolveUrl(string? url, string fallback)
+                        {
+                            if (string.IsNullOrWhiteSpace(url)) return fallback;
+                            if (url.StartsWith("http", StringComparison.OrdinalIgnoreCase)) return url;
+                            return Url.Content("~/" + url);
+                        }
 
-                        var logoLista = lista.RecursosMultimedia?
-                        .FirstOrDefault()?.UrlFoto ?? "img/default-lista.png";
-
-                        var fotoPresidente = presidente?.GaleriaMultimedia?
-                        .FirstOrDefault()?.UrlFoto ?? "img/default-persona.png";
-
-                        var fotoVicepresidente = vicepresidente?.GaleriaMultimedia?
-                        .FirstOrDefault()?.UrlFoto ?? "img/default-persona.png";
+                        var logoLista = ResolveUrl(lista.RecursosMultimedia?.FirstOrDefault()?.UrlFoto, "img/default-lista.png");
+                        var fotoPresidente = ResolveUrl(presidente?.GaleriaMultimedia?.FirstOrDefault()?.UrlFoto, "img/default-persona.png");
+                        var fotoVicepresidente = ResolveUrl(vicepresidente?.GaleriaMultimedia?.FirstOrDefault()?.UrlFoto, "img/default-persona.png");
 
                         <label class="opcion-card">
                             <input type="radio"
@@ -76,7 +85,7 @@
 
                             <div class="opcion-content">
                                 <div class="partido">
-                                    <img src="~/@logoLista" />
+                                    <img src="@logoLista" alt="Logo Lista" />
                                     <div>
                                         <strong>@lista.NombreLista</strong><br />
                                         <span class="lista">Lista @lista.NumeroLista</span>
@@ -85,17 +94,45 @@
 
                                 <div class="binomio">
                                     <div class="persona">
-                                        <img src="~/@fotoPresidente" />
-                                        <span class="cargo">Presidente</span>
+                                        <div class="foto-container">
+                                            <img src="@fotoPresidente" alt="Presidente" />
+                                        </div>
+                                        <span class="cargo">@presidente?.Dignidad?.NombreDignidad ?? "Presidente"</span>
                                         <span class="nombre">@presidente?.NombreCandidato</span>
                                     </div>
 
-                                    <div class="persona">
-                                        <img src="~/@fotoVicepresidente" />
-                                        <span class="cargo">Vicepresidente</span>
-                                        <span class="nombre">@vicepresidente?.NombreCandidato</span>
-                                    </div>
+                                    @if(vicepresidente != null)
+                                    {
+                                        <div class="persona">
+                                            <div class="foto-container">
+                                                <img src="@fotoVicepresidente" alt="Vicepresidente" />
+                                            </div>
+                                            <span class="cargo">@vicepresidente?.Dignidad?.NombreDignidad ?? "Vicepresidente"</span>
+                                            <span class="nombre">@vicepresidente?.NombreCandidato</span>
+                                        </div>
+                                    }
                                 </div>
+
+                                @if (otrosCandidatos.Any())
+                                {
+                                    <div class="otros-candidatos">
+                                        <hr class="separador-candidatos"/>
+                                        <h5>Asambleistas / Otros</h5>
+                                        <div class="lista-otros">
+                                            @foreach (var otro in otrosCandidatos)
+                                            {
+                                                 var fotoOtro = ResolveUrl(otro.GaleriaMultimedia?.FirstOrDefault()?.UrlFoto, "img/default-persona.png");
+                                                <div class="persona-small">
+                                                    <img src="@fotoOtro" alt="@otro.NombreCandidato" class="img-small"/>
+                                                    <div>
+                                                        <span class="cargo-small">@otro.Dignidad?.NombreDignidad</span>
+                                                        <span class="nombre-small">@otro.NombreCandidato</span>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                }
                             </div>
                         </label>
                     }
@@ -106,8 +143,12 @@
                 }
             </div>
 
-            <div class="acciones">
-                <button type="submit" class="btn-votar">
+            <!-- Floating Action Bar -->
+            <div class="floating-bar">
+                <button type="button" onclick="confirmarVotoBlanco()" class="btn-blanco">
+                    VOTO EN BLANCO
+                </button>
+                <button type="button" onclick="confirmarVoto()" class="btn-votar-floating">
                     VOTAR
                 </button>
             </div>
@@ -120,6 +161,73 @@
         <span class="titulo">Tiempo restante</span>
         <span id="tiempo-restante">00:15:00</span>
     </div>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmarVoto() {
+            // Verificar si hay una opción seleccionada
+            const seleccionado = document.querySelector('input[name="idLista"]:checked');
+            if (!seleccionado) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Atención',
+                    text: 'Debe seleccionar una lista para votar, o elija Voto en Blanco.',
+                    confirmButtonText: 'Entendido'
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: '¿Confirmar Voto?',
+                text: "Su voto será registrado para la lista seleccionada.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#1d4ed8',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Sí, Votar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.querySelector('form').submit();
+                }
+            });
+        }
+
+        function confirmarVotoBlanco() {
+            Swal.fire({
+                title: '¿Voto en Blanco?',
+                text: "Está a punto de consignar su voto en blanco. ¿Continuar?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#6b7280',
+                cancelButtonColor: '#1d4ed8',
+                confirmButtonText: 'Sí, Votar en Blanco',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Desmarcar radios y setear input hidden si fuera necesario, 
+                    // pero aquí mandaremos un valor especial o manipularemos el form.
+                    // Para simplificar, creamos un input hidden dinámico con idLista = -1
+                    
+                    const form = document.querySelector('form');
+                    
+                    // Remover input idLista si existe (el radio)
+                    const radios = document.querySelectorAll('input[name="idLista"]');
+                    radios.forEach(r => r.checked = false);
+
+                    // Agregar hidden input con valor -1 (Blanco)
+                    let input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'idLista';
+                    input.value = '-1';
+                    form.appendChild(input);
+
+                    form.submit();
+                }
+            });
+        }
+    </script>
 
 
 </body>

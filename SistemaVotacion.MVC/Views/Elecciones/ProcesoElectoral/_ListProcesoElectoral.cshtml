@@ -74,6 +74,18 @@
                             <td>
                                 <div class="d-flex flex-wrap gap-2">
 
+                                    @* Ver Resultados *@
+                                    @{
+                                        var esConsulta = item.TipoProceso != null && (item.TipoProceso.NombreTipoProceso.ToLower().Contains("consulta") || item.TipoProceso.NombreTipoProceso.ToLower().Contains("referendum"));
+                                        var actionResults = esConsulta ? "ConsultaPopular" : "EleccionGeneral";
+                                    }
+                                    <a asp-controller="VotoDetalle" 
+                                       asp-action="@actionResults" 
+                                       asp-route-idProceso="@item.Id" 
+                                       class="btn elec-btn btn-primary btn-sm">
+                                        <i class="bi bi-bar-chart"></i> Resultados
+                                    </a>
+
                                     @* Editar *@
                                     @if (puedeEditar)
                                     {

@@ -1,8 +1,4 @@
-using Azure.Storage.Blobs;
-using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace SistemaVotacion.API
 {
@@ -10,75 +6,46 @@ namespace SistemaVotacion.API
     {
         public static void Main(string[] args)
         {
-
-            //Ignora restriccion de Postgres y permite ingresar Fecha sin zona horario obligatoria
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
             var builder = WebApplication.CreateBuilder(args);
+
+            // 🔑 ÚNICA cadena de conexión
+            var connectionString =
+                builder.Configuration.GetConnectionString("SistemaVotacionAPIContext")
+                ?? builder.Configuration["SistemaVotacionAPIContext"];
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new InvalidOperationException(
+                    "No se encontró la cadena de conexión 'SistemaVotacionAPIContext'.");
+
             builder.Services.AddDbContext<SistemaVotacionAPIContext>(options =>
-                options.UseNpgsql(builder.Configuration.GetConnectionString("SistemaVotacionAPIContext") ?? throw new InvalidOperationException("Connection string 'SistemaVotacionAPIContext' not found.")));
-            //Azure Blob Service storage
-            builder.Services.AddSingleton(x => 
-            { var config = x.GetRequiredService<IConfiguration>(); 
-                var connectionString = config.GetConnectionString("AzureStorage"); 
-                return new BlobServiceClient(connectionString); });
+                options.UseNpgsql(connectionString));
 
-            // Add services to the container.
+            builder.Services.AddControllers()
+                .AddNewtonsoftJson(options =>
+                    options.SerializerSettings.ReferenceLoopHandling =
+                        Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                );
 
-            builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            // Configure JSON options
-            builder.Services
-                .AddControllers()
-                .AddNewtonsoftJson(
-                    options =>
-                    options.SerializerSettings.ReferenceLoopHandling
-                    = Newtonsoft.Json.ReferenceLoopHandling.Ignore
-                );
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            //if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+            // Swagger SIEMPRE activo
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
-            app.UseAuthorization();
+            // Si tienes autenticación JWT/Cookies, descomenta:
+            // app.UseAuthentication();
 
+            app.UseAuthorization();
 
             app.MapControllers();
-
             app.Run();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         }
     }
 }

@@ -1,0 +1,40 @@
+@model SistemaVotacion.Modelos.UsuarioEditDto
+
+@{
+    ViewData["Title"] = "Eliminar Usuario";
+}
+
+<div class="elec-page container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card elec-card border-danger shadow-lg">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>Eliminar Usuario</h4>
+                </div>
+                <div class="card-body p-4 text-center">
+                    <h3 class="text-danger mb-3">¿Está seguro de eliminar este usuario?</h3>
+                    <p class="text-white-50 mb-4">Esta acción no se puede deshacer.</p>
+
+                    <div class="alert elec-alert elec-alert-danger text-start d-inline-block w-100">
+                        <ul class="list-unstyled mb-0">
+                            <li><strong>ID:</strong> @Model.Id</li>
+                            <li><strong>Nombre:</strong> @Model.Nombres @Model.Apellidos</li>
+                            <li><strong>Email:</strong> @Model.Email</li>
+                            <li><strong>Identificación:</strong> @Model.NumeroIdentificacion</li>
+                        </ul>
+                    </div>
+
+                    <form asp-action="DeleteUsuario" class="mt-4">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-flex justify-content-center gap-3">
+                            <a asp-action="ListUsuarios" class="btn btn-outline-light px-4">Cancelar</a>
+                            <button type="submit" class="btn btn-danger px-4">
+                                <i class="bi bi-trash-fill me-2"></i>Confirmar Eliminación
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

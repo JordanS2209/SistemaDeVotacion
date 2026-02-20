@@ -50,7 +50,7 @@ namespace SistemaVotacion.MVC.Controllers
             {
                 try
                 {
-
+                    // 1. Obtener conteo de votos actuales para esta Junta y Proceso desde la API
                     int totalSufragantes = 0;
                     int votosUrna = 0;
 
@@ -60,7 +60,7 @@ namespace SistemaVotacion.MVC.Controllers
                         var json = await response.Content.ReadAsStringAsync();
                         dynamic data = JsonConvert.DeserializeObject(json);
                         
-
+                        // Fix: Handle camelCase (standard API behavior) or PascalCase, and nulls
                         totalSufragantes = (int?)data.totalEmpadronados ?? (int?)data.TotalEmpadronados ?? 0;
                         votosUrna = (int?)data.totalSufragantes ?? (int?)data.TotalSufragantes ?? 0;
                     }

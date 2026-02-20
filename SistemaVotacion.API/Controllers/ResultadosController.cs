@@ -21,7 +21,12 @@ namespace SistemaVotacion.API.Controllers
         {
             try
             {
-                int idDignidadUsar = 1;
+                // Agrupar por Lista y contar
+                // 1. Determinar Dignidad a mostrar
+                // Si no se especifica, buscamos la primera disponible en los votos de este proceso
+                // (Para evitar que salga vacío si no es dignidad 1)
+                
+                int idDignidadUsar = 1; // Default
                 
                 var dignidadesEnProceso = await _context.VotoDetalles
                     .Where(v => v.IdProceso == idProceso)
@@ -31,14 +36,18 @@ namespace SistemaVotacion.API.Controllers
 
                 if (dignidadesEnProceso.Any())
                 {
+                    // Si hay votos registrados, usamos la primera dignidad encontrada (ej. Alcalde, Prefecto, etc.)
+                   // Idealmente se pasaría como parámetro, pero esto arregla el "Empty View"
                     idDignidadUsar = dignidadesEnProceso.First() ?? 1;
                 }
                 
                 IQueryable<VotoDetalle> query = _context.VotoDetalles
                     .Where(v => v.IdProceso == idProceso && v.IdDignidad == idDignidadUsar);
 
+                // FILTRO POR PROVINCIA (Si aplica)
                 if (idProvincia.HasValue && idProvincia.Value > 0)
                 {
+                    // Relación: Voto -> Junta -> Recinto -> Parroquia -> Ciudad -> Provincia
                     query = from v in query
                             join j in _context.JuntasReceptoras on v.IdJunta equals j.Id
                             join r in _context.RecintosElectorales on j.IdRecinto equals r.Id
@@ -58,6 +67,7 @@ namespace SistemaVotacion.API.Controllers
                     })
                     .ToListAsync();
 
+                // Traer listas reales
                 var listas = await _context.Listas
                     .Where(l => l.IdProceso == idProceso)
                     .Include(l => l.RecursosMultimedia)
@@ -65,6 +75,7 @@ namespace SistemaVotacion.API.Controllers
 
                 var reporte = new List<object>();
 
+                // 1. Procesar Votos Válidos (con Lista asociada)
                 foreach(var list in listas)
                 {
                     var conteo = resultados
@@ -83,6 +94,7 @@ namespace SistemaVotacion.API.Controllers
                     });
                 }
 
+                // 2. Procesar Votos Blancos
                 var votosBlancos = resultados
                     .Where(r => r.IdTipoVoto == 2)
                     .Sum(r => r.TotalVotos);
@@ -92,6 +104,7 @@ namespace SistemaVotacion.API.Controllers
                     reporte.Add(new { Lista = "VOTOS EN BLANCO", Numero = 0, Votos = votosBlancos, UrlLogo = "", EsValido = false });
                 }
 
+                // 3. Procesar Votos Nulos
                 var votosNulos = resultados
                     .Where(r => r.IdTipoVoto == 3)
                     .Sum(r => r.TotalVotos);
@@ -101,6 +114,7 @@ namespace SistemaVotacion.API.Controllers
                     reporte.Add(new { Lista = "VOTOS NULOS", Numero = 0, Votos = votosNulos, UrlLogo = "", EsValido = false });
                 }
 
+                // Ordenar: Ganador primero, luego Blancos/Nulos
                 reporte = reporte.OrderByDescending(x => ((dynamic)x).Votos).ToList();
 
                 return Ok(reporte);
@@ -117,6 +131,7 @@ namespace SistemaVotacion.API.Controllers
         {
             try
             {
+                // Agrupar por Pregunta -> Opcion
                 var resultados = await _context.VotoDetalles
                     .Where(v => v.IdProceso == idProceso && v.IdTipoVoto == 1 && v.IdPregunta != null && v.IdOpcion != null)
                     .GroupBy(v => new { v.IdPregunta, v.IdOpcion })
@@ -128,8 +143,9 @@ namespace SistemaVotacion.API.Controllers
                     })
                     .ToListAsync();
 
+                // Traer preguntas y opciones para etiquetas
                 var preguntas = await _context.PreguntasConsultas.Where(p => p.IdProceso == idProceso).ToListAsync();
-                var opciones = await _context.OpcionConsultas.ToListAsync();
+                var opciones = await _context.OpcionConsultas.ToListAsync(); // Mejor filtrar si tuviéramos IDs
 
                 var reporte = from r in resultados
                               join p in preguntas on r.IdPregunta equals p.Id
@@ -141,6 +157,7 @@ namespace SistemaVotacion.API.Controllers
                                   Votos = r.TotalVotos
                               };
 
+                // Agrupado jerárquico para el frontend
                 var jerarquico = reporte.GroupBy(x => x.Pregunta)
                     .Select(g => new
                     {
@@ -162,12 +179,15 @@ namespace SistemaVotacion.API.Controllers
         {
             try
             {
+                // 1. Obtener Total Empadronados en esa Junta
+                // Padron -> Votante -> Junta
                 var queryBase = _context.Padrones
                     .Include(p => p.Votante)
                     .Where(p => p.IdProceso == idProceso && p.Votante.IdJunta == idJunta);
 
                 int totalEmpadronados = await queryBase.CountAsync();
 
+                // 2. Obtener Total Sufragantes (HaVotado = true)
                 int totalSufragantes = await queryBase
                     .Where(p => p.HaVotado == true)
                     .CountAsync();

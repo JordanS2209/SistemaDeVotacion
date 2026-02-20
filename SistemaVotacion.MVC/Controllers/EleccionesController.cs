@@ -47,10 +47,20 @@ namespace SistemaVotacion.MVC.Controllers
             try
             {
                 var listas = Crud<Lista>.GetAll() ?? new List<Lista>();
+                var procesos = Crud<ProcesoElectoral>.GetAll() ?? new List<ProcesoElectoral>();
+
                 return listas
-                    .OrderBy(l => l.NumeroLista)
-                    .ThenBy(l => l.NombreLista)
-                    .Select(l => new SelectListItem { Value = l.Id.ToString(), Text = $"{l.NumeroLista} - {l.NombreLista}" })
+                    .OrderBy(l => l.IdProceso)
+                    .ThenBy(l => l.NumeroLista)
+                    .Select(l => {
+                        var proc = procesos.FirstOrDefault(p => p.Id == l.IdProceso);
+                        string procNombre = proc != null ? $" [{proc.NombreProceso}]" : "";
+                        return new SelectListItem 
+                        { 
+                            Value = l.Id.ToString(), 
+                            Text = $"{l.NumeroLista} - {l.NombreLista}{procNombre}" 
+                        };
+                    })
                     .ToList();
             }
             catch
@@ -80,9 +90,22 @@ namespace SistemaVotacion.MVC.Controllers
             try
             {
                 var candidatos = Crud<Candidato>.GetAll() ?? new List<Candidato>();
+                var listas = Crud<Lista>.GetAll() ?? new List<Lista>();
+                var procesos = Crud<ProcesoElectoral>.GetAll() ?? new List<ProcesoElectoral>();
+
                 return candidatos
                     .OrderBy(c => c.NombreCandidato)
-                    .Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.NombreCandidato })
+                    .Select(c => {
+                        var lista = listas.FirstOrDefault(l => l.Id == c.IdLista);
+                        var proc = lista != null ? procesos.FirstOrDefault(p => p.Id == lista.IdProceso) : null;
+                        string context = proc != null ? $" ({lista.NombreLista} - {proc.NombreProceso})" : "";
+
+                        return new SelectListItem 
+                        { 
+                            Value = c.Id.ToString(), 
+                            Text = $"{c.NombreCandidato}{context}" 
+                        };
+                    })
                     .ToList();
             }
             catch
@@ -829,6 +852,8 @@ namespace SistemaVotacion.MVC.Controllers
             try
             {
                 var listaData = Crud<Lista>.GetAll() ?? new List<Lista>();
+                // Ordenar por proceso para que sea más fácil de leer
+                listaData = listaData.OrderBy(l => l.Proceso?.NombreProceso).ThenBy(l => l.NumeroLista).ToList();
                 return View("Lista/ListLista", listaData);
             }
             catch (Exception ex)

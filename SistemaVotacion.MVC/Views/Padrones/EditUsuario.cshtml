@@ -4,94 +4,91 @@
     ViewData["Title"] = "Editar Usuario";
 }
 
-<div class="elec-page container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card elec-card shadow-sm border-0">
-                <div class="card-header bg-transparent border-bottom border-secondary d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0 text-white"><i class="bi bi-person-gear me-2"></i>Editar Usuario</h4>
-                    <span class="badge bg-primary">ID: @Model.Id</span>
-                </div>
-                <div class="card-body p-4">
-                    <form asp-action="EditUsuario">
-                        <div asp-validation-summary="ModelOnly" class="alert elec-alert elec-alert-danger mb-3"></div>
-                        <input type="hidden" asp-for="Id" />
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card elec-card shadow-lg border-primary">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Editar Usuario</h4>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="EditUsuario">
+                    <div asp-validation-summary="ModelOnly" class="alert elec-alert elec-alert-danger text-danger"></div>
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="CuentaBloqueada" />
 
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label asp-for="Nombres" class="form-label text-white-50">Nombres</label>
-                                <input asp-for="Nombres" class="form-control bg-dark text-white border-secondary" />
-                                <span asp-validation-for="Nombres" class="text-danger small"></span>
-                            </div>
-                            <div class="col-md-6">
-                                <label asp-for="Apellidos" class="form-label text-white-50">Apellidos</label>
-                                <input asp-for="Apellidos" class="form-control bg-dark text-white border-secondary" />
-                                <span asp-validation-for="Apellidos" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-12">
-                                <label asp-for="Email" class="form-label text-white-50">Correo Electrónico</label>
-                                <input asp-for="Email" class="form-control bg-dark text-white border-secondary" />
-                                <span asp-validation-for="Email" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label asp-for="IdTipoIdentificacion" class="form-label text-white-50">Tipo Identificación</label>
-                                <select asp-for="IdTipoIdentificacion" class="form-select bg-dark text-white border-secondary" asp-items="ViewBag.TiposIdentificacion">
-                                    <option value="">-- Seleccione --</option>
-                                </select>
-                                <span asp-validation-for="IdTipoIdentificacion" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label asp-for="NumeroIdentificacion" class="form-label text-white-50">Número Identificación</label>
-                                <input asp-for="NumeroIdentificacion" class="form-control bg-dark text-white border-secondary" />
-                                <span asp-validation-for="NumeroIdentificacion" class="text-danger small"></span>
-                            </div>
-
-                             <div class="col-md-6">
-                                <label asp-for="IdGenero" class="form-label text-white-50">Género</label>
-                                <select asp-for="IdGenero" class="form-select bg-dark text-white border-secondary" asp-items="ViewBag.Generos">
-                                    <option value="">-- Seleccione --</option>
-                                </select>
-                                <span asp-validation-for="IdGenero" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label asp-for="FechaNacimiento" class="form-label text-white-50">Fecha Nacimiento</label>
-                                <input asp-for="FechaNacimiento" class="form-control bg-dark text-white border-secondary" type="date" />
-                                <span asp-validation-for="FechaNacimiento" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-12">
-                                <hr class="border-secondary my-4" />
-                                <h6 class="text-uppercase text-white-50 mb-3">Configuración de Cuenta</h6>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label asp-for="IdRol" class="form-label text-white-50">Rol de Usuario</label>
-                                <select asp-for="IdRol" class="form-select bg-dark text-white border-secondary" asp-items="ViewBag.Roles">
-                                    <option value="">-- Seleccione --</option>
-                                </select>
-                                <span asp-validation-for="IdRol" class="text-danger small"></span>
-                            </div>
-
-                             <div class="col-md-6 d-flex align-items-end">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="bloqueoSwitch" asp-for="CuentaBloqueada">
-                                    <label class="form-check-label text-white" for="bloqueoSwitch">Cuenta Bloqueada</label>
-                                </div>
-                            </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="Nombres" class="form-label fw-bold"></label>
+                            <input asp-for="Nombres" class="form-control" />
+                            <span asp-validation-for="Nombres" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Apellidos" class="form-label fw-bold"></label>
+                            <input asp-for="Apellidos" class="form-control" />
+                            <span asp-validation-for="Apellidos" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="col-md-12">
+                            <label asp-for="Email" class="form-label fw-bold"></label>
+                            <input asp-for="Email" class="form-control" type="email" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
                         </div>
 
-                        <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top border-secondary">
-                            <a asp-action="ListUsuarios" class="btn btn-outline-light">Cancelar</a>
-                            <button type="submit" class="btn btn-primary px-4">
-                                <i class="bi bi-save me-2"></i>Guardar Cambios
-                            </button>
+                        <div class="col-md-6">
+                            <label asp-for="FechaNacimiento" class="form-label fw-bold"></label>
+                            <input asp-for="FechaNacimiento" class="form-control" type="date" />
+                            <span asp-validation-for="FechaNacimiento" class="text-danger"></span>
                         </div>
-                    </form>
-                </div>
+                        
+                         <div class="col-md-6">
+                            <label asp-for="IdRol" class="form-label fw-bold">Rol</label>
+                            <select asp-for="IdRol" class="form-select" asp-items="ViewBag.Roles">
+                                <option value="">-- Seleccione Rol --</option>
+                            </select>
+                            <span asp-validation-for="IdRol" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="IdTipoIdentificacion" class="form-label fw-bold">Tipo Identificación</label>
+                            <select asp-for="IdTipoIdentificacion" class="form-select" asp-items="ViewBag.TiposIdentificacion">
+                                <option value="">-- Seleccione Tipo --</option>
+                            </select>
+                            <span asp-validation-for="IdTipoIdentificacion" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="NumeroIdentificacion" class="form-label fw-bold"></label>
+                            <input asp-for="NumeroIdentificacion" class="form-control" />
+                            <span asp-validation-for="NumeroIdentificacion" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="IdGenero" class="form-label fw-bold">Género</label>
+                            <select asp-for="IdGenero" class="form-select" asp-items="ViewBag.Generos">
+                                <option value="">-- Seleccione Género --</option>
+                            </select>
+                             <span asp-validation-for="IdGenero" class="text-danger"></span>
+                        </div>
+
+                         @* CodigoDactilar es opcional o depende del requerimiento, lo incluimos *@
+                        @*
+                        <div class="col-md-6">
+                            <label asp-for="CodigoDactilar" class="form-label fw-bold"></label>
+                            <input asp-for="CodigoDactilar" class="form-control" />
+                            <span asp-validation-for="CodigoDactilar" class="text-danger"></span>
+                        </div>
+                        *@
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="ListUsuarios" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save me-2"></i>Guardar Cambios
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

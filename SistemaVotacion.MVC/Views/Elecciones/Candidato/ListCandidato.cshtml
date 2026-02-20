@@ -69,9 +69,10 @@
                 <table class="table elec-table mb-0">
                     <thead>
                         <tr>
-                            <th>@Html.DisplayNameFor(model => model.First().Id)</th>
-                            <th>@Html.DisplayNameFor(model => model.First().NombreCandidato)</th>
+                            <th>ID</th>
+                            <th>Nombre Candidato</th>
                             <th>Lista</th>
+                            <th>Proceso</th>
                             <th>Dignidad</th>
                             <th class="text-end">Acciones</th>
                         </tr>
@@ -84,8 +85,13 @@
                             {
                                 <tr>
                                     <td>@item.Id</td>
-                                    <td>@item.NombreCandidato</td>
-                                    <td>@item.Lista?.NombreLista</td>
+                                    <td class="fw-bold text-primary">@item.NombreCandidato</td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">
+                                            @item.Lista?.NombreLista (@item.Lista?.NumeroLista)
+                                        </span>
+                                    </td>
+                                    <td class="small text-muted">@item.Lista?.Proceso?.NombreProceso</td>
                                     <td>@item.Dignidad?.NombreDignidad</td>
 
                                     <td class="text-end">

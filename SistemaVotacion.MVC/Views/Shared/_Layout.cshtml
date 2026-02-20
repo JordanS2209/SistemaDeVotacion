@@ -44,24 +44,24 @@
                 {
                     <div class="mt-3 mb-2 px-3 small text-uppercase opacity-50 fw-bold" style="font-size: 0.65rem; letter-spacing: 1px;">Gestión</div>
                     
+                    <a asp-controller="Geografia" asp-action="Index" class="nav-item-sidebar @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Geografia" ? "active" : "")">
+                        <i class="bi bi-map"></i> Geografía
+                    </a>
+
+                    <a asp-controller="Infraestructura" asp-action="Index" class="nav-item-sidebar @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Infraestructura" ? "active" : "")">
+                        <i class="bi bi-bricks"></i> Infraestructura
+                    </a>
+                    
+                    <a asp-controller="Representantes" asp-action="Index" class="nav-item-sidebar @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Representantes" ? "active" : "")">
+                        <i class="bi bi-people"></i> Representantes
+                    </a>
+
                     <a asp-controller="Elecciones" asp-action="Index" class="nav-item-sidebar @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Elecciones" ? "active" : "")">
                         <i class="bi bi-ui-checks-grid"></i> Elecciones
                     </a>
 
                     <a asp-controller="Padrones" asp-action="Index" class="nav-item-sidebar @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Padrones" ? "active" : "")">
                         <i class="bi bi-people-fill"></i> Padrón Electoral
-                    </a>
-
-                    <a asp-controller="Representantes" asp-action="Index" class="nav-item-sidebar @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Representantes" ? "active" : "")">
-                        <i class="bi bi-people"></i> Representantes
-                    </a>
-
-                    <a asp-controller="Infraestructura" asp-action="Index" class="nav-item-sidebar @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Infraestructura" ? "active" : "")">
-                        <i class="bi bi-bricks"></i> Infraestructura
-                    </a>
-
-                    <a asp-controller="Geografia" asp-action="Index" class="nav-item-sidebar @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Geografia" ? "active" : "")">
-                        <i class="bi bi-map"></i> Geografía
                     </a>
                     <div class="mt-3 mb-2 px-3 small text-uppercase opacity-50 fw-bold" style="font-size: 0.65rem; letter-spacing: 1px;">Reportes</div>
 

@@ -51,7 +51,10 @@
                                     <td>
                                         <span class="badge bg-secondary rounded-pill">List @item.NumeroLista</span>
                                     </td>
-                                    <td>@item.Proceso?.NombreProceso</td>
+                                    <td>
+                                        <div class="fw-bold">@item.Proceso?.NombreProceso</div>
+                                        <div class="small text-muted">ID Proceso: @item.IdProceso</div>
+                                    </td>
                                     <td class="text-end">
                                         <div class="btn-group">
                                             <a asp-action="EditLista" asp-route-id="@item.Id" class="btn elec-btn-sm elec-btn-outline-primary" title="Editar">
